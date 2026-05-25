@@ -9,7 +9,7 @@
 ```
 instructions_version: 2026-05-24-v1
 decisions_version: 2026-05-24-v1
-schema_version: 2025-05-v1
+schema_version: 2026-05-26-v1
 claude_md_version: 2026-05-24-v1
 ```
 
@@ -18,14 +18,15 @@ claude_md_version: 2026-05-24-v1
 - **Status:** In progress
 
 ## Phase 1 Progress
-- [ ] Supabase project setup (dev + prod)
-- [ ] Schema migration + RLS policies
-- [ ] pg_cron keep-alive
-- [ ] Supabase Auth: Google OAuth + Email/Password
-- [ ] Auto-create profile trigger
+- [~] Supabase project setup (dev + prod) — code ready, user ยังไม่ได้สร้าง project
+- [x] Schema (profiles + auth) — schema.sql ready, รอ apply ใน Supabase SQL Editor
+- [~] pg_cron keep-alive — SQL comment ใน schema.sql, รอ enable extension
+- [x] Supabase Auth: Email/Password — actions + login/signup pages done (Google OAuth ทีหลัง)
+- [x] Auto-create profile trigger — ใน schema.sql
 - [ ] Header (logged out / logged in)
 - [ ] Footer
-- [ ] Protected routes + Next.js middleware
+- [x] Next.js middleware — session refresh via @supabase/ssr
+- [ ] Protected routes
 - [ ] GitHub repo + branch protection
 - [ ] GitHub Actions CI (lint + typecheck + test)
 - [ ] Husky + lint-staged setup
@@ -44,7 +45,8 @@ claude_md_version: 2026-05-24-v1
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
-| 2026-05-26 | Design review fixes: 6 issues (Button hover, uppercase, Toast icons, Modal gap, extra radii) | Button.tsx, Toast.tsx, Modal.tsx, globals.css, page.tsx |
+| 2026-05-26 | Phase 1 Part 1: Supabase clients, middleware, auth pages, schema.sql | lib/supabase/*, middleware.ts, (auth)/*, schema.sql, types/database.ts |
+| 2026-05-26 | Design review fixes + minor fix (remove --weight-semi) | Button.tsx, Toast.tsx, Modal.tsx, globals.css, tokens.css, page.tsx |
 | 2026-05-25 | Design tokens + Tailwind v4 theme + 9 base UI components | tokens.css, globals.css, layout.tsx, components/ui/* |
 | 2026-05-24 | Initial setup: Clean Architecture, npm, logging strategy | DECISIONS.md, CLAUDE.md, PROJECT_INSTRUCTIONS.md |
 
@@ -52,5 +54,7 @@ claude_md_version: 2026-05-24-v1
 [ยังไม่มี]
 
 ## Notes for Chat
-- Design system review fixes ครบ 6 จุดแล้ว — ยังไม่ commit รอ user ตัดสินใจ
-- พร้อมเริ่ม Phase 1 (Supabase setup + Auth)
+- Phase 1 Part 1 code done: Supabase clients + middleware + auth (Email/Password) + schema.sql
+- User ยังไม่ได้สร้าง Supabase project — ต้องสร้าง + apply schema + ใส่ keys ใน .env.local ก่อน test ได้
+- Google OAuth ยังไม่ทำ — จะเพิ่มทีหลัง
+- เหลือ Part 2: Header/Footer + Protected Routes + CI/Husky
