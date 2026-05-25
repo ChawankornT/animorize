@@ -15,7 +15,7 @@ claude_md_version: 2026-05-24-v1
 
 ## Current Phase
 - **Active:** Phase 1 — Foundation & Auth
-- **Status:** Not started
+- **Status:** In progress
 
 ## Phase 1 Progress
 - [ ] Supabase project setup (dev + prod)
@@ -30,16 +30,27 @@ claude_md_version: 2026-05-24-v1
 - [ ] GitHub Actions CI (lint + typecheck + test)
 - [ ] Husky + lint-staged setup
 
+## Design System Progress (pre-Phase 1)
+- [x] CSS design tokens (tokens.css)
+- [x] Tailwind v4 theme mapping (globals.css @theme inline)
+- [x] Base UI components (Button, Input, Textarea, Select, Card, Badge, Modal, Toast, Skeleton) — design review fixes applied
+- [x] Layout updated to Inter font + brand metadata
+- [x] cn() utility (lib/utils/cn.ts)
+- [x] Dev preview page (/dev/components)
+
 ## Pending Decisions
-[ยังไม่มี]
+(ไม่มี)
 
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
+| 2026-05-26 | Design review fixes: 6 issues (Button hover, uppercase, Toast icons, Modal gap, extra radii) | Button.tsx, Toast.tsx, Modal.tsx, globals.css, page.tsx |
+| 2026-05-25 | Design tokens + Tailwind v4 theme + 9 base UI components | tokens.css, globals.css, layout.tsx, components/ui/* |
 | 2026-05-24 | Initial setup: Clean Architecture, npm, logging strategy | DECISIONS.md, CLAUDE.md, PROJECT_INSTRUCTIONS.md |
 
 ## Blockers
 [ยังไม่มี]
 
 ## Notes for Chat
-[ข้อความจาก Code ถึง Chat — เช่น "เปลี่ยน architecture ตรงนี้เพราะ..." หรือ "ต้องอัปเดท instructions section X"]
+- Design system review fixes ครบ 6 จุดแล้ว — ยังไม่ commit รอ user ตัดสินใจ
+- พร้อมเริ่ม Phase 1 (Supabase setup + Auth)

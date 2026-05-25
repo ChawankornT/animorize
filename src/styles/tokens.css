@@ -1,0 +1,134 @@
+:root {
+  /* Brand (raw) */
+  --color-ink:        #0F0F0F;
+  --color-ink-2:      #1A1A1A;
+  --color-soft-dark:  #222222;
+  --color-paper:      #FFFFFF;
+  --color-soft:       #F5F4EF;
+  --color-accent:     #D4537E;   /* sparkle / favorites / brand presence ONLY */
+
+  /* Semantic — light mode */
+  --bg-page:          var(--color-paper);
+  --bg-surface:       var(--color-soft);
+  --bg-surface-2:     #EEEDE7;
+  --bg-overlay:       rgba(15, 15, 15, 0.50);
+  --bg-skeleton:      rgba(15, 15, 15, 0.06);
+  --bg-skeleton-2:    rgba(15, 15, 15, 0.10);
+
+  --text-primary:     var(--color-ink);
+  --text-secondary:   rgba(15, 15, 15, 0.65);
+  --text-tertiary:    rgba(15, 15, 15, 0.45);
+  --text-disabled:    rgba(15, 15, 15, 0.25);
+  --text-inverse:     var(--color-paper);
+
+  --border-subtle:    rgba(0, 0, 0, 0.06);
+  --border-default:   rgba(0, 0, 0, 0.08);
+  --border-strong:    rgba(0, 0, 0, 0.16);
+  --border-focus:     rgba(15, 15, 15, 0.55);
+
+  /* Status (UI layer) */
+  --status-success:    #2F8A5C;
+  --status-success-bg: #E8F2EC;
+  --status-warning:    #B45309;
+  --status-warning-bg: #FBF1E5;
+  --status-error:      #C53030;
+  --status-error-bg:   #FBE9E9;
+  --status-info:       #1F6FEB;
+  --status-info-bg:    #E8EFFC;
+
+  /* Spacing (8px base) */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radii */
+  --radius-input:    8px;
+  --radius-button:   8px;
+  --radius-card:     12px;
+  --radius-modal:    16px;
+  --radius-pill:     999px;
+  --radius-app-icon: 18%;
+
+  /* Borders */
+  --border-w-hair: 0.5px;
+  --border-w-1:    1px;
+  --border-w-icon: 1.5px;
+
+  /* Typography */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --font-size-xs:  12px;
+  --font-size-sm:  13px;
+  --font-size-md:  14px;
+  --font-size-lg:  15px;
+  --font-size-xl:  17px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+  --font-size-4xl: 32px;
+  --font-size-5xl: 40px;
+
+  --line-tight: 1.2;
+  --line-snug:  1.4;
+  --line-body:  1.6;
+
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-semi:    600;
+
+  --letter-tight: -0.02em;
+  --letter-normal: 0;
+
+  /* Motion */
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --duration-slow: 240ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* z-index (no shadows in the system) */
+  --z-base:    1;
+  --z-sticky:  30;
+  --z-popover: 60;
+  --z-modal:   80;
+  --z-toast:   90;
+}
+
+[data-theme="dark"] {
+  --bg-page:          var(--color-ink-2);
+  --bg-surface:       var(--color-soft-dark);
+  --bg-surface-2:     #2A2A2A;
+  --bg-overlay:       rgba(0, 0, 0, 0.60);
+  --bg-skeleton:      rgba(255, 255, 255, 0.05);
+  --bg-skeleton-2:    rgba(255, 255, 255, 0.09);
+
+  --text-primary:     #F5F4EF;
+  --text-secondary:   rgba(245, 244, 239, 0.65);
+  --text-tertiary:    rgba(245, 244, 239, 0.45);
+  --text-disabled:    rgba(245, 244, 239, 0.25);
+  --text-inverse:     var(--color-ink);
+
+  --border-subtle:    rgba(255, 255, 255, 0.06);
+  --border-default:   rgba(255, 255, 255, 0.10);
+  --border-strong:    rgba(255, 255, 255, 0.18);
+  --border-focus:     rgba(245, 244, 239, 0.55);
+
+  --status-success:    #4FB07F;
+  --status-success-bg: rgba(79, 176, 127, 0.14);
+  --status-warning:    #D7873A;
+  --status-warning-bg: rgba(215, 135, 58, 0.14);
+  --status-error:      #E25555;
+  --status-error-bg:   rgba(226, 85, 85, 0.14);
+  --status-info:       #5589F0;
+  --status-info-bg:    rgba(85, 137, 240, 0.14);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

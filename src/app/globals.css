@@ -1,26 +1,118 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import "../styles/tokens.css";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Semantic colors — light/dark via CSS custom properties */
+  --color-page: var(--bg-page);
+  --color-surface: var(--bg-surface);
+  --color-surface-2: var(--bg-surface-2);
+  --color-overlay: var(--bg-overlay);
+  --color-skeleton: var(--bg-skeleton);
+  --color-skeleton-2: var(--bg-skeleton-2);
+
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-tertiary: var(--text-tertiary);
+  --color-disabled: var(--text-disabled);
+  --color-inverse: var(--text-inverse);
+
+  --color-subtle: var(--border-subtle);
+  --color-default: var(--border-default);
+  --color-strong: var(--border-strong);
+  --color-focus: var(--border-focus);
+
+  --color-success: var(--status-success);
+  --color-success-bg: var(--status-success-bg);
+  --color-warning: var(--status-warning);
+  --color-warning-bg: var(--status-warning-bg);
+  --color-error: var(--status-error);
+  --color-error-bg: var(--status-error-bg);
+  --color-info: var(--status-info);
+  --color-info-bg: var(--status-info-bg);
+
+  /* Brand colors — static across modes */
+  --color-accent: #D4537E;
+  --color-ink: #0F0F0F;
+  --color-ink-2: #1A1A1A;
+  --color-paper: #FFFFFF;
+  --color-soft: #F5F4EF;
+  --color-soft-dark: #222222;
+
+  /* Font family */
+  --font-sans: var(--font-inter, 'Inter'), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, monospace;
+
+  /* Font sizes with paired line-heights & letter-spacing */
+  --font-size-xs: 12px;
+  --font-size-xs--line-height: 1.4;
+  --font-size-sm: 13px;
+  --font-size-sm--line-height: 1.4;
+  --font-size-md: 14px;
+  --font-size-md--line-height: 1.6;
+  --font-size-lg: 15px;
+  --font-size-lg--line-height: 1.55;
+  --font-size-xl: 17px;
+  --font-size-xl--line-height: 1.3;
+  --font-size-xl--letter-spacing: -0.005em;
+  --font-size-2xl: 20px;
+  --font-size-2xl--line-height: 1.25;
+  --font-size-2xl--letter-spacing: -0.01em;
+  --font-size-3xl: 24px;
+  --font-size-3xl--line-height: 1.2;
+  --font-size-3xl--letter-spacing: -0.015em;
+  --font-size-4xl: 32px;
+  --font-size-4xl--line-height: 1.1;
+  --font-size-4xl--letter-spacing: -0.02em;
+  --font-size-5xl: 40px;
+  --font-size-5xl--line-height: 1.05;
+  --font-size-5xl--letter-spacing: -0.025em;
+
+  /* Radii */
+  --radius-input: 8px;
+  --radius-button: 8px;
+  --radius-card: 12px;
+  --radius-modal: 16px;
+  --radius-pill: 999px;
+
+  /* Z-index */
+  --z-base: 1;
+  --z-sticky: 30;
+  --z-popover: 60;
+  --z-modal: 80;
+  --z-toast: 90;
+
+  /* Easing — overrides Tailwind default ease-out */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Skeleton animation */
+  --animate-skeleton: skeleton-pulse 1.6s ease-in-out infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Custom duration utilities */
+@utility duration-fast {
+  transition-duration: 120ms;
+}
+@utility duration-base {
+  transition-duration: 180ms;
+}
+@utility duration-slow {
+  transition-duration: 240ms;
 }
 
+/* Skeleton keyframes */
+@keyframes skeleton-pulse {
+  0%, 100% { background-color: var(--bg-skeleton); }
+  50% { background-color: var(--bg-skeleton-2); }
+}
+
+/* Modal backdrop */
+dialog::backdrop {
+  background: var(--bg-overlay);
+}
+
+/* Base body styles */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-inter, 'Inter'), ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
