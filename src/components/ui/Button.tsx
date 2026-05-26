@@ -27,6 +27,25 @@ const sizeStyles: Record<ButtonSize, string> = {
   lg: 'h-[42px] px-[18px] text-lg gap-2',
 };
 
+export function buttonVariants({
+  variant = 'primary',
+  size = 'md',
+  className,
+}: {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  className?: string;
+} = {}) {
+  return cn(
+    'inline-flex items-center justify-center rounded-button font-medium',
+    'transition-colors duration-fast ease-out cursor-pointer',
+    'focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2',
+    variantStyles[variant],
+    sizeStyles[size],
+    className,
+  );
+}
+
 export function Button({
   variant = 'primary',
   size = 'md',
