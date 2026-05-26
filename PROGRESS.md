@@ -27,7 +27,7 @@ claude_md_version: 2026-05-24-v1
 - [x] Footer — wordmark + © 2026
 - [x] Next.js proxy — session refresh via @supabase/ssr (renamed middleware→proxy per Next.js 16)
 - [x] Protected routes — (main)/layout.tsx + admin/layout.tsx
-- [ ] GitHub repo + branch protection
+- [x] GitHub repo + branch protection — ruleset on master
 - [x] GitHub Actions CI — .github/workflows/ci.yml (trigger: PR to main/develop)
 - [x] Husky + lint-staged — pre-commit: eslint --fix + tsc-files --noEmit
 
