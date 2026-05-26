@@ -20,7 +20,7 @@ claude_md_version: 2026-05-24-v1
 ## Phase 1 Progress
 - [x] Supabase project setup (dev) — สร้างแล้ว + apply schema + .env.local พร้อม
 - [x] Schema (profiles + auth) — applied ใน Supabase SQL Editor แล้ว
-- [~] pg_cron keep-alive — SQL comment ใน schema.sql, รอ enable extension
+- [x] pg_cron keep-alive — schedule 'keep-alive' ทุก 3 วัน applied แล้วใน Supabase
 - [x] Supabase Auth: Email/Password — actions + login/signup pages done (Google OAuth ทีหลัง)
 - [x] Auto-create profile trigger — ใน schema.sql
 - [x] Header (logged out / logged in) — Wordmark + nav + avatar/logout
