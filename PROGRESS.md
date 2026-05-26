@@ -8,14 +8,14 @@
 ## Versions (สำหรับ sync check)
 ```
 instructions_version: 2026-05-24-v1
-decisions_version: 2026-05-24-v1
+decisions_version: 2026-05-27-v1
 schema_version: 2026-05-26-v1
 claude_md_version: 2026-05-24-v1
 ```
 
 ## Current Phase
 - **Active:** Phase 1 — Foundation & Auth
-- **Status:** In progress
+- **Status:** Complete (code) — รอ Supabase project setup ฝั่ง user
 
 ## Phase 1 Progress
 - [~] Supabase project setup (dev + prod) — code ready, user ยังไม่ได้สร้าง project
@@ -23,18 +23,21 @@ claude_md_version: 2026-05-24-v1
 - [~] pg_cron keep-alive — SQL comment ใน schema.sql, รอ enable extension
 - [x] Supabase Auth: Email/Password — actions + login/signup pages done (Google OAuth ทีหลัง)
 - [x] Auto-create profile trigger — ใน schema.sql
-- [ ] Header (logged out / logged in)
-- [ ] Footer
-- [x] Next.js middleware — session refresh via @supabase/ssr
-- [ ] Protected routes
+- [x] Header (logged out / logged in) — Wordmark + nav + avatar/logout
+- [x] Footer — wordmark + © 2026
+- [x] Next.js proxy — session refresh via @supabase/ssr (renamed middleware→proxy per Next.js 16)
+- [x] Protected routes — (main)/layout.tsx + admin/layout.tsx
 - [ ] GitHub repo + branch protection
-- [ ] GitHub Actions CI (lint + typecheck + test)
-- [ ] Husky + lint-staged setup
+- [x] GitHub Actions CI — .github/workflows/ci.yml (trigger: PR to main/develop)
+- [x] Husky + lint-staged — pre-commit: eslint --fix + tsc-files --noEmit
 
 ## Design System Progress (pre-Phase 1)
 - [x] CSS design tokens (tokens.css)
 - [x] Tailwind v4 theme mapping (globals.css @theme inline)
-- [x] Base UI components (Button, Input, Textarea, Select, Card, Badge, Modal, Toast, Skeleton) — design review fixes applied
+- [x] Base UI components (Button, Input, Textarea, Select, Card, Badge, Modal, Toast, Skeleton)
+- [x] buttonVariants() helper — styled Link ใช้ได้โดยไม่ duplicate styles
+- [x] Brand components: Sparkle.tsx, Wordmark.tsx
+- [x] Layout components: Header.tsx, Footer.tsx
 - [x] Layout updated to Inter font + brand metadata
 - [x] cn() utility (lib/utils/cn.ts)
 - [x] Dev preview page (/dev/components)
@@ -45,16 +48,18 @@ claude_md_version: 2026-05-24-v1
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
-| 2026-05-26 | Phase 1 Part 1: Supabase clients, middleware, auth pages, schema.sql | lib/supabase/*, middleware.ts, (auth)/*, schema.sql, types/database.ts |
-| 2026-05-26 | Design review fixes + minor fix (remove --weight-semi) | Button.tsx, Toast.tsx, Modal.tsx, globals.css, tokens.css, page.tsx |
-| 2026-05-25 | Design tokens + Tailwind v4 theme + 9 base UI components | tokens.css, globals.css, layout.tsx, components/ui/* |
-| 2026-05-24 | Initial setup: Clean Architecture, npm, logging strategy | DECISIONS.md, CLAUDE.md, PROJECT_INSTRUCTIONS.md |
+| 2026-05-27 | Header, Footer, Sparkle, Wordmark, Husky, CI, buttonVariants | components/brand/*, components/layout/*, .husky/*, .github/workflows/*, Button.tsx, package.json |
+| 2026-05-27 | Protected routes, loading/error states, page.tsx redirect, boilerplate cleanup | (auth|main|admin)/layout.tsx, loading.tsx, error.tsx, page.tsx, README.md |
+| 2026-05-27 | Rename middleware→proxy per Next.js 16 | src/proxy.ts, lib/supabase/proxy.ts |
+| 2026-05-26 | Phase 1 Part 1: Supabase clients, auth pages, schema.sql | lib/supabase/*, (auth)/*, schema.sql, types/database.ts |
+| 2026-05-26 | Design review fixes | Button.tsx, Toast.tsx, Modal.tsx, globals.css, tokens.css |
 
 ## Blockers
 [ยังไม่มี]
 
 ## Notes for Chat
-- Phase 1 Part 1 code done: Supabase clients + middleware + auth (Email/Password) + schema.sql
-- User ยังไม่ได้สร้าง Supabase project — ต้องสร้าง + apply schema + ใส่ keys ใน .env.local ก่อน test ได้
-- Google OAuth ยังไม่ทำ — จะเพิ่มทีหลัง
-- เหลือ Part 2: Header/Footer + Protected Routes + CI/Husky
+- Phase 1 code สมบูรณ์แล้ว — รอ user สร้าง Supabase project + apply schema + ใส่ keys ใน .env.local
+- Google OAuth ยังไม่ทำ — Phase 1 ใช้ Email/Password เท่านั้น
+- GitHub repo + branch protection ยังไม่ได้ทำ (ไม่ใช่ code task)
+- CI trigger: PR to main/develop — ปัจจุบัน repo ยัง push ไปที่ master
+- Phase 2 ต่อไป: Admin Panel + AniList Import
