@@ -42,7 +42,7 @@ export async function loginAction(
     return { error: error.message };
   }
 
-  redirect('/');
+  redirect('/dashboard');
 }
 
 export async function signupAction(
@@ -69,7 +69,7 @@ export async function signupAction(
     return { error: error.message };
   }
 
-  redirect('/');
+  redirect('/dashboard');
 }
 
 export async function logoutAction(): Promise<void> {
