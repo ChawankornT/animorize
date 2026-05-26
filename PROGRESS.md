@@ -14,12 +14,12 @@ claude_md_version: 2026-05-24-v1
 ```
 
 ## Current Phase
-- **Active:** Phase 1 — Foundation & Auth
-- **Status:** Complete (code) — รอ Supabase project setup ฝั่ง user
+- **Active:** Phase 2 — Admin Panel + Import
+- **Status:** Phase 1 complete และ tested แล้ว — พร้อมเริ่ม Phase 2
 
 ## Phase 1 Progress
-- [~] Supabase project setup (dev + prod) — code ready, user ยังไม่ได้สร้าง project
-- [x] Schema (profiles + auth) — schema.sql ready, รอ apply ใน Supabase SQL Editor
+- [x] Supabase project setup (dev) — สร้างแล้ว + apply schema + .env.local พร้อม
+- [x] Schema (profiles + auth) — applied ใน Supabase SQL Editor แล้ว
 - [~] pg_cron keep-alive — SQL comment ใน schema.sql, รอ enable extension
 - [x] Supabase Auth: Email/Password — actions + login/signup pages done (Google OAuth ทีหลัง)
 - [x] Auto-create profile trigger — ใน schema.sql
@@ -48,18 +48,19 @@ claude_md_version: 2026-05-24-v1
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
+| 2026-05-27 | Phase 1 tested: Supabase setup + signup/login/dashboard ทำงาน | — (no code change) |
 | 2026-05-27 | Header, Footer, Sparkle, Wordmark, Husky, CI, buttonVariants | components/brand/*, components/layout/*, .husky/*, .github/workflows/*, Button.tsx, package.json |
 | 2026-05-27 | Protected routes, loading/error states, page.tsx redirect, boilerplate cleanup | (auth|main|admin)/layout.tsx, loading.tsx, error.tsx, page.tsx, README.md |
 | 2026-05-27 | Rename middleware→proxy per Next.js 16 | src/proxy.ts, lib/supabase/proxy.ts |
 | 2026-05-26 | Phase 1 Part 1: Supabase clients, auth pages, schema.sql | lib/supabase/*, (auth)/*, schema.sql, types/database.ts |
-| 2026-05-26 | Design review fixes | Button.tsx, Toast.tsx, Modal.tsx, globals.css, tokens.css |
 
 ## Blockers
 [ยังไม่มี]
 
 ## Notes for Chat
-- Phase 1 code สมบูรณ์แล้ว — รอ user สร้าง Supabase project + apply schema + ใส่ keys ใน .env.local
+- Phase 1 complete และ tested — signup/login/logout/dashboard/protected routes ทำงานได้จริงแล้ว
+- Supabase email validation: ต้องใช้ email domain ที่มี MX record จริงเท่านั้น (หรือ disable ใน dashboard)
 - Google OAuth ยังไม่ทำ — Phase 1 ใช้ Email/Password เท่านั้น
 - GitHub repo + branch protection ยังไม่ได้ทำ (ไม่ใช่ code task)
 - CI trigger: PR to main/develop — ปัจจุบัน repo ยัง push ไปที่ master
-- Phase 2 ต่อไป: Admin Panel + AniList Import
+- Phase 2 ต่อไป: Admin Panel + AniList Import (Provider CRUD → Franchise CRUD → Media CRUD → AniList import)
