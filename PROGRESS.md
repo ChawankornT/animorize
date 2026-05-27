@@ -15,13 +15,15 @@ claude_md_version: 2026-05-27-v2
 
 ## Current Phase
 - **Active:** Phase 2 — Admin Panel + Import
-- **Status:** Phase 2 Part 0 (Schema Migration) complete — พร้อมเริ่ม Phase 2 Part 1 (Provider CRUD)
+- **Status:** Phase 2 Part 1 (Domain + Repository layer) complete — พร้อมเริ่ม Phase 2 Part 2 (Server Actions + UI)
 
 ## Phase 2 Progress
 - [x] Phase 2 schema migration — schema/ folder (13 SQL files) + types/database.ts updated
-- [ ] Provider CRUD (ชื่อ, สี, logo, URL)
-- [ ] Franchise CRUD
-- [ ] Media CRUD (manual)
+- [x] Domain entities + usecases — Provider, Franchise, Media, SyncLog, SystemSettings
+- [x] Repository interfaces + Supabase implementations + factory
+- [ ] Provider CRUD UI (ชื่อ, สี, logo, URL)
+- [ ] Franchise CRUD UI
+- [ ] Media CRUD UI (manual)
 - [ ] AniList import by ID + preview before save
 - [ ] Media Provider assignment (media → provider + audio + base_url)
 - [ ] Sync log viewer + retry button
@@ -58,20 +60,19 @@ claude_md_version: 2026-05-27-v2
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
+| 2026-05-27 | Phase 2 Part 1: domain entities, usecases, repository interfaces, Supabase implementations, factory | src/domain/*, src/repositories/* |
+| 2026-05-27 | CompatDatabase type wrapper — แก้ TypeScript GenericSchema incompatibility ของ Database type | src/lib/supabase/types.ts, server.ts, client.ts |
 | 2026-05-27 | Phase 2 Part 0: schema/ folder (00-12 + README), ลบ schema.sql | schema/*, CLAUDE.md |
 | 2026-05-27 | types/database.ts — เพิ่ม 8 tables + 5 enum types (Phase 2) | src/types/database.ts |
 | 2026-05-27 | Phase 1 tested: Supabase setup + signup/login/dashboard ทำงาน | — (no code change) |
-| 2026-05-27 | Header, Footer, Sparkle, Wordmark, Husky, CI, buttonVariants | components/brand/*, components/layout/*, .husky/*, .github/workflows/*, Button.tsx, package.json |
-| 2026-05-27 | Protected routes, loading/error states, page.tsx redirect, boilerplate cleanup | (auth|main|admin)/layout.tsx, loading.tsx, error.tsx, page.tsx, README.md |
 
 ## Blockers
 [ยังไม่มี]
 
 ## Notes for Chat
-- **Phase 2 Part 0 complete** — schema reorganized จาก schema.sql → schema/ folder
-- **Dev DB migration ต้องทำ:** รัน `schema/01-enums.sql` (enums ใหม่) + `schema/03-franchises.sql` → `schema/12-indexes.sql` ใน Supabase SQL Editor (ข้าม 00, 02 เพราะมีอยู่แล้ว)
-- **CLAUDE.md เปลี่ยน:** reference `@schema.sql` → `@schema/` (bump claude_md_version)
-- **schema_version bump:** schema.sql ถูกแทนด้วย schema/ folder โครงสร้างใหม่
+- **Phase 2 Part 1 complete** — domain + repository layer พร้อมใช้งาน
+- **CompatDatabase:** สร้าง `src/lib/supabase/types.ts` เพื่อ wrap `Database` ให้ compatible กับ postgrest-js GenericSchema (ไม่แตะ types/database.ts) — `server.ts` และ `client.ts` ใช้ `CompatDatabase` แทน `Database` แล้ว
+- **Part 2 ต่อไป:** Server Actions + Admin UI สำหรับ Provider CRUD → Franchise CRUD → Media CRUD
+- **Dev DB migration ต้องทำ (ถ้ายังไม่ได้ทำ):** รัน `schema/01-enums.sql` (enums ใหม่) + `schema/03-franchises.sql` → `schema/12-indexes.sql` ใน Supabase SQL Editor (ข้าม 00, 02)
 - Supabase email validation: ต้องใช้ email domain ที่มี MX record จริงเท่านั้น (หรือ disable ใน dashboard)
 - Google OAuth ยังไม่ทำ — Phase 1 ใช้ Email/Password เท่านั้น
-- Phase 2 ต่อไป: Provider CRUD → Franchise CRUD → Media CRUD → AniList import
