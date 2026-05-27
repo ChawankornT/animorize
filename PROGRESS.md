@@ -15,14 +15,14 @@ claude_md_version: 2026-05-27-v3
 
 ## Current Phase
 - **Active:** Phase 2 — Admin Panel + Import
-- **Status:** Phase 2 Part 2 (Provider CRUD) complete — พร้อมเริ่ม Part 3 (Franchise CRUD)
+- **Status:** Phase 2 Part 3 (Franchise CRUD) complete — พร้อมเริ่ม Part 4 (Media CRUD)
 
 ## Phase 2 Progress
 - [x] Phase 2 schema migration — schema/ folder (13 SQL files) + types/database.ts updated
 - [x] Domain entities + usecases — Provider, Franchise, Media, SyncLog, SystemSettings
 - [x] Repository interfaces + Supabase implementations + factory
 - [x] Provider CRUD UI (ชื่อ, สี, logo, URL) — Server Actions + Admin pages + components
-- [ ] Franchise CRUD UI
+- [x] Franchise CRUD UI — Server Actions + Admin pages (list/new/edit) + FranchiseForm + FranchiseDeleteButton
 - [ ] Media CRUD UI (manual)
 - [ ] AniList import by ID + preview before save
 - [ ] Media Provider assignment (media → provider + audio + base_url)
@@ -60,21 +60,21 @@ claude_md_version: 2026-05-27-v3
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
+| 2026-05-28 | Phase 2 Part 3: Franchise CRUD — Server Actions, Admin pages (list/new/edit), FranchiseForm, FranchiseDeleteButton, loading/error | src/app/actions/franchise.ts, src/app/admin/franchises/*, src/components/admin/FranchiseForm.tsx, FranchiseDeleteButton.tsx |
 | 2026-05-27 | docs: เพิ่ม client boundary convention ใน CLAUDE.md (pure utility ต้องไม่มี 'use client') | CLAUDE.md |
 | 2026-05-27 | fix: แยก buttonVariants → button-variants.ts (no 'use client') + เปลี่ยน rounded-[2px] เป็น rounded-xs | src/components/ui/button-variants.ts, Button.tsx, ProviderForm.tsx, providers/page.tsx |
 | 2026-05-27 | Phase 2 Part 2: Provider CRUD — Server Actions, Admin pages (list/new/edit), ProviderForm, ProviderDeleteButton, DeleteConfirmModal, AdminSidebar, Dashboard placeholder | src/app/actions/provider.ts, src/app/admin/*, src/components/admin/* |
 | 2026-05-27 | Phase 2 Part 1: domain entities, usecases, repository interfaces, Supabase implementations, factory | src/domain/*, src/repositories/* |
-| 2026-05-27 | CompatDatabase type wrapper — แก้ TypeScript GenericSchema incompatibility ของ Database type | src/lib/supabase/types.ts, server.ts, client.ts |
-| 2026-05-27 | Phase 2 Part 0: schema/ folder (00-12 + README), ลบ schema.sql | schema/*, CLAUDE.md |
 
 ## Blockers
 [ยังไม่มี]
 
 ## Notes for Chat
+- **Phase 2 Part 3 complete** — Franchise CRUD พร้อมใช้งาน: `/admin/franchises` (list), `/admin/franchises/new`, `/admin/franchises/[id]/edit`
+- **FranchiseActionState** มี `rootError` สำหรับ refine error (at least one title) แยกจาก field-level errors
+- **Part 4 ต่อไป:** Media CRUD UI
 - **Phase 2 Part 2 complete** — Provider CRUD พร้อมใช้งาน: `/admin/providers` (list), `/admin/providers/new`, `/admin/providers/[id]/edit`
-- **Admin sidebar** สร้างแล้ว — links: Dashboard, Providers, Franchises, Media, Import, Sync logs, Settings (หน้าอื่นยัง placeholder ยังไม่มี page)
-- **Delete pattern** — `deleteProviderAction.bind(null, id)` + `useActionState` + `DeleteConfirmModal` ใช้เป็น pattern สำหรับ Franchise/Media delete ต่อไปได้เลย
-- **Part 3 ต่อไป:** Franchise CRUD UI (pattern เดียวกับ Provider)
+- **Delete pattern** — `deleteXxxAction.bind(null, id)` + `useActionState` + `DeleteConfirmModal` + `XxxDeleteButton` wrapper — ใช้เป็น pattern สำหรับ Media delete ต่อไปได้เลย
 - **Convention ใหม่:** pure utility fn ที่ใช้ใน Server Component ต้องอยู่ในไฟล์ที่ไม่มี `'use client'` — ดูตัวอย่าง `button-variants.ts`
 - **Dev DB migration ต้องทำ (ถ้ายังไม่ได้ทำ):** รัน `schema/01-enums.sql` (enums ใหม่) + `schema/03-franchises.sql` → `schema/12-indexes.sql` ใน Supabase SQL Editor (ข้าม 00, 02)
 - Supabase email validation: ต้องใช้ email domain ที่มี MX record จริงเท่านั้น (หรือ disable ใน dashboard)
