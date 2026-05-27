@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { createProviderRepository } from '@/repositories';
 import { listProviders } from '@/domain/usecases/ListProviders';
-import { buttonVariants } from '@/components/ui/Button';
+import { buttonVariants } from '@/components/ui/button-variants';
 import { ProviderDeleteButton } from '@/components/admin/ProviderDeleteButton';
 
 export default async function ProvidersPage() {
@@ -52,7 +52,7 @@ export default async function ProvidersPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <div
-                        className="w-2 h-2 rounded-[2px] shrink-0 border-[0.5px] border-default"
+                        className="w-2 h-2 rounded-xs shrink-0 border-[0.5px] border-default"
                         style={{ backgroundColor: provider.color }}
                       />
                       <span className="font-medium text-primary">{provider.name}</span>

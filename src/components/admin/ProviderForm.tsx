@@ -79,7 +79,7 @@ export function ProviderForm({ provider }: { provider?: Provider }) {
         </label>
         <div className="flex items-center gap-2">
           <div
-            className="w-2 h-2 rounded-[2px] shrink-0 border-[0.5px] border-default"
+            className="w-2 h-2 rounded-xs shrink-0 border-[0.5px] border-default"
             style={{ backgroundColor: colorIsValid ? color : 'transparent' }}
           />
           <input
