@@ -61,10 +61,10 @@ UseCases: `IncrementEpisode.ts` / Repos: `IMediaRepository.ts` / Actions: `updat
 
 ## Session Sync
 - จบทุก session → รัน `/sync-progress` เพื่ออัปเดท PROGRESS.md
-- ถ้าแก้ DECISIONS.md / CLAUDE.md / schema.sql → bump version ใน PROGRESS.md
+- ถ้าแก้ DECISIONS.md / CLAUDE.md / schema/ → bump version ใน PROGRESS.md
 - ถ้าแก้ PROJECT_INSTRUCTIONS.md → เตือนใน PROGRESS.md ว่า Chat ต้องอัปเดท
 
 ## References
 - @DECISIONS.md
-- @schema.sql
+- @schema/ (see schema/README.md for structure and migration order)
 - @PROGRESS.md

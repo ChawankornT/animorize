@@ -9,20 +9,30 @@
 ```
 instructions_version: 2026-05-24-v1
 decisions_version: 2026-05-27-v1
-schema_version: 2026-05-26-v1
-claude_md_version: 2026-05-24-v1
+schema_version: 2026-05-27-v2
+claude_md_version: 2026-05-27-v2
 ```
 
 ## Current Phase
 - **Active:** Phase 2 — Admin Panel + Import
-- **Status:** Phase 1 complete และ tested แล้ว — พร้อมเริ่ม Phase 2
+- **Status:** Phase 2 Part 0 (Schema Migration) complete — พร้อมเริ่ม Phase 2 Part 1 (Provider CRUD)
+
+## Phase 2 Progress
+- [x] Phase 2 schema migration — schema/ folder (13 SQL files) + types/database.ts updated
+- [ ] Provider CRUD (ชื่อ, สี, logo, URL)
+- [ ] Franchise CRUD
+- [ ] Media CRUD (manual)
+- [ ] AniList import by ID + preview before save
+- [ ] Media Provider assignment (media → provider + audio + base_url)
+- [ ] Sync log viewer + retry button
+- [ ] system_settings: auto-sync toggle
 
 ## Phase 1 Progress
 - [x] Supabase project setup (dev) — สร้างแล้ว + apply schema + .env.local พร้อม
 - [x] Schema (profiles + auth) — applied ใน Supabase SQL Editor แล้ว
 - [x] pg_cron keep-alive — schedule 'keep-alive' ทุก 3 วัน applied แล้วใน Supabase
 - [x] Supabase Auth: Email/Password — actions + login/signup pages done (Google OAuth ทีหลัง)
-- [x] Auto-create profile trigger — ใน schema.sql
+- [x] Auto-create profile trigger — ใน schema/02-profiles.sql
 - [x] Header (logged out / logged in) — Wordmark + nav + avatar/logout
 - [x] Footer — wordmark + © 2026
 - [x] Next.js proxy — session refresh via @supabase/ssr (renamed middleware→proxy per Next.js 16)
@@ -48,19 +58,20 @@ claude_md_version: 2026-05-24-v1
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
+| 2026-05-27 | Phase 2 Part 0: schema/ folder (00-12 + README), ลบ schema.sql | schema/*, CLAUDE.md |
+| 2026-05-27 | types/database.ts — เพิ่ม 8 tables + 5 enum types (Phase 2) | src/types/database.ts |
 | 2026-05-27 | Phase 1 tested: Supabase setup + signup/login/dashboard ทำงาน | — (no code change) |
 | 2026-05-27 | Header, Footer, Sparkle, Wordmark, Husky, CI, buttonVariants | components/brand/*, components/layout/*, .husky/*, .github/workflows/*, Button.tsx, package.json |
 | 2026-05-27 | Protected routes, loading/error states, page.tsx redirect, boilerplate cleanup | (auth|main|admin)/layout.tsx, loading.tsx, error.tsx, page.tsx, README.md |
-| 2026-05-27 | Rename middleware→proxy per Next.js 16 | src/proxy.ts, lib/supabase/proxy.ts |
-| 2026-05-26 | Phase 1 Part 1: Supabase clients, auth pages, schema.sql | lib/supabase/*, (auth)/*, schema.sql, types/database.ts |
 
 ## Blockers
 [ยังไม่มี]
 
 ## Notes for Chat
-- Phase 1 complete และ tested — signup/login/logout/dashboard/protected routes ทำงานได้จริงแล้ว
+- **Phase 2 Part 0 complete** — schema reorganized จาก schema.sql → schema/ folder
+- **Dev DB migration ต้องทำ:** รัน `schema/01-enums.sql` (enums ใหม่) + `schema/03-franchises.sql` → `schema/12-indexes.sql` ใน Supabase SQL Editor (ข้าม 00, 02 เพราะมีอยู่แล้ว)
+- **CLAUDE.md เปลี่ยน:** reference `@schema.sql` → `@schema/` (bump claude_md_version)
+- **schema_version bump:** schema.sql ถูกแทนด้วย schema/ folder โครงสร้างใหม่
 - Supabase email validation: ต้องใช้ email domain ที่มี MX record จริงเท่านั้น (หรือ disable ใน dashboard)
 - Google OAuth ยังไม่ทำ — Phase 1 ใช้ Email/Password เท่านั้น
-- GitHub repo + branch protection ยังไม่ได้ทำ (ไม่ใช่ code task)
-- CI trigger: PR to main/develop — ปัจจุบัน repo ยัง push ไปที่ master
-- Phase 2 ต่อไป: Admin Panel + AniList Import (Provider CRUD → Franchise CRUD → Media CRUD → AniList import)
+- Phase 2 ต่อไป: Provider CRUD → Franchise CRUD → Media CRUD → AniList import
