@@ -46,6 +46,9 @@ loading.tsx + error.tsx ทุก route group / logic ใน domain/usecases/ / 
 **DON'T:** ❌ `any` / ❌ `console.log` prod / ❌ AniList จาก client / ❌ inline style /
 ❌ install package ไม่บันทึก DECISIONS.md / ❌ แก้ types/database.ts / ❌ import Supabase ใน domain/
 
+**Client boundary:** pure utility functions (ไม่ใช้ React hooks / browser API) ต้องอยู่ในไฟล์แยกที่ไม่มี `'use client'`
+เพื่อให้ Server Components import ได้ — ดูตัวอย่าง `components/ui/button-variants.ts`
+
 ## Naming
 Components: PascalCase `MediaCard.tsx` / Hooks: `useWatchlog.ts` / Entities: `Media.ts`
 UseCases: `IncrementEpisode.ts` / Repos: `IMediaRepository.ts` / Actions: `updateProfileAction.ts`

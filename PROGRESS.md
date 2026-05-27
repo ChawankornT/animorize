@@ -10,7 +10,7 @@
 instructions_version: 2026-05-24-v1
 decisions_version: 2026-05-27-v1
 schema_version: 2026-05-27-v2
-claude_md_version: 2026-05-27-v2
+claude_md_version: 2026-05-27-v3
 ```
 
 ## Current Phase
@@ -60,11 +60,11 @@ claude_md_version: 2026-05-27-v2
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
+| 2026-05-27 | fix: แยก buttonVariants → button-variants.ts (no 'use client') + เปลี่ยน rounded-[2px] เป็น rounded-xs | src/components/ui/button-variants.ts, Button.tsx, ProviderForm.tsx, providers/page.tsx |
 | 2026-05-27 | Phase 2 Part 2: Provider CRUD — Server Actions, Admin pages (list/new/edit), ProviderForm, ProviderDeleteButton, DeleteConfirmModal, AdminSidebar, Dashboard placeholder | src/app/actions/provider.ts, src/app/admin/*, src/components/admin/* |
 | 2026-05-27 | Phase 2 Part 1: domain entities, usecases, repository interfaces, Supabase implementations, factory | src/domain/*, src/repositories/* |
 | 2026-05-27 | CompatDatabase type wrapper — แก้ TypeScript GenericSchema incompatibility ของ Database type | src/lib/supabase/types.ts, server.ts, client.ts |
 | 2026-05-27 | Phase 2 Part 0: schema/ folder (00-12 + README), ลบ schema.sql | schema/*, CLAUDE.md |
-| 2026-05-27 | types/database.ts — เพิ่ม 8 tables + 5 enum types (Phase 2) | src/types/database.ts |
 
 ## Blockers
 [ยังไม่มี]
@@ -74,6 +74,7 @@ claude_md_version: 2026-05-27-v2
 - **Admin sidebar** สร้างแล้ว — links: Dashboard, Providers, Franchises, Media, Import, Sync logs, Settings (หน้าอื่นยัง placeholder ยังไม่มี page)
 - **Delete pattern** — `deleteProviderAction.bind(null, id)` + `useActionState` + `DeleteConfirmModal` ใช้เป็น pattern สำหรับ Franchise/Media delete ต่อไปได้เลย
 - **Part 3 ต่อไป:** Franchise CRUD UI (pattern เดียวกับ Provider)
+- **Convention ใหม่:** pure utility fn ที่ใช้ใน Server Component ต้องอยู่ในไฟล์ที่ไม่มี `'use client'` — ดูตัวอย่าง `button-variants.ts`
 - **Dev DB migration ต้องทำ (ถ้ายังไม่ได้ทำ):** รัน `schema/01-enums.sql` (enums ใหม่) + `schema/03-franchises.sql` → `schema/12-indexes.sql` ใน Supabase SQL Editor (ข้าม 00, 02)
 - Supabase email validation: ต้องใช้ email domain ที่มี MX record จริงเท่านั้น (หรือ disable ใน dashboard)
 - Google OAuth ยังไม่ทำ — Phase 1 ใช้ Email/Password เท่านั้น
