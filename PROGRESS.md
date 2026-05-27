@@ -60,6 +60,7 @@ claude_md_version: 2026-05-27-v3
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
+| 2026-05-27 | docs: เพิ่ม client boundary convention ใน CLAUDE.md (pure utility ต้องไม่มี 'use client') | CLAUDE.md |
 | 2026-05-27 | fix: แยก buttonVariants → button-variants.ts (no 'use client') + เปลี่ยน rounded-[2px] เป็น rounded-xs | src/components/ui/button-variants.ts, Button.tsx, ProviderForm.tsx, providers/page.tsx |
 | 2026-05-27 | Phase 2 Part 2: Provider CRUD — Server Actions, Admin pages (list/new/edit), ProviderForm, ProviderDeleteButton, DeleteConfirmModal, AdminSidebar, Dashboard placeholder | src/app/actions/provider.ts, src/app/admin/*, src/components/admin/* |
 | 2026-05-27 | Phase 2 Part 1: domain entities, usecases, repository interfaces, Supabase implementations, factory | src/domain/*, src/repositories/* |
