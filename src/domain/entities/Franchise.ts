@@ -38,5 +38,5 @@ export function validateFranchise(data: {
 export function getDisplayTitle(
   franchise: Pick<Franchise, 'titleTh' | 'titleEn' | 'titleRomaji'>,
 ): string {
-  return franchise.titleTh ?? franchise.titleEn ?? franchise.titleRomaji ?? '';
+  return franchise.titleEn ?? franchise.titleRomaji ?? franchise.titleTh ?? '';
 }

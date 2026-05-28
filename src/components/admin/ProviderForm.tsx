@@ -74,22 +74,33 @@ export function ProviderForm({ provider }: { provider?: Provider }) {
       />
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="color" className="text-[13px] font-medium text-secondary">
-          Color
+        <label className="text-[13px] font-medium text-secondary">
+          Brand color
         </label>
         <div className="flex items-center gap-2">
-          <div
-            className="w-2 h-2 rounded-xs shrink-0 border-[0.5px] border-default"
-            style={{ backgroundColor: colorIsValid ? color : 'transparent' }}
-          />
+          {/* Clickable swatch — opens native color picker */}
+          <label
+            className="relative w-8 h-8 rounded-lg shrink-0 border-[0.5px] border-default cursor-pointer overflow-hidden transition-shadow duration-fast hover:shadow-[0_0_0_2px_rgba(0,0,0,0.15)]"
+            style={{ backgroundColor: colorIsValid ? color : '#000000' }}
+            title="Click to open color picker"
+          >
+            <input
+              type="color"
+              value={colorIsValid ? color : '#000000'}
+              onChange={(e) => setColor(e.target.value)}
+              className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+              tabIndex={-1}
+            />
+          </label>
+          {/* Hex text input */}
           <input
             id="color"
             name="color"
             value={color}
             onChange={(e) => setColor(e.target.value)}
-            placeholder="#FF5733"
+            placeholder="#F47521"
             className={cn(
-              'flex-1 h-9 px-3 bg-page text-md text-primary rounded-input',
+              'flex-1 h-9 px-3 bg-page text-sm text-primary rounded-input font-mono',
               'border-[0.5px] border-default placeholder:text-tertiary',
               'transition-colors duration-fast ease-out hover:border-strong',
               'focus:border-primary focus:outline-none',
@@ -100,6 +111,7 @@ export function ProviderForm({ provider }: { provider?: Provider }) {
             autoComplete="off"
           />
         </div>
+        <p className="text-xs text-tertiary">Click the swatch to open the color picker.</p>
         {state.errors?.color?.[0] && (
           <p id="color-error" className="text-xs text-error" role="alert">
             {state.errors.color[0]}

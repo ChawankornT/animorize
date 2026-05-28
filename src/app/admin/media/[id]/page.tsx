@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
@@ -14,25 +13,18 @@ import { listProviders } from '@/domain/usecases/ListProviders';
 import { listSyncLogs } from '@/domain/usecases/ListSyncLogs';
 import { getDisplayTitle } from '@/domain/entities/Media';
 import type { MediaType, AiringStatus } from '@/domain/entities/Media';
+import {
+  MEDIA_TYPE_LABELS,
+  MEDIA_STATUS_VARIANT,
+  SEASON_LABELS,
+  TILE_COLORS,
+} from '@/constants/admin';
 import { Badge } from '@/components/ui/Badge';
 import { buttonVariants } from '@/components/ui/button-variants';
 import { MediaDeleteButton } from '@/components/admin/MediaDeleteButton';
 import { AssignProviderForm } from '@/components/admin/AssignProviderForm';
 import { RemoveProviderButton } from '@/components/admin/RemoveProviderButton';
 
-const mediaTypeLabels: Record<MediaType, string> = {
-  anime: 'Anime',
-  series: 'Series',
-  movie: 'Movie',
-  ova: 'OVA',
-  special: 'Special',
-};
-
-const statusVariant: Record<AiringStatus, 'success' | 'warning' | 'default'> = {
-  ongoing: 'success',
-  upcoming: 'warning',
-  finished: 'default',
-};
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '—';
@@ -61,6 +53,7 @@ export default async function MediaDetailPage({
   if (!media) notFound();
 
   const displayTitle = getDisplayTitle(media);
+  const tileColor = TILE_COLORS[media.id.charCodeAt(0) % TILE_COLORS.length];
 
   return (
     <div className="p-8 space-y-6">
@@ -94,30 +87,33 @@ export default async function MediaDetailPage({
       </div>
 
       {/* Media info card */}
-      <div className="flex gap-6 p-5 border-[0.5px] border-default rounded-card bg-surface">
-        {media.posterUrl && (
-          <div className="shrink-0 w-28 h-40 relative rounded-md overflow-hidden">
-            <Image
-              src={media.posterUrl}
-              alt={displayTitle}
-              fill
-              className="object-cover"
-              sizes="112px"
-            />
-          </div>
-        )}
-        <div className="flex-1 space-y-3">
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge>{mediaTypeLabels[media.mediaType]}</Badge>
-            <Badge variant={statusVariant[media.airingStatus]} dot>
+      <div className="flex gap-5 p-5 border-[0.5px] border-default rounded-card bg-surface">
+        {/* Poster tile — always shown; image layered on top if available */}
+        <div
+          className="shrink-0 rounded-md overflow-hidden relative flex items-end p-2"
+          style={{ width: 110, height: 156, backgroundColor: tileColor }}
+        >
+          {/* Gradient overlay */}
+          <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
+          {/* Title text */}
+          <span className="relative z-10 text-[10px] font-medium text-white leading-snug">
+            {media.titleEn ?? media.titleRomaji ?? media.titleTh}
+          </span>
+        </div>
+
+        <div className="flex-1 min-w-0 flex flex-col gap-2.5">
+          {/* Badges */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <Badge>{MEDIA_TYPE_LABELS[media.mediaType]}</Badge>
+            <Badge variant={MEDIA_STATUS_VARIANT[media.airingStatus]} dot>
               {media.airingStatus}
             </Badge>
-            {media.anilistId && (
-              <Badge variant="default">AniList #{media.anilistId}</Badge>
-            )}
+            {media.anilistId && <Badge>AniList #{media.anilistId}</Badge>}
+            {media.autoSync && <Badge variant="info" dot>Auto-sync</Badge>}
           </div>
 
-          <dl className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
+          {/* Metadata dl */}
+          <dl className="grid gap-x-3 gap-y-0.5 text-sm" style={{ gridTemplateColumns: '130px 1fr' }}>
             {media.titleTh && (
               <>
                 <dt className="text-secondary">Thai title</dt>
@@ -126,24 +122,24 @@ export default async function MediaDetailPage({
             )}
             {media.titleEn && (
               <>
-                <dt className="text-secondary">English title</dt>
+                <dt className="text-secondary">English</dt>
                 <dd className="text-primary">{media.titleEn}</dd>
               </>
             )}
             {media.titleRomaji && (
               <>
-                <dt className="text-secondary">Romaji title</dt>
+                <dt className="text-secondary">Romaji</dt>
                 <dd className="text-primary">{media.titleRomaji}</dd>
               </>
             )}
             <dt className="text-secondary">Episodes</dt>
             <dd className="text-primary">{media.totalEpisodes || '—'}</dd>
-            {(media.seasonYear || media.seasonQuarter) && (
+            {(media.seasonQuarter || media.seasonYear) && (
               <>
                 <dt className="text-secondary">Season</dt>
                 <dd className="text-primary">
                   {[
-                    media.seasonQuarter ? `Q${media.seasonQuarter}` : null,
+                    media.seasonQuarter ? SEASON_LABELS[media.seasonQuarter] : null,
                     media.seasonYear,
                   ]
                     .filter(Boolean)

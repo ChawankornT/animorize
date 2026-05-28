@@ -49,14 +49,20 @@ export default async function FranchisesPage() {
             </thead>
             <tbody className="divide-y-[0.5px] divide-default">
               {franchises.map((franchise) => {
-                const displayTitle = getDisplayTitle(franchise);
+                const primaryTitle = getDisplayTitle(franchise);
+                const subParts = [franchise.titleRomaji, franchise.titleTh]
+                  .filter((t): t is string => !!t && t !== primaryTitle);
+                const subTitle = subParts.join(' · ');
                 return (
                   <tr
                     key={franchise.id}
                     className="hover:bg-surface transition-colors duration-fast"
                   >
                     <td className="px-4 py-3">
-                      <span className="font-medium text-primary">{displayTitle}</span>
+                      <div className="font-medium text-primary">{primaryTitle}</div>
+                      {subTitle && (
+                        <div className="text-xs text-tertiary mt-0.5">{subTitle}</div>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-secondary text-xs">
                       {new Date(franchise.createdAt).toLocaleDateString('en-GB', {
@@ -73,7 +79,7 @@ export default async function FranchisesPage() {
                         >
                           Edit
                         </Link>
-                        <FranchiseDeleteButton id={franchise.id} title={displayTitle} />
+                        <FranchiseDeleteButton id={franchise.id} title={primaryTitle} />
                       </div>
                     </td>
                   </tr>

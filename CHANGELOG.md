@@ -5,6 +5,28 @@
 
 ---
 
+## [2026-05-29] Admin UI Redesign + Refactor
+
+### UI
+- **Admin Dashboard** — เปลี่ยนจาก stat cards → "Needs attention" inbox (failed syncs + retry) + all-clear state; ดึงข้อมูลจริงจาก DB
+- **Providers list** — เปลี่ยนจาก table → row list พร้อม color chip 36×36 + meta row (slug · URL · hex)
+- **Media list** — title EN-first multi-line + color swatch 22×30 + Season/Auto-sync columns (แทน Franchise)
+- **Media detail** — color tile 110×156 แสดงเสมอ (แม้ไม่มี posterUrl) + auto-sync badge
+- **Provider form** — color picker swatch 32×32 (native `<input type="color">`) แทน dot 2×2
+- **Import panel** — Step 1: centered layout, Step 2: preview card, Step 3: success card + icon
+- **Franchises list** — เพิ่ม sub-title row (Romaji · Thai) ใต้ primary title
+
+### Domain
+- `getDisplayTitle()` ทั้ง `Media.ts` และ `Franchise.ts` เปลี่ยน order เป็น **EN > Romaji > Thai** (เดิม Thai-first)
+
+### Architecture
+- สร้าง `src/constants/admin.ts` — รวม `MEDIA_TYPE_LABELS`, `MEDIA_STATUS_VARIANT`, `SEASON_LABELS`, `TILE_COLORS` ที่เคย define ซ้ำใน 3 ไฟล์
+
+### Decisions Updated
+- Title display order rule เปลี่ยนเป็น `title_en > title_romaji > title_th` ใน CLAUDE.md + DECISIONS.md
+
+---
+
 ## [2026-05-27] Phase 2 Part 0 — Schema Migration
 
 ### Schema Restructure

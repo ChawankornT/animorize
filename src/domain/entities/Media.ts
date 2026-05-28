@@ -87,7 +87,7 @@ export function validateMedia(data: {
 export function getDisplayTitle(
   media: Pick<Media, 'titleTh' | 'titleEn' | 'titleRomaji'>,
 ): string {
-  return media.titleTh ?? media.titleEn ?? media.titleRomaji ?? '';
+  return media.titleEn ?? media.titleRomaji ?? media.titleTh ?? '';
 }
 
 export function isTrackable(media: Pick<Media, 'mediaType'>): boolean {

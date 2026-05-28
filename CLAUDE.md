@@ -56,7 +56,7 @@ UseCases: `IncrementEpisode.ts` / Repos: `IMediaRepository.ts` / Actions: `updat
 ## Key Business Rules
 - movie/special → total_episodes=1, toggle "Watched" / ova → episode tracking ปกติ
 - +1 Episode: current_episode++ → INSERT watchlog → ถ้า current=total → status='completed'
-- Title: title_th > title_en > title_romaji
+- Title: title_en > title_romaji > title_th
 - Dashboard: status='watching' OR is_favorite=true
 - Provider URL: custom_url ?? base_url
 - Auto-sync: system enabled AND media.auto_sync AND airing_status='ongoing'
