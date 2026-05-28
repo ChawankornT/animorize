@@ -8,6 +8,7 @@ export interface SyncLog {
   result: SyncResult;
   errorMessage: string | null;
   syncedAt: string;
+  mediaTitle?: string;
 }
 
 export interface CreateSyncLogInput {

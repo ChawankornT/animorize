@@ -2,14 +2,24 @@ import type { Database } from '@/types/database';
 import type { Provider, CreateProviderInput, UpdateProviderInput } from '@/domain/entities/Provider';
 import type { Franchise, CreateFranchiseInput, UpdateFranchiseInput } from '@/domain/entities/Franchise';
 import type { Media, CreateMediaInput, UpdateMediaInput } from '@/domain/entities/Media';
+import type { MediaProvider, CreateMediaProviderInput } from '@/domain/entities/MediaProvider';
 import type { SyncLog, CreateSyncLogInput } from '@/domain/entities/SyncLog';
 import type { SystemSettings } from '@/domain/entities/SystemSettings';
 
 type ProviderRow = Database['public']['Tables']['providers']['Row'];
 type FranchiseRow = Database['public']['Tables']['franchises']['Row'];
 type MediaRow = Database['public']['Tables']['media']['Row'];
+type MediaProviderRow = Database['public']['Tables']['media_providers']['Row'];
 type SyncLogRow = Database['public']['Tables']['sync_logs']['Row'];
 type SystemSettingsRow = Database['public']['Tables']['system_settings']['Row'];
+
+type MediaProviderRowWithJoin = MediaProviderRow & {
+  providers?: { name: string; color: string } | null;
+};
+
+type SyncLogRowWithJoin = SyncLogRow & {
+  media?: { title_th: string | null; title_en: string | null; title_romaji: string | null } | null;
+};
 
 // ─── To entity (DB row → domain entity) ──────────────────────────────────────
 
@@ -64,13 +74,29 @@ export function toMedia(row: MediaRow): Media {
   };
 }
 
-export function toSyncLog(row: SyncLogRow): SyncLog {
+export function toMediaProvider(row: MediaProviderRowWithJoin): MediaProvider {
+  return {
+    id: row.id,
+    mediaId: row.media_id,
+    providerId: row.provider_id,
+    audio: row.audio,
+    baseUrl: row.base_url,
+    createdAt: row.created_at,
+    providerName: row.providers?.name ?? '',
+    providerColor: row.providers?.color ?? '#000000',
+  };
+}
+
+export function toSyncLog(row: SyncLogRowWithJoin): SyncLog {
+  const m = row.media;
+  const mediaTitle = m?.title_th ?? m?.title_en ?? m?.title_romaji ?? undefined;
   return {
     id: row.id,
     mediaId: row.media_id,
     result: row.result,
     errorMessage: row.error_message,
     syncedAt: row.synced_at,
+    mediaTitle,
   };
 }
 
@@ -177,6 +203,17 @@ export function fromUpdateMediaInput(
   if (input.autoSync !== undefined) result.auto_sync = input.autoSync;
   if (input.sortOrder !== undefined) result.sort_order = input.sortOrder;
   return result;
+}
+
+export function fromCreateMediaProviderInput(
+  input: CreateMediaProviderInput,
+): Database['public']['Tables']['media_providers']['Insert'] {
+  return {
+    media_id: input.mediaId,
+    provider_id: input.providerId,
+    audio: input.audio,
+    base_url: input.baseUrl ?? null,
+  };
 }
 
 export function fromCreateSyncLogInput(

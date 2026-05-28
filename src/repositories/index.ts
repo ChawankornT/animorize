@@ -2,6 +2,7 @@ import type { SupabaseDb } from '@/lib/supabase/types';
 import { SupabaseProviderRepository } from '@/repositories/supabase/SupabaseProviderRepository';
 import { SupabaseFranchiseRepository } from '@/repositories/supabase/SupabaseFranchiseRepository';
 import { SupabaseMediaRepository } from '@/repositories/supabase/SupabaseMediaRepository';
+import { SupabaseMediaProviderRepository } from '@/repositories/supabase/SupabaseMediaProviderRepository';
 import { SupabaseSyncLogRepository } from '@/repositories/supabase/SupabaseSyncLogRepository';
 import { SupabaseSystemSettingsRepository } from '@/repositories/supabase/SupabaseSystemSettingsRepository';
 
@@ -15,6 +16,10 @@ export function createFranchiseRepository(supabase: SupabaseDb) {
 
 export function createMediaRepository(supabase: SupabaseDb) {
   return new SupabaseMediaRepository(supabase);
+}
+
+export function createMediaProviderRepository(supabase: SupabaseDb) {
+  return new SupabaseMediaProviderRepository(supabase);
 }
 
 export function createSyncLogRepository(supabase: SupabaseDb) {

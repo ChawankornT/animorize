@@ -9,7 +9,7 @@ export class SupabaseSyncLogRepository implements ISyncLogRepository {
   async findAll(options?: { mediaId?: string; limit?: number }): Promise<SyncLog[]> {
     let query = this.supabase
       .from('sync_logs')
-      .select('*')
+      .select('*, media(title_th, title_en, title_romaji)')
       .order('synced_at', { ascending: false });
 
     if (options?.mediaId) query = query.eq('media_id', options.mediaId);
@@ -17,7 +17,8 @@ export class SupabaseSyncLogRepository implements ISyncLogRepository {
 
     const { data, error } = await query;
     if (error) throw new Error(`Failed to list sync logs: ${error.message}`);
-    return (data ?? []).map(toSyncLog);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (data ?? []).map((row) => toSyncLog(row as any));
   }
 
   async create(input: CreateSyncLogInput): Promise<SyncLog> {

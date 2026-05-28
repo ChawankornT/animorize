@@ -156,10 +156,10 @@ export default async function MediaPage({
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
                         <Link
-                          href={`/admin/media/${m.id}/edit`}
+                          href={`/admin/media/${m.id}`}
                           className={buttonVariants({ variant: 'secondary', size: 'sm' })}
                         >
-                          Edit
+                          View
                         </Link>
                         <MediaDeleteButton id={m.id} title={displayTitle || m.id} />
                       </div>
