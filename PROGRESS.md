@@ -15,7 +15,7 @@ claude_md_version: 2026-05-27-v3
 
 ## Current Phase
 - **Active:** Phase 2 — Admin Panel + Import
-- **Status:** Phase 2 Part 4 (Media CRUD) complete — พร้อมเริ่ม Part 5 (AniList import)
+- **Status:** Phase 2 Part 5 (AniList import) complete — พร้อมเริ่ม Part 6 (Media Provider assignment)
 
 ## Phase 2 Progress
 - [x] Phase 2 schema migration — schema/ folder (13 SQL files) + types/database.ts updated
@@ -24,7 +24,7 @@ claude_md_version: 2026-05-27-v3
 - [x] Provider CRUD UI (ชื่อ, สี, logo, URL) — Server Actions + Admin pages + components
 - [x] Franchise CRUD UI — Server Actions + Admin pages (list/new/edit) + FranchiseForm + FranchiseDeleteButton
 - [x] Media CRUD UI (manual)
-- [ ] AniList import by ID + preview before save
+- [x] AniList import by ID + preview before save
 - [ ] Media Provider assignment (media → provider + audio + base_url)
 - [ ] Sync log viewer + retry button
 - [ ] system_settings: auto-sync toggle
@@ -60,23 +60,24 @@ claude_md_version: 2026-05-27-v3
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
+| 2026-05-28 | Phase 2 Part 5: AniList import — lib/anilist (types/api/mapper), usecases (ImportMedia/RetrySync), actions/anilist.ts, admin/import page + ImportPanel (3-step flow) | src/lib/anilist/*, src/domain/usecases/ImportMedia.ts, RetrySync.ts, src/app/actions/anilist.ts, src/app/admin/import/*, src/components/admin/ImportPanel.tsx |
+| 2026-05-28 | config: เพิ่ม AniList image domain (s4.anilist.co) ใน next.config.ts | next.config.ts |
 | 2026-05-28 | Phase 2 Part 4: Media CRUD — Server Actions, Admin pages (list/new/edit + loading/error), MediaForm, MediaDeleteButton | src/app/actions/media.ts, src/app/admin/media/*, src/components/admin/MediaForm.tsx, MediaDeleteButton.tsx |
 | 2026-05-28 | Phase 2 Part 3: Franchise CRUD — Server Actions, Admin pages (list/new/edit), FranchiseForm, FranchiseDeleteButton, loading/error | src/app/actions/franchise.ts, src/app/admin/franchises/*, src/components/admin/FranchiseForm.tsx, FranchiseDeleteButton.tsx |
 | 2026-05-27 | docs: เพิ่ม client boundary convention ใน CLAUDE.md (pure utility ต้องไม่มี 'use client') | CLAUDE.md |
-| 2026-05-27 | fix: แยก buttonVariants → button-variants.ts (no 'use client') + เปลี่ยน rounded-[2px] เป็น rounded-xs | src/components/ui/button-variants.ts, Button.tsx, ProviderForm.tsx, providers/page.tsx |
-| 2026-05-27 | Phase 2 Part 2: Provider CRUD — Server Actions, Admin pages (list/new/edit), ProviderForm, ProviderDeleteButton, DeleteConfirmModal, AdminSidebar, Dashboard placeholder | src/app/actions/provider.ts, src/app/admin/*, src/components/admin/* |
 
 ## Blockers
 [ยังไม่มี]
 
 ## Notes for Chat
+- **Phase 2 Part 5 complete** — AniList import พร้อมใช้งาน: `/admin/import` (3-step flow: ID → preview+edit → success)
+- **Import flow:** fetchAnilistPreviewAction (fetch + duplicate check, ไม่ save) → saveImportAction (save + sync_log) — ห้าม auto-save
+- **retrySyncAction** — fetch AniList ใน action layer, retrySync usecase strip protected fields (titleTh, synopsis, posterUrl) ก่อน update
+- **ImportMedia usecase error handling** — ถ้า media create fail: throw ทันที (ไม่มี mediaId → ไม่ log); ถ้า success log fail: เขียน failed log แล้ว re-throw
+- **genres round-trip** — comma-joined string ใน hidden input → split/trim/filter ใน saveImportAction (เหมือน MediaForm)
+- **AniList image domain** — เพิ่ม `s4.anilist.co` ใน next.config.ts remotePatterns แล้ว, ใช้ `next/image` ใน ImportPanel
+- **Part 6 ต่อไป:** Media Provider assignment (media → provider + audio + base_url)
 - **Phase 2 Part 4 complete** — Media CRUD พร้อมใช้งาน: `/admin/media` (list + filter), `/admin/media/new`, `/admin/media/[id]/edit`
-- **MediaForm dynamic behavior** — media_type = movie/special → totalEpisodes locked to 1 (client-side useState); ค่าเดิมจะถูก restore เมื่อ switch กลับ
-- **Filter bar** — GET form ด้วย URL searchParams (`?type=anime&status=ongoing`) — Server Component ไม่ต้อง client-side state
-- **MediaActionState** มี `rootError` (from refine: at least one title) + field-level `errors` ครบทุก field
-- **genres transform** — form รับ comma-separated string → action split/trim/filter → DB เก็บ string[]
-- **Part 5 ต่อไป:** AniList import by ID + preview before save
-- **Phase 2 Part 3 complete** — Franchise CRUD พร้อมใช้งาน: `/admin/franchises` (list), `/admin/franchises/new`, `/admin/franchises/[id]/edit`
 - **Delete pattern** — `deleteXxxAction.bind(null, id)` + `useActionState` + `DeleteConfirmModal` + `XxxDeleteButton` wrapper — ใช้แล้วใน Provider, Franchise, Media
 - **Dev DB migration ต้องทำ (ถ้ายังไม่ได้ทำ):** รัน `schema/01-enums.sql` (enums ใหม่) + `schema/03-franchises.sql` → `schema/12-indexes.sql` ใน Supabase SQL Editor (ข้าม 00, 02)
 - Supabase email validation: ต้องใช้ email domain ที่มี MX record จริงเท่านั้น (หรือ disable ใน dashboard)
