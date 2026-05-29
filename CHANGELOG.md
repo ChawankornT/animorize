@@ -27,6 +27,27 @@
 
 ---
 
+## [2026-05-28] Phase 2 Part 1–6 — Admin Panel + AniList Import
+
+### Features
+- **Provider CRUD** — name, slug, color, logo_url, base_url + Zod validation
+- **Franchise CRUD** — multi-title (th/en/romaji) + at-least-one-title constraint
+- **Media CRUD (manual)** — full field set + movie/special = 1 episode enforcement
+- **AniList import** — 2-step flow: fetchAnilistPreviewAction (fetch + duplicate check, ไม่ save) → saveImportAction (save + sync_log) — server-side only, admin preview/edit ก่อน save
+- **MediaProvider assignment** — media → provider + audio (sub/dub) + base_url; findByMediaId() JOIN providers(name, color)
+- **SyncLog viewer + retry** — list + per-row retry button
+- **system_settings** — auto-sync toggle (singleton row)
+
+### Domain / Repository
+- เพิ่ม entities: Provider, Franchise, Media, MediaProvider, SyncLog, SystemSettings (+ Create/Update inputs, validateMedia, isTrackable, getDisplayTitle)
+- เพิ่ม usecases: Media/Franchise/Provider CRUD, ImportMedia, RetrySync, GetMedia, ListFranchises
+- repositories/interfaces/ + supabase/ implementation + mappers (row ↔ entity)
+
+### Server Actions
+- Mutations ทั้งหมดผ่าน Server Actions + Zod validate + revalidatePath
+
+---
+
 ## [2026-05-27] Phase 2 Part 0 — Schema Migration
 
 ### Schema Restructure

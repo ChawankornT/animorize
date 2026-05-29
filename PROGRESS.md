@@ -54,9 +54,6 @@ claude_md_version: 2026-05-29-v4
 - [x] cn() utility (lib/utils/cn.ts)
 - [x] Dev preview page (/dev/components)
 
-## Pending Decisions
-- [ ] เพิ่ม CHANGELOG.md entry สำหรับ Phase 2 Part 1-6 (2026-05-28) — Media CRUD, AniList import, MediaProvider, SyncLogs, Settings
-
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
@@ -72,7 +69,7 @@ claude_md_version: 2026-05-29-v4
 ## Notes for Chat
 - **Phase 2 merged to main** (PR #3) — 120 files, 5853 insertions — พร้อมเริ่ม Phase 3
 - **3 bugs fixed หลัง code review** — (1) ImportPanel autoSync checkbox ใช้ `name="autoSync" value="true"` แล้ว (ไม่ใช่ `autoSyncCheck`); (2) `totalEpisodes ?? 1` แล้ว (ไม่ใช่ 0); (3) `retrySyncAction` revalidate `/admin/sync-logs` ด้วยแล้ว
-- **4 bugs fixed (PR #5, issue #4) — รอ merge** — (1) `toSyncLog()` ใน `mappers.ts` เป็น EN-first แล้ว (Known issue เดิมแก้แล้ว); (2) media list secondary title เทียบ `primaryTitle`; (3) AniList `mapper.ts` คืน `undefined` เมื่อ episodes=null (เดิม `?? 0` ทำให้ import ได้ total_episodes=0 — กระทบ Phase 4); (4) retry-sync fetch fail บันทึก failed sync_log แล้ว
+- **4 bugs fixed (PR #5, issue #4) — merged to main** — (1) `toSyncLog()` ใน `mappers.ts` เป็น EN-first แล้ว (Known issue เดิมแก้แล้ว); (2) media list secondary title เทียบ `primaryTitle`; (3) AniList `mapper.ts` คืน `undefined` เมื่อ episodes=null (เดิม `?? 0` ทำให้ import ได้ total_episodes=0 — กระทบ Phase 4); (4) retry-sync fetch fail บันทึก failed sync_log แล้ว
 - **`retrySync()` signature เปลี่ยน** — เดิม `(mediaRepo, syncLogRepo, mediaId, updateInput)` → ตอนนี้ `(mediaRepo, syncLogRepo, mediaId, fetchUpdate)` โดย `fetchUpdate: () => Promise<Partial<UpdateMediaInput>>` (inject AniList fetch เป็น callback ให้ try/catch ครอบ fetch+update ทั้งคู่ — infra dependency อยู่นอก domain)
 - **src/constants/admin.ts** — shared constants: `MEDIA_TYPE_LABELS`, `MEDIA_STATUS_VARIANT`, `SEASON_LABELS`, `TILE_COLORS` — import จากที่นี่
 - **RemoveProviderButton pattern** — ใช้ `Modal` โดยตรง (ไม่ใช้ `DeleteConfirmModal`) เพราะต้องการ hidden `<input name="mediaId">` ใน form
@@ -81,3 +78,5 @@ claude_md_version: 2026-05-29-v4
 - **Import flow:** fetchAnilistPreviewAction (fetch + duplicate check, ไม่ save) → saveImportAction (save + sync_log) — ห้าม auto-save
 - **Dev DB migration ต้องทำ (ถ้ายังไม่ได้ทำ):** รัน `schema/01-enums.sql` + `schema/03-franchises.sql` → `schema/12-indexes.sql` ตามลำดับ (ข้าม 00, 02)
 - Google OAuth ยังไม่ทำ — Phase 1 ใช้ Email/Password เท่านั้น
+- **Title order ฝั่ง user = เหมือน admin (EN-first)** — ยืนยัน 2026-05-29 ไม่แบ่งภาษา, getDisplayTitle() ใช้ตัวเดียวร่วมกัน ไม่ต้องเพิ่ม variant
+- **Phase 3 พร้อมเริ่ม** — schema user_media + watchlogs มีแล้ว, ยังไม่มี entity/repository (= งาน Phase 3)

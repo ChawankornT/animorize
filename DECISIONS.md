@@ -1,7 +1,7 @@
 # ANIMORIZE — DECISIONS.md
 > บันทึกเหตุผลการตัดสินใจทุกอย่างในโปรเจค
 > อัปเดตทุกครั้งที่มีการเปลี่ยน tech, approach, หรือ scope
-> อัปเดตล่าสุด: 2026-05
+> อัปเดตล่าสุด: 2026-05-29
 
 ---
 
@@ -123,7 +123,7 @@ UI            → app/ + components/         (render เท่านั้น)
 - Admin panel ใช้งานกับชื่อ English เป็นหลัก — ค้นหา/จดจำง่ายกว่า
 - Breadcrumb, heading, dropdown ที่แสดง Thai-first อ่านยากเมื่อ media มีแต่ชื่อ Romaji
 - `getDisplayTitle()` ใน `Media.ts` และ `Franchise.ts` ทั้งคู่ใช้ order เดียวกัน
-- ไม่กระทบ user-facing pages (Phase 3+) ซึ่งยังไม่ได้ implement — ทบทวนได้ตอนนั้น
+- User-facing pages (Phase 3+) ใช้ getDisplayTitle() ตัวเดียวกับ admin (EN-first) — ยืนยัน 2026-05-29 ว่าไม่แบ่งภาษา ไม่เพิ่ม per-language variant
 
 ### `src/constants/admin.ts` — shared display constants สำหรับ admin
 **เหตุผล:**

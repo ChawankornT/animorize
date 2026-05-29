@@ -1,6 +1,6 @@
 # ANIMORIZE — Project Instructions
 > Claude อ่านไฟล์นี้ทุก conversation
-> สำหรับรายละเอียดและเหตุผลเชิงลึก ดู DECISIONS.md และ schema.sql
+> สำหรับรายละเอียดและเหตุผลเชิงลึก ดู DECISIONS.md และ schema/ (ดู schema/README.md)
 
 ---
 
@@ -127,7 +127,7 @@ anime / series    →  episode tracking ปกติ
 +1 Episode:
   current_episode++  →  INSERT watchlog  →  ถ้า current = total → status = 'completed'
 
-Title display:    title_th > title_en > title_romaji
+Title display:    title_en > title_romaji > title_th
 Dashboard filter: status = 'watching' OR is_favorite = true
 Provider URL:     custom_url ?? base_url
 
