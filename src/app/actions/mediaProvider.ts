@@ -9,6 +9,7 @@ import { removeProvider } from '@/domain/usecases/RemoveProvider';
 
 export type AssignProviderState = {
   message?: string;
+  success?: boolean;
   errors?: {
     providerId?: string[];
     audio?: string[];
@@ -61,7 +62,7 @@ export async function assignProviderAction(
       baseUrl: baseUrl || null,
     });
     revalidatePath(`/admin/media/${mediaId}`);
-    return { message: 'Provider assigned.' };
+    return { message: 'Provider assigned.', success: true };
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Failed to assign provider';
     if (msg.includes('unique') || msg.includes('duplicate') || msg.includes('violates')) {

@@ -5,6 +5,20 @@
 
 ---
 
+## [2026-05-29] Admin UI Fixes — Poster + Sync + Consistency (PR #6)
+
+### Bug Fixes
+- **Poster rendering** — เพิ่ม `next/image` ซ้อนบน color tile ใน media detail (110×156), ImportPanel preview (84×120), media list swatch (22×30) — แสดงเมื่อ `posterUrl` มีค่า
+- **Sync now button** — เพิ่มปุ่ม Sync now ใน media detail header (เฉพาะเมื่อมี `anilistId`); `RetrySyncButton` รับ `label`/`pendingLabel` optional props
+- **retrySyncAction** — เพิ่ม `revalidatePath(/admin/media/:id)` ใน success path (เดิม revalidate แค่ list + sync-logs)
+- **AssignProviderForm** — success message "Provider assigned." แสดงสีเขียวแล้ว (เดิม `text-error` ตลอด); เพิ่ม `success?: boolean` ใน `AssignProviderState`
+- **RetrySyncButton** — message absolute-positioned ใต้ปุ่ม ไม่ดัน button Y ขึ้น
+- **RemoveProviderButton** — migrate จาก `Modal` โดยตรง → ใช้ `DeleteConfirmModal` เหมือนกับ delete dialogs อื่น; inject `mediaId` ผ่าน wrapper function
+- **DeleteConfirmModal** — เพิ่ม `submitLabel?` / `submitPendingLabel?` optional props (default "Delete"/"Deleting…")
+- **Modal** — เพิ่ม `text-left` บน outer div ครอบ title+body; แก้ `text-md` (invalid Tailwind) → `text-sm`
+
+---
+
 ## [2026-05-29] Admin UI Redesign + Refactor
 
 ### UI
