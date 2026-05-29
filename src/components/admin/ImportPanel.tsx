@@ -97,7 +97,7 @@ export function ImportPanel({ franchises }: ImportPanelProps) {
         <input type="hidden" name="titleRomaji" value={d.titleRomaji ?? ''} />
         <input type="hidden" name="titleEn" value={d.titleEn ?? ''} />
         <input type="hidden" name="posterUrl" value={d.posterUrl ?? ''} />
-        <input type="hidden" name="totalEpisodes" value={d.totalEpisodes ?? 0} />
+        <input type="hidden" name="totalEpisodes" value={d.totalEpisodes ?? ''} />
         <input type="hidden" name="airingStatus" value={d.airingStatus ?? 'upcoming'} />
         <input type="hidden" name="genres" value={(d.genres ?? []).join(', ')} />
         <input type="hidden" name="seasonQuarter" value={d.seasonQuarter ?? ''} />
@@ -105,7 +105,6 @@ export function ImportPanel({ franchises }: ImportPanelProps) {
         <input type="hidden" name="airDateStart" value={d.airDateStart ?? ''} />
         <input type="hidden" name="airDateEnd" value={d.airDateEnd ?? ''} />
         <input type="hidden" name="mediaType" value={d.mediaType} />
-        <input type="hidden" name="autoSync" value={d.autoSync ? 'true' : 'false'} />
 
         {/* Preview card */}
         <div className="border-[0.5px] border-default rounded-card overflow-hidden">
@@ -197,8 +196,9 @@ export function ImportPanel({ franchises }: ImportPanelProps) {
             <label className="flex items-start gap-2.5 cursor-pointer">
               <input
                 type="checkbox"
-                name="autoSyncCheck"
-                defaultChecked
+                name="autoSync"
+                value="true"
+                defaultChecked={d.autoSync !== false}
                 className="mt-0.5 size-4 rounded accent-primary"
               />
               <div>

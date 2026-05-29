@@ -78,7 +78,7 @@ const saveSchema = z.object({
   airDateStart: z.string().optional().or(z.literal('')),
   airDateEnd: z.string().optional().or(z.literal('')),
   mediaType: z.enum(['anime', 'series', 'movie', 'ova', 'special']).default('anime'),
-  autoSync: z.coerce.boolean().default(true),
+  autoSync: z.preprocess((v) => v === 'true' || v === 'on', z.boolean()).default(false),
 });
 
 export async function saveImportAction(
@@ -125,7 +125,7 @@ export async function saveImportAction(
       synopsis: d.synopsis || null,
       posterUrl: d.posterUrl || null,
       genres: d.genres?.split(',').map((s) => s.trim()).filter(Boolean) ?? [],
-      totalEpisodes: d.totalEpisodes ?? 0,
+      totalEpisodes: d.totalEpisodes ?? 1,
       seasonQuarter: d.seasonQuarter ?? null,
       seasonYear: d.seasonYear ?? null,
       airDateStart: d.airDateStart || null,
@@ -189,6 +189,7 @@ export async function retrySyncAction(
     });
 
     revalidatePath('/admin/media');
+    revalidatePath('/admin/sync-logs');
     return { success: true, message: 'Sync completed' };
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Failed to sync';
