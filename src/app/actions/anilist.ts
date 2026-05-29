@@ -173,25 +173,30 @@ export async function retrySyncAction(
       return { message: 'No AniList ID linked to this media' };
     }
 
-    const response = await fetchAnilistMedia(media.anilistId);
-    const mapped = mapAnilistToMedia(response);
-
-    await retrySync(mediaRepo, syncLogRepo, mediaId, {
-      titleRomaji: mapped.titleRomaji,
-      titleEn: mapped.titleEn,
-      genres: mapped.genres,
-      totalEpisodes: mapped.totalEpisodes,
-      seasonQuarter: mapped.seasonQuarter,
-      seasonYear: mapped.seasonYear,
-      airDateStart: mapped.airDateStart,
-      airDateEnd: mapped.airDateEnd,
-      airingStatus: mapped.airingStatus,
+    const anilistId = media.anilistId;
+    await retrySync(mediaRepo, syncLogRepo, mediaId, async () => {
+      const response = await fetchAnilistMedia(anilistId);
+      const mapped = mapAnilistToMedia(response);
+      return {
+        titleRomaji: mapped.titleRomaji,
+        titleEn: mapped.titleEn,
+        genres: mapped.genres,
+        totalEpisodes: mapped.totalEpisodes,
+        seasonQuarter: mapped.seasonQuarter,
+        seasonYear: mapped.seasonYear,
+        airDateStart: mapped.airDateStart,
+        airDateEnd: mapped.airDateEnd,
+        airingStatus: mapped.airingStatus,
+      };
     });
 
     revalidatePath('/admin/media');
     revalidatePath('/admin/sync-logs');
     return { success: true, message: 'Sync completed' };
   } catch (err) {
+    // retrySync writes a failed sync_log on both fetch and update failures —
+    // revalidate so the "Sync Failed" badge / sync-logs view reflect it.
+    revalidatePath('/admin/sync-logs');
     const msg = err instanceof Error ? err.message : 'Failed to sync';
     return { message: msg };
   }

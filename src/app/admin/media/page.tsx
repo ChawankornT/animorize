@@ -120,7 +120,7 @@ export default async function MediaPage({
               {mediaList.map((m, i) => {
                 const primaryTitle = getDisplayTitle(m) || '—';
                 const secondaryTitle =
-                  m.titleRomaji && m.titleRomaji !== m.titleEn ? m.titleRomaji : null;
+                  m.titleRomaji && m.titleRomaji !== primaryTitle ? m.titleRomaji : null;
                 const tertiaryTitle = m.titleTh || null;
                 const tileColor = TILE_COLORS[i % TILE_COLORS.length];
                 const seasonStr =

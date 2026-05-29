@@ -36,7 +36,7 @@ export function mapAnilistToMedia(
     posterUrl: m.coverImage.large ?? undefined,
     synopsis: m.description ? stripHtml(m.description) : undefined,
     genres: m.genres ?? [],
-    totalEpisodes: m.episodes ?? 0,
+    totalEpisodes: m.episodes ?? undefined,
     seasonQuarter: m.season ? (SEASON_MAP[m.season] ?? undefined) : undefined,
     seasonYear: m.seasonYear ?? undefined,
     airDateStart: toDateString(m.startDate.year, m.startDate.month, m.startDate.day),
