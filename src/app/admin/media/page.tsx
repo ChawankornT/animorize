@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { createMediaRepository } from '@/repositories';
@@ -139,13 +140,23 @@ export default async function MediaPage({
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div
-                          className="shrink-0 rounded-sm"
+                          className="shrink-0 rounded-sm relative overflow-hidden"
                           style={{
                             width: 22,
                             height: 30,
                             backgroundColor: tileColor,
                           }}
-                        />
+                        >
+                          {m.posterUrl && (
+                            <Image
+                              src={m.posterUrl}
+                              alt=""
+                              fill
+                              className="object-cover"
+                              sizes="22px"
+                            />
+                          )}
+                        </div>
                         <div>
                           <div className="font-medium text-primary">{primaryTitle}</div>
                           {secondaryTitle && (

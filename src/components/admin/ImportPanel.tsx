@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
@@ -115,6 +116,15 @@ export function ImportPanel({ franchises }: ImportPanelProps) {
               className="shrink-0 rounded-md overflow-hidden relative flex items-end p-2.5"
               style={{ width: 84, height: 120, backgroundColor: tileColor }}
             >
+              {d.posterUrl && (
+                <Image
+                  src={d.posterUrl}
+                  alt={d.titleEn ?? d.titleRomaji ?? ''}
+                  fill
+                  className="object-cover"
+                  sizes="84px"
+                />
+              )}
               <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/55 to-transparent pointer-events-none" />
               <span className="relative z-10 text-[11px] font-medium text-white leading-snug">
                 {d.titleEn ?? d.titleRomaji}
