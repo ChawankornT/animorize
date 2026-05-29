@@ -2,7 +2,7 @@
 
 import { useState, useActionState } from 'react';
 import { Button } from '@/components/ui/Button';
-import { Modal } from '@/components/ui/Modal';
+import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { removeProviderAction, type RemoveProviderState } from '@/app/actions/mediaProvider';
 
 interface Props {
@@ -15,39 +15,32 @@ export function RemoveProviderButton({ id, mediaId, providerName }: Props) {
   const [open, setOpen] = useState(false);
 
   const boundAction = removeProviderAction.bind(null, id);
-  const [state, action, pending] = useActionState<RemoveProviderState, FormData>(
+  const [state, wrappedAction, pending] = useActionState<RemoveProviderState, FormData>(
     boundAction,
     {},
   );
+
+  function actionWithMediaId(formData: FormData) {
+    formData.set('mediaId', mediaId);
+    wrappedAction(formData);
+  }
 
   return (
     <>
       <Button variant="destructive" size="sm" onClick={() => setOpen(true)}>
         Remove
       </Button>
-      <Modal
+      <DeleteConfirmModal
         open={open}
         onClose={() => setOpen(false)}
+        action={actionWithMediaId}
+        pending={pending}
+        error={state.error}
         title={`Remove "${providerName}"?`}
-        actions={
-          <form action={action} className="contents">
-            <input type="hidden" name="mediaId" value={mediaId} />
-            <Button variant="secondary" size="sm" type="button" onClick={() => setOpen(false)} disabled={pending}>
-              Cancel
-            </Button>
-            <Button variant="destructive" size="sm" type="submit" disabled={pending}>
-              {pending ? 'Removing…' : 'Remove'}
-            </Button>
-          </form>
-        }
-      >
-        <p>Remove {providerName} from this media? This cannot be undone.</p>
-        {state.error && (
-          <p className="mt-2 text-sm text-error" role="alert">
-            {state.error}
-          </p>
-        )}
-      </Modal>
+        description={`Remove ${providerName} from this media? This action cannot be undone.`}
+        submitLabel="Remove"
+        submitPendingLabel="Removing…"
+      />
     </>
   );
 }

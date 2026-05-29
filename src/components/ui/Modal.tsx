@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useCallback } from 'react';
-import { cn } from '@/lib/utils/cn';
+import { useEffect, useRef, useCallback } from "react";
+import { cn } from "@/lib/utils/cn";
 
 interface ModalProps {
   open: boolean;
@@ -48,21 +48,19 @@ export function Modal({
       onClose={onClose}
       onClick={handleBackdropClick}
       className={cn(
-        'w-[min(420px,calc(100%-32px))] p-0 m-auto',
-        'bg-page rounded-modal border-[0.5px] border-default',
-        'backdrop:bg-overlay',
+        "w-[min(420px,calc(100%-32px))] p-0 m-auto",
+        "bg-page rounded-modal border-[0.5px] border-default",
+        "backdrop:bg-overlay",
         className,
       )}
     >
-      <div className="p-6">
+      <div className="p-6 text-left">
         {title && (
           <h2 className="text-xl font-medium tracking-tight text-primary mb-3">
             {title}
           </h2>
         )}
-        <div className="text-md text-secondary leading-[1.6]">
-          {children}
-        </div>
+        <div className="text-sm text-secondary leading-[1.6]">{children}</div>
         {actions && (
           <div className="flex items-center justify-end gap-2 mt-4">
             {actions}

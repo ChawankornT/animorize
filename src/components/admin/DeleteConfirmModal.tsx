@@ -11,6 +11,8 @@ interface DeleteConfirmModalProps {
   error?: string;
   title: string;
   description: string;
+  submitLabel?: string;
+  submitPendingLabel?: string;
 }
 
 export function DeleteConfirmModal({
@@ -21,6 +23,8 @@ export function DeleteConfirmModal({
   error,
   title,
   description,
+  submitLabel = 'Delete',
+  submitPendingLabel = 'Deleting…',
 }: DeleteConfirmModalProps) {
   return (
     <Modal
@@ -33,7 +37,7 @@ export function DeleteConfirmModal({
             Cancel
           </Button>
           <Button variant="destructive" size="sm" type="submit" disabled={pending}>
-            {pending ? 'Deleting…' : 'Delete'}
+            {pending ? submitPendingLabel : submitLabel}
           </Button>
         </form>
       }

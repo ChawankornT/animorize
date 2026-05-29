@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
@@ -12,7 +13,6 @@ import { listMediaProviders } from '@/domain/usecases/ListMediaProviders';
 import { listProviders } from '@/domain/usecases/ListProviders';
 import { listSyncLogs } from '@/domain/usecases/ListSyncLogs';
 import { getDisplayTitle } from '@/domain/entities/Media';
-import type { MediaType, AiringStatus } from '@/domain/entities/Media';
 import {
   MEDIA_TYPE_LABELS,
   MEDIA_STATUS_VARIANT,
@@ -22,6 +22,7 @@ import {
 import { Badge } from '@/components/ui/Badge';
 import { buttonVariants } from '@/components/ui/button-variants';
 import { MediaDeleteButton } from '@/components/admin/MediaDeleteButton';
+import { RetrySyncButton } from '@/components/admin/RetrySyncButton';
 import { AssignProviderForm } from '@/components/admin/AssignProviderForm';
 import { RemoveProviderButton } from '@/components/admin/RemoveProviderButton';
 
@@ -76,6 +77,14 @@ export default async function MediaDetailPage({
           {displayTitle || 'Untitled'}
         </h1>
         <div className="flex items-center gap-2">
+          {media.anilistId && (
+            <RetrySyncButton
+              mediaId={id}
+              mediaTitle={displayTitle || id}
+              label="Sync now"
+              pendingLabel="Syncing…"
+            />
+          )}
           <Link
             href={`/admin/media/${id}/edit`}
             className={buttonVariants({ variant: 'secondary', size: 'sm' })}
@@ -93,6 +102,15 @@ export default async function MediaDetailPage({
           className="shrink-0 rounded-md overflow-hidden relative flex items-end p-2"
           style={{ width: 110, height: 156, backgroundColor: tileColor }}
         >
+          {media.posterUrl && (
+            <Image
+              src={media.posterUrl}
+              alt={displayTitle || ''}
+              fill
+              className="object-cover"
+              sizes="110px"
+            />
+          )}
           {/* Gradient overlay */}
           <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
           {/* Title text */}

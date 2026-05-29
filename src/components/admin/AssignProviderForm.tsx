@@ -28,7 +28,7 @@ export function AssignProviderForm({ providers, mediaId }: Props) {
       <input type="hidden" name="mediaId" value={mediaId} />
 
       {state.message && (
-        <p className="text-sm text-error">{state.message}</p>
+        <p className={`text-sm ${state.success ? 'text-success' : 'text-error'}`}>{state.message}</p>
       )}
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">

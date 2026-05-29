@@ -192,6 +192,7 @@ export async function retrySyncAction(
 
     revalidatePath('/admin/media');
     revalidatePath('/admin/sync-logs');
+    revalidatePath(`/admin/media/${mediaId}`);
     return { success: true, message: 'Sync completed' };
   } catch (err) {
     // retrySync writes a failed sync_log on both fetch and update failures —
