@@ -57,11 +57,11 @@ claude_md_version: 2026-05-29-v4
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
+| 2026-05-29 | chore(rules): สร้าง `.claude/rules/git.md` — convention ต้องรอ CI pass ก่อน merge ทุก PR (feature→develop, develop→main) + branch naming + commit convention | .claude/rules/git.md (ใหม่) |
 | 2026-05-29 | fix(admin): poster rendering ใน media list/detail/import + Sync now button + UI consistency (PR #6) — poster ใน tile 3 ขนาด, Sync now button บน detail, revalidate detail หลัง sync, AssignProviderForm success green, RetrySyncButton message absolute, RemoveProviderButton → DeleteConfirmModal, Modal text-left | media/page.tsx, media/[id]/page.tsx, ImportPanel.tsx, RetrySyncButton.tsx, AssignProviderForm.tsx, DeleteConfirmModal.tsx, RemoveProviderButton.tsx, mediaProvider.ts, anilist.ts, Modal.tsx |
 | 2026-05-29 | fix(admin): 4 bugs จาก follow-up code review (issue #4, PR #5) — (1) toSyncLog Thai-first → EN-first; (2) media list secondary title เทียบ primaryTitle (ไม่ใช่ titleEn); (3) AniList mapper `?? undefined` (เดิม `?? 0` ทำให้ `?? 1` ไม่ทำงาน → total_episodes=0); (4) retrySync รับ fetch เป็น callback → fetch fail ก็เขียน failed sync_log + revalidate /admin/sync-logs ใน catch | src/repositories/supabase/mappers.ts, src/app/admin/media/page.tsx, src/lib/anilist/mapper.ts, src/domain/usecases/RetrySync.ts, src/app/actions/anilist.ts |
 | 2026-05-29 | fix(import): 3 bugs จาก code review + PR comment — autoSync checkbox (name="autoSync"), totalEpisodes ?? 1 (ไม่ใช่ 0), retrySyncAction revalidate /admin/sync-logs ด้วย | src/components/admin/ImportPanel.tsx, src/app/actions/anilist.ts |
 | 2026-05-29 | Admin UI redesign ตาม design file (7 หน้า): Dashboard → "Needs attention" inbox, Providers list → row+chip, Media list → EN title+swatch+Season+AutoSync columns, Media detail → color tile 110×156, Provider form → color picker swatch, Import panel → 3-step redesign, Franchises list → sub-title | src/app/admin/page.tsx, providers/page.tsx, media/page.tsx, media/[id]/page.tsx, franchises/page.tsx, import/page.tsx, src/components/admin/ProviderForm.tsx, ImportPanel.tsx |
-| 2026-05-29 | getDisplayTitle order เปลี่ยน Thai>EN>Romaji → **EN>Romaji>Thai** ทั้ง Media และ Franchise entity + อัปเดท CLAUDE.md + DECISIONS.md | src/domain/entities/Media.ts, Franchise.ts, CLAUDE.md, DECISIONS.md |
 
 ## Blockers
 [ยังไม่มี]
