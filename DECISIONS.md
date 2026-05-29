@@ -429,3 +429,4 @@ Bundle (first load) <  200KB
 | 2025-05 | tailwindcss, @tailwindcss/postcss | ^4 | Styling |
 | 2025-05 | eslint, eslint-config-next | ^9 / 16.0.5 | Linting |
 | 2026-05 | tsc-files | ^1.1.4 | Type-check staged files only ใน lint-staged (ไม่ต้อง run tsc ทั้ง project ทุก commit) |
+| 2026-05-30 | lucide-react | ^1.17.0 | Icon library สำหรับ UI (Phase 3+: MediaCard, Provider badge, nav) — tree-shakeable, ไม่มี runtime dependency |
