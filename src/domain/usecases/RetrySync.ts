@@ -12,22 +12,27 @@ const PROTECTED: (keyof UpdateMediaInput)[] = ['titleTh', 'synopsis', 'posterUrl
  * @param mediaRepo - IMediaRepository
  * @param syncLogRepo - ISyncLogRepository
  * @param mediaId - ID of the media to update
- * @param updateInput - Mapped update data from AniList (protected fields are stripped)
+ * @param fetchUpdate - Fetches mapped update data from AniList (injected; the
+ *   AniList/infra dependency stays out of the domain). Protected fields are stripped.
  * @returns Updated Media entity
- * @throws If update fails (after writing failed sync_log)
+ * @throws If the fetch or update fails (after writing failed sync_log)
+ *
+ * Failure handling: both fetch failures (AniList down / rate-limited) and update
+ * failures write a `failed` sync_log so the "Sync Failed" badge stays accurate.
  */
 export async function retrySync(
   mediaRepo: IMediaRepository,
   syncLogRepo: ISyncLogRepository,
   mediaId: string,
-  updateInput: Partial<UpdateMediaInput>,
+  fetchUpdate: () => Promise<Partial<UpdateMediaInput>>,
 ): Promise<Media> {
-  const safeInput = { ...updateInput };
-  for (const field of PROTECTED) {
-    delete safeInput[field];
-  }
-
   try {
+    const updateInput = await fetchUpdate();
+    const safeInput = { ...updateInput };
+    for (const field of PROTECTED) {
+      delete safeInput[field];
+    }
+
     const media = await mediaRepo.update(mediaId, safeInput);
     await syncLogRepo.create({ mediaId, result: 'success' });
     return media;

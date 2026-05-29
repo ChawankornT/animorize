@@ -60,11 +60,11 @@ claude_md_version: 2026-05-29-v4
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
+| 2026-05-29 | fix(admin): 4 bugs จาก follow-up code review (issue #4, PR #5) — (1) toSyncLog Thai-first → EN-first; (2) media list secondary title เทียบ primaryTitle (ไม่ใช่ titleEn); (3) AniList mapper `?? undefined` (เดิม `?? 0` ทำให้ `?? 1` ไม่ทำงาน → total_episodes=0); (4) retrySync รับ fetch เป็น callback → fetch fail ก็เขียน failed sync_log + revalidate /admin/sync-logs ใน catch | src/repositories/supabase/mappers.ts, src/app/admin/media/page.tsx, src/lib/anilist/mapper.ts, src/domain/usecases/RetrySync.ts, src/app/actions/anilist.ts |
 | 2026-05-29 | fix(import): 3 bugs จาก code review + PR comment — autoSync checkbox (name="autoSync"), totalEpisodes ?? 1 (ไม่ใช่ 0), retrySyncAction revalidate /admin/sync-logs ด้วย | src/components/admin/ImportPanel.tsx, src/app/actions/anilist.ts |
 | 2026-05-29 | Admin UI redesign ตาม design file (7 หน้า): Dashboard → "Needs attention" inbox, Providers list → row+chip, Media list → EN title+swatch+Season+AutoSync columns, Media detail → color tile 110×156, Provider form → color picker swatch, Import panel → 3-step redesign, Franchises list → sub-title | src/app/admin/page.tsx, providers/page.tsx, media/page.tsx, media/[id]/page.tsx, franchises/page.tsx, import/page.tsx, src/components/admin/ProviderForm.tsx, ImportPanel.tsx |
 | 2026-05-29 | getDisplayTitle order เปลี่ยน Thai>EN>Romaji → **EN>Romaji>Thai** ทั้ง Media และ Franchise entity + อัปเดท CLAUDE.md + DECISIONS.md | src/domain/entities/Media.ts, Franchise.ts, CLAUDE.md, DECISIONS.md |
 | 2026-05-29 | สร้าง src/constants/admin.ts รวม MEDIA_TYPE_LABELS, MEDIA_STATUS_VARIANT, SEASON_LABELS, TILE_COLORS แทนการ define ซ้ำใน 3 ไฟล์ | src/constants/admin.ts (ใหม่), media/page.tsx, media/[id]/page.tsx, ImportPanel.tsx |
-| 2026-05-28 | Phase 2 Part 6: MediaProvider entity+repo+usecases, AssignProvider/RemoveProvider/ListMediaProviders/ListSyncLogs usecases, mediaProvider+systemSettings actions, AssignProviderForm+RemoveProviderButton+RetrySyncButton+SystemSettingsForm components, media detail page, sync-logs page, settings page, loading/error for all new routes | src/domain/entities/MediaProvider.ts, src/domain/usecases/*, src/repositories/*, src/app/actions/mediaProvider.ts|systemSettings.ts, src/components/admin/*, src/app/admin/* |
 
 ## Blockers
 [ยังไม่มี]
@@ -72,7 +72,8 @@ claude_md_version: 2026-05-29-v4
 ## Notes for Chat
 - **Phase 2 merged to main** (PR #3) — 120 files, 5853 insertions — พร้อมเริ่ม Phase 3
 - **3 bugs fixed หลัง code review** — (1) ImportPanel autoSync checkbox ใช้ `name="autoSync" value="true"` แล้ว (ไม่ใช่ `autoSyncCheck`); (2) `totalEpisodes ?? 1` แล้ว (ไม่ใช่ 0); (3) `retrySyncAction` revalidate `/admin/sync-logs` ด้วยแล้ว
-- **Known issue ที่ยังไม่แก้** — `SupabaseSyncLogRepository.toSyncLog()` ใช้ Thai-first title order (`title_th ?? title_en ?? title_romaji`) ขัดกับ EN-first rule — sync-logs page และ dashboard แสดงชื่อไทยแทนชื่อ EN
+- **4 bugs fixed (PR #5, issue #4) — รอ merge** — (1) `toSyncLog()` ใน `mappers.ts` เป็น EN-first แล้ว (Known issue เดิมแก้แล้ว); (2) media list secondary title เทียบ `primaryTitle`; (3) AniList `mapper.ts` คืน `undefined` เมื่อ episodes=null (เดิม `?? 0` ทำให้ import ได้ total_episodes=0 — กระทบ Phase 4); (4) retry-sync fetch fail บันทึก failed sync_log แล้ว
+- **`retrySync()` signature เปลี่ยน** — เดิม `(mediaRepo, syncLogRepo, mediaId, updateInput)` → ตอนนี้ `(mediaRepo, syncLogRepo, mediaId, fetchUpdate)` โดย `fetchUpdate: () => Promise<Partial<UpdateMediaInput>>` (inject AniList fetch เป็น callback ให้ try/catch ครอบ fetch+update ทั้งคู่ — infra dependency อยู่นอก domain)
 - **src/constants/admin.ts** — shared constants: `MEDIA_TYPE_LABELS`, `MEDIA_STATUS_VARIANT`, `SEASON_LABELS`, `TILE_COLORS` — import จากที่นี่
 - **RemoveProviderButton pattern** — ใช้ `Modal` โดยตรง (ไม่ใช้ `DeleteConfirmModal`) เพราะต้องการ hidden `<input name="mediaId">` ใน form
 - **removeProviderAction signature** — `(id: string, prevState, formData)` (3 args)

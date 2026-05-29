@@ -89,7 +89,7 @@ export function toMediaProvider(row: MediaProviderRowWithJoin): MediaProvider {
 
 export function toSyncLog(row: SyncLogRowWithJoin): SyncLog {
   const m = row.media;
-  const mediaTitle = m?.title_th ?? m?.title_en ?? m?.title_romaji ?? undefined;
+  const mediaTitle = m?.title_en ?? m?.title_romaji ?? m?.title_th ?? undefined;
   return {
     id: row.id,
     mediaId: row.media_id,
