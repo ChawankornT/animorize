@@ -46,6 +46,9 @@ loading.tsx + error.tsx ทุก route group / logic ใน domain/usecases/ / 
 **DON'T:** ❌ `any` / ❌ `console.log` prod / ❌ AniList จาก client / ❌ inline style /
 ❌ install package ไม่บันทึก DECISIONS.md / ❌ แก้ types/database.ts / ❌ import Supabase ใน domain/
 
+**Client boundary:** pure utility functions (ไม่ใช้ React hooks / browser API) ต้องอยู่ในไฟล์แยกที่ไม่มี `'use client'`
+เพื่อให้ Server Components import ได้ — ดูตัวอย่าง `components/ui/button-variants.ts`
+
 ## Naming
 Components: PascalCase `MediaCard.tsx` / Hooks: `useWatchlog.ts` / Entities: `Media.ts`
 UseCases: `IncrementEpisode.ts` / Repos: `IMediaRepository.ts` / Actions: `updateProfileAction.ts`
@@ -53,7 +56,7 @@ UseCases: `IncrementEpisode.ts` / Repos: `IMediaRepository.ts` / Actions: `updat
 ## Key Business Rules
 - movie/special → total_episodes=1, toggle "Watched" / ova → episode tracking ปกติ
 - +1 Episode: current_episode++ → INSERT watchlog → ถ้า current=total → status='completed'
-- Title: title_th > title_en > title_romaji
+- Title: title_en > title_romaji > title_th
 - Dashboard: status='watching' OR is_favorite=true
 - Provider URL: custom_url ?? base_url
 - Auto-sync: system enabled AND media.auto_sync AND airing_status='ongoing'
@@ -61,10 +64,10 @@ UseCases: `IncrementEpisode.ts` / Repos: `IMediaRepository.ts` / Actions: `updat
 
 ## Session Sync
 - จบทุก session → รัน `/sync-progress` เพื่ออัปเดท PROGRESS.md
-- ถ้าแก้ DECISIONS.md / CLAUDE.md / schema.sql → bump version ใน PROGRESS.md
+- ถ้าแก้ DECISIONS.md / CLAUDE.md / schema/ → bump version ใน PROGRESS.md
 - ถ้าแก้ PROJECT_INSTRUCTIONS.md → เตือนใน PROGRESS.md ว่า Chat ต้องอัปเดท
 
 ## References
 - @DECISIONS.md
-- @schema.sql
+- @schema/ (see schema/README.md for structure and migration order)
 - @PROGRESS.md

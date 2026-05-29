@@ -1,8 +1,6 @@
--- Animorize — Phase 1 schema (profiles + auth)
--- Run in Supabase SQL Editor
-
--- Enum: user roles
-create type public.user_role as enum ('user', 'admin');
+-- Phase 1: Profiles + Auth
+-- ย้ายจาก schema.sql ที่ root — ห้ามแก้ logic ที่ใช้งานอยู่แล้ว
+-- NOTE: Existing Phase 1 DB ให้ข้ามไฟล์นี้ (มีอยู่แล้ว) — ดู README.md
 
 -- Profiles table
 create table public.profiles (
@@ -35,7 +33,7 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
--- Auto-update updated_at
+-- Auto-update updated_at (reused by all tables with updated_at column)
 create or replace function public.update_updated_at()
 returns trigger
 language plpgsql
@@ -62,12 +60,7 @@ create policy "Users can update own profile"
   using (auth.uid() = id)
   with check (auth.uid() = id);
 
--- Prevent users from changing their own role
 create policy "Users cannot update role"
   on public.profiles as restrictive for update
   using (true)
   with check (role = (select role from public.profiles where id = auth.uid()));
-
--- pg_cron keep-alive (prevents free tier pause after 7 days inactive)
--- Requires pg_cron extension enabled in Supabase dashboard
--- select cron.schedule('keep-alive', '0 0 */3 * *', 'select 1');

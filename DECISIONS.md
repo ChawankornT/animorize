@@ -117,6 +117,20 @@ UI            → app/ + components/         (render เท่านั้น)
 
 ## Data Model Decisions
 
+### Title Display Order: English > Romaji > Thai (เปลี่ยนจาก Thai-first)
+**ปฏิเสธ:** Thai > English > Romaji (เดิม)
+**เหตุผล:**
+- Admin panel ใช้งานกับชื่อ English เป็นหลัก — ค้นหา/จดจำง่ายกว่า
+- Breadcrumb, heading, dropdown ที่แสดง Thai-first อ่านยากเมื่อ media มีแต่ชื่อ Romaji
+- `getDisplayTitle()` ใน `Media.ts` และ `Franchise.ts` ทั้งคู่ใช้ order เดียวกัน
+- ไม่กระทบ user-facing pages (Phase 3+) ซึ่งยังไม่ได้ implement — ทบทวนได้ตอนนั้น
+
+### `src/constants/admin.ts` — shared display constants สำหรับ admin
+**เหตุผล:**
+- `MEDIA_TYPE_LABELS`, `MEDIA_STATUS_VARIANT`, `SEASON_LABELS`, `TILE_COLORS` ถูกใช้ซ้ำใน 3 ไฟล์
+- รวมไว้ที่เดียวเพื่อให้ Phase อื่นที่ต้องการ admin display constants ดึงใช้ได้โดยไม่ต้องนิยามซ้ำ
+- วางใน `constants/` (ไม่ใช่ `domain/`) เพราะเป็น UI display mapping ไม่ใช่ business logic
+
 ### Franchise → Media (แยก 2 ระดับ)
 **เหตุผล:**
 - Kimetsu no Yaiba มีหลาย season, movie, OVA ภายใต้ franchise เดียว
