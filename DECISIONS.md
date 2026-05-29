@@ -1,7 +1,7 @@
 # ANIMORIZE — DECISIONS.md
 > บันทึกเหตุผลการตัดสินใจทุกอย่างในโปรเจค
 > อัปเดตทุกครั้งที่มีการเปลี่ยน tech, approach, หรือ scope
-> อัปเดตล่าสุด: 2026-05-29
+> อัปเดตล่าสุด: 2026-05-30
 
 ---
 
@@ -171,7 +171,7 @@ UI            → app/ + components/         (render เท่านั้น)
 **เหตุผล:**
 - Supabase Free tier จะ pause project หลัง inactive 7 วัน
 - pg_cron `SELECT 1` ทุก 3 วัน ทำงานได้ในระดับ DB ไม่ต้อง external service
-- ใช้ cron เดียวกับ auto-sync ได้เลย (daily sync = keep-alive อัตโนมัติ)
+- keep-alive เป็น pg_cron `SELECT 1` standalone (applied แล้ว Phase 1) — คนละกลไกกับ auto-sync: auto-sync เรียก AniList external API จึงรันผ่าน Vercel Cron/Edge Function (ดู Phase 6) ไม่ใช่ pg_cron เดียวกัน แต่ daily sync ที่ touch DB ก็ช่วย keep-alive ไปในตัว
 
 ### Provider URL Resolution
 ```
@@ -293,33 +293,117 @@ Schema ปัจจุบันรองรับได้ด้วย `air_date
 - system_settings: auto-sync toggle
 
 ### Phase 3 — User Library & Dashboard
-- Search (3 ภาษา) + autocomplete suggestion
+
+#### Foundation (domain → repo ก่อน UI ตาม Clean Architecture)
+- UserMedia entity (+ Create/Update inputs + business rules) ใน domain/entities/
+- IUserMediaRepository interface + SupabaseUserMediaRepository + factory
+- usecases: AddToLibrary, ToggleFavorite, RemoveFromLibrary, ListUserLibrary
+
+#### Features
+- Search — match ข้าม title_th / title_en / title_romaji + autocomplete (display ผ่าน getDisplayTitle = EN-first)
 - เพิ่ม media เข้า library จาก search result
-- เลือก Provider + audio + custom URL
+- เลือก Provider + audio + custom URL (custom_url ?? base_url)
 - Favorite (star) toggle
-- Dashboard: แสดงเฉพาะ watching + favorite
-- Provider badge (สีตามแบรนด์)
+- Dashboard: แสดงเฉพาะ status='watching' OR is_favorite=true
+- MediaCard: render poster จริง (next/image — AniList host config มาแล้วจาก PR #6 poster fix) + fallback color tile เมื่อไม่มี poster + Provider badge (swatch ตาม BRAND 10.4/10.5)
+
+#### Decision (เคาะตอนเริ่ม Phase 3)
+- Client data layer: TanStack Query (server state user_media) + useOptimistic/Server Actions สำหรับ favorite toggle — หรือเริ่ม Server Actions + useOptimistic ก่อนแล้วค่อยเพิ่ม TanStack Query (stack ล็อกไว้แต่ยังไม่เคยใช้) → เคาะก่อนสร้าง hook แรก
 
 ### Phase 4 — Progress Tracking + Watchlog
-- +1 Episode button
-- auto status update เมื่อครบตอน
-- movie/special: toggle Watched button
-- Watchlog auto-record ทุกครั้งที่กด +1
+
+#### Foundation
+- WatchLog entity + IWatchLogRepository + SupabaseWatchLogRepository + factory
+- usecases: IncrementEpisode, ToggleWatched — business rule อยู่ใน usecase ไม่ใช่ UI
+
+#### Features
+- +1 Episode (EpisodeTracker → useEpisodeTracker → IncrementEpisode) + optimistic update
+- auto status update เมื่อ current = total → 'completed' (อยู่ใน IncrementEpisode)
+- movie/special: toggle Watched (total_episodes = 1)
+- Watchlog auto-record atomic กับ +1 ทุกครั้ง
 - History page: รายการ watchlog ของ user
 
 ### Phase 5 — UX Polish
-- Skeleton loading ทุก async component
-- Error states + retry
-- Empty states + illustrations
-- Dark mode toggle
+- Audit loading.tsx (skeleton) + error.tsx ครบทุก route group (convention บังคับตั้งแต่ต้น — Phase 5 = ตรวจ/เก็บตก)
+- Error states + retry (client) + toast
+- Empty states + illustrations + action button
+- Dark mode toggle (เพิ่ม dark tokens ใน tokens.css ถ้ายังไม่มี)
 - Responsive (mobile hamburger menu)
 - Accessibility: WCAG 2.1 AA, keyboard navigation
 
 ### Phase 6 — Extended Features
 - Franchise page (รวมทุก season/movie/OVA ของ franchise)
-- Category page: กรองตาม ปี / ฤดูกาล / media_type
-- Auto-sync cron job (pg_cron daily)
+- Category page: user browse media ของเรา กรองตาม ปี / ฤดูกาล / media_type
+  (คนละเรื่องกับ Phase 7 discovery ซึ่ง browse AniList)
+- Auto-sync job: รัน sync logic (system_settings.enabled AND media.auto_sync AND airing_status='ongoing') ตามรอบ
+  ⚠️ pg_cron เพียว ๆ เรียก AniList ไม่ได้ (เป็น SQL) → ต้องใช้ Vercel Cron → API route หรือ Supabase Edge Function + pg_net — เคาะ mechanism ตอนเริ่ม
 - Basic stats (ดูไปกี่ตอน กี่เรื่อง)
+- (manual "Sync now" — done แล้วใน PR #6 (merged) ไม่ต้องทำซ้ำ)
+
+### Phase 7 — Discovery & Bulk Import (admin-side) [planned]
+- Discovery forward-only: default ซีซั่นปัจจุบัน + กำลังจะมา (AniList Page query)
+- ย้อนหลัง = manual filter (season + year)
+- 7a: live discovery + select-import (ยังไม่มี table — diff กับ media สด)
+- 7b: import_candidates table (lean cache) + notification (count 'new') + dismiss
+- 7c: cron auto-refresh candidates (ใช้ cron infra ร่วมกับ Phase 6)
+- รายละเอียด + decision เต็ม: ดูหัวข้อ "Phase 7 — Discovery & Bulk Import (detail)" ด้านล่าง
+
+---
+
+## Phase 7 — Discovery & Bulk Import (detail) [DRAFT 2026-05-30 rev.3]
+
+**สถานะ:** ร่าง — เคาะ scope + schema + data model แล้ว รอเริ่มจริง
+**ลำดับ:** admin-side ไม่ block Phase 3-6 → ทำหลัง Phase 3 ได้
+
+### ปัญหาที่แก้
+- import ได้ทีละเรื่อง + admin ต้องรู้ AniList ID เอง → ไม่รู้ว่าซีซั่นข้างหน้ามีอะไรเข้า
+
+### Scope ที่ทำ
+- Discovery = forward-only — default ซีซั่นปัจจุบัน + กำลังจะมา (RELEASING / NOT_YET_RELEASED)
+- ย้อนหลัง = manual filter (season + year) เท่านั้น ไม่ดึงย้อนอัตโนมัติ
+- Notification: เจอเรื่องใหม่ → ขึ้นจำนวน (candidates status='new') ไม่ import เอง
+- Admin เลือก import: list + checkbox → import เฉพาะที่เลือก
+- เรื่องที่ไม่เลือก: Dismiss → เก็บไว้ browse/import ภายหลัง ไม่เตือนซ้ำ
+- หน่วย import = ซีซั่น — ไม่ทำ full-catalog dump ผ่านเว็บ
+
+### Scope ที่ไม่ทำ (ตั้งใจ)
+- ❌ Full-catalog dump (หมื่นเรื่อง) ผ่าน Server Action — เกิน serverless timeout + ขัด curate model
+- ❌ ดึงย้อนหลังอัตโนมัติ
+
+### Data model — candidates เก็บ LEAN (เคาะ 2026-05-30)
+- เก็บแค่ field สำหรับ "แสดง list + อ้างอิงตอน import":
+  anilist_id (unique), title_romaji, title_en, poster_url, media_type,
+  season_quarter, season_year, airing_status, status (new|dismissed|imported), discovered_at
+- ไม่เก็บ synopsis / genres / episodes / air dates — เพราะ discovery มองเรื่องที่ยังไม่ฉาย
+  ข้อมูลพวกนี้เปลี่ยนบ่อยก่อนฉาย → cache แล้ว stale
+- ตอน admin กด import → re-fetch ตัวเต็มสด ๆ จาก AniList ด้วย anilist_id แล้วสร้าง media
+  (candidates ไม่เป็น source of truth ซ้อนกับ media, ไม่ drift จาก schema)
+
+### Schema — DEFER (เคาะ 2026-05-30)
+- import_candidates table ยังไม่ migrate ตอนนี้ → สร้างตอนเริ่ม 7b
+- เริ่มที่ 7a (live discovery, ไม่มี table) ก่อน
+- ตอนทำ 7b: เพิ่ม schema file ใหม่ + regenerate types/database.ts (auto-gen — ห้ามแก้มือ) + RLS (admin-only)
+
+### กฎที่ต้อง preserve / แก้
+- ✅ Preview ก่อน save ยังอยู่ — admin เลือกเอง = preview
+- ✅ ห้าม auto-save (สร้าง media อัตโนมัติ) ยังอยู่ — cache candidates ≠ save
+- 🔧 .claude/rules/admin.md:
+  - เพิ่ม: "cache discovery candidates ไม่ถือเป็น save — ห้ามสร้าง media อัตโนมัติ"
+  - แก้: bulk import แบบ select-list อนุญาต; bulk retry ยังห้าม (ทีละรายการ)
+- Dedup ด้วย anilist_id (unique ทั้ง media + candidates) — ข้ามที่มีแล้ว ไม่ overwrite
+- sync_log ต่อเรื่องตอน import — 1 เรื่อง fail ไม่ล้มทั้ง batch
+
+### Architecture (Clean Architecture เดิม)
+- lib/anilist/ — Page query (browse by season/year/status) + list mapper
+- domain/entities/ — ImportCandidate (7b)
+- domain/usecases/ — DiscoverUpcoming, BulkImportSelected, DismissCandidate (7b)
+- repositories/ — IImportCandidateRepository + Supabase impl (7b)
+- actions/ — refreshDiscoveryAction / bulkImportAction / dismissCandidateAction
+- rate limit: sleep ระหว่าง request, เคารพ ~30-90 req/min (Page ดึงทีละ ~50 ประหยัด quota)
+
+### ⚠️ ต้อง confirm ตอนเริ่ม
+1. notification ขึ้นที่ไหน — admin dashboard "Needs attention" inbox (มีอยู่แล้ว) เพิ่ม section?
+2. cron mechanism (7c) ใช้ตัวเดียวกับ auto-sync Phase 6
 
 ---
 
