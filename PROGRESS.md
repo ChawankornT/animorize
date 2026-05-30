@@ -15,7 +15,7 @@ claude_md_version: 2026-05-30-v5
 
 ## Current Phase
 - **Active:** Phase 3 — User Library & Dashboard
-- **Status:** Phase 2 merged to main (PR #3) — พร้อมเริ่ม Phase 3
+- **Status:** Pre-Phase 3 foundation merged to main (PR #10 → #11) — พร้อมเริ่ม Phase 3 Foundation
 
 ## Phase 2 Progress
 - [x] Phase 2 schema migration — schema/ folder (13 SQL files) + types/database.ts updated
@@ -57,36 +57,35 @@ claude_md_version: 2026-05-30-v5
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
-| 2026-05-30 | chore(pre-phase3): ESLint dependency rules, getDisplayTitle refactor, vitest + 60 tests, decisions + CLAUDE.md + rules update | eslint.config.mjs, domain/entities/title.ts, Media.ts, Franchise.ts, vitest.config.ts, src/__tests__/ (7 files), DECISIONS.md, CLAUDE.md, .claude/rules/ (4 files) |
+| 2026-05-30 | chore(rules): เพิ่มกฎ branch cleanup — `[gone]` vs unpushed แยกชัด; merge เข้า `develop` ห้าม `--delete-branch` | .claude/rules/git.md |
+| 2026-05-30 | chore(pre-phase3): ESLint dependency rules, getDisplayTitle refactor, vitest + 60 tests, decisions + CLAUDE.md + rules update (PR #10 → #11 → main) | eslint.config.mjs, domain/entities/title.ts, Media.ts, Franchise.ts, vitest.config.ts, src/__tests__/ (7 files), DECISIONS.md, CLAUDE.md, .claude/rules/ (5 files) |
 | 2026-05-30 | docs: revise roadmap Phase 3-6 + เพิ่ม Phase 7 (Discovery & Bulk Import, admin) | DECISIONS.md, PROJECT_INSTRUCTIONS.md, CHANGELOG.md, PROGRESS.md |
-| 2026-05-29 | chore(rules): สร้าง `.claude/rules/git.md` — convention ต้องรอ CI pass ก่อน merge + branch naming + commit convention | .claude/rules/git.md (ใหม่) |
-| 2026-05-29 | fix(admin): poster rendering ใน media list/detail/import + Sync now button + UI consistency (PR #6) | media/page.tsx, media/[id]/page.tsx, ImportPanel.tsx, RetrySyncButton.tsx, AssignProviderForm.tsx, DeleteConfirmModal.tsx, RemoveProviderButton.tsx, Modal.tsx |
+| 2026-05-29 | fix(admin): poster rendering + Sync now button + UI consistency (PR #6) | media/page.tsx, media/[id]/page.tsx, ImportPanel.tsx, RetrySyncButton.tsx, AssignProviderForm.tsx, DeleteConfirmModal.tsx, RemoveProviderButton.tsx, Modal.tsx |
 | 2026-05-29 | fix(admin): 4 bugs (PR #5) — toSyncLog EN-first, secondary title, AniList episodes null→undefined, retrySync fetch fail log | mappers.ts, media/page.tsx, anilist/mapper.ts, RetrySync.ts, actions/anilist.ts |
 
 ## Blockers
 [ยังไม่มี]
 
 ## Notes for Chat
-- **Pre-Phase 3 foundation done** (branch: `chore/pre-phase3-foundation`) — 4 commits, พร้อม PR เข้า develop แล้ว merge main
-- **ESLint dependency rules active** — domain/ + repositories/ มี `no-restricted-imports` fail ที่ CI ถ้าละเมิด Clean Architecture
-- **getDisplayTitle** — shared util ที่ `domain/entities/title.ts`, re-exported จาก Media + Franchise; ห้าม inline `titleEn ?? titleRomaji ?? titleTh` ในโค้ดใหม่
-- **vitest + 60 tests** — ครอบ domain entities, usecases, mappers; harness อยู่ที่ `src/__tests__/utils/mockRepositories.ts`
-- **DECISIONS.md มี 7 entries ใหม่** (Pre-Phase 3 section): client data layer, validation SoT, testing policy, ESLint enforcement, RLS pattern, atomic +1 RPC exception, optimistic UI pattern
-- **Phase 2 merged to main** (PR #3) — 120 files, 5853 insertions — พร้อมเริ่ม Phase 3
-- **3 bugs fixed หลัง code review** — (1) ImportPanel autoSync checkbox ใช้ `name="autoSync" value="true"` แล้ว (ไม่ใช่ `autoSyncCheck`); (2) `totalEpisodes ?? 1` แล้ว (ไม่ใช่ 0); (3) `retrySyncAction` revalidate `/admin/sync-logs` ด้วยแล้ว
-- **4 bugs fixed (PR #5, issue #4) — merged to main** — (1) `toSyncLog()` ใน `mappers.ts` เป็น EN-first แล้ว (Known issue เดิมแก้แล้ว); (2) media list secondary title เทียบ `primaryTitle`; (3) AniList `mapper.ts` คืน `undefined` เมื่อ episodes=null (เดิม `?? 0` ทำให้ import ได้ total_episodes=0 — กระทบ Phase 4); (4) retry-sync fetch fail บันทึก failed sync_log แล้ว
-- **`retrySync()` signature เปลี่ยน** — เดิม `(mediaRepo, syncLogRepo, mediaId, updateInput)` → ตอนนี้ `(mediaRepo, syncLogRepo, mediaId, fetchUpdate)` โดย `fetchUpdate: () => Promise<Partial<UpdateMediaInput>>` (inject AniList fetch เป็น callback ให้ try/catch ครอบ fetch+update ทั้งคู่ — infra dependency อยู่นอก domain)
-- **src/constants/admin.ts** — shared constants: `MEDIA_TYPE_LABELS`, `MEDIA_STATUS_VARIANT`, `SEASON_LABELS`, `TILE_COLORS` — import จากที่นี่
-- **RemoveProviderButton pattern** — ใช้ `DeleteConfirmModal` (migrate แล้ว PR #6) — inject `mediaId` ผ่าน `actionWithMediaId` wrapper แทน hidden input
-- **removeProviderAction signature** — `(id: string, prevState, formData)` (3 args)
-- **DeleteConfirmModal** รับ `submitLabel?` / `submitPendingLabel?` optional props แล้ว (default "Delete"/"Deleting…")
-- **MediaProvider JOIN** — `SupabaseMediaProviderRepository.findByMediaId()` ใช้ `select('*, providers(name, color)')` → entity มี `providerName`, `providerColor`
-- **Import flow:** fetchAnilistPreviewAction (fetch + duplicate check, ไม่ save) → saveImportAction (save + sync_log) — ห้าม auto-save
-- **Dev DB migration ต้องทำ (ถ้ายังไม่ได้ทำ):** รัน `schema/01-enums.sql` + `schema/03-franchises.sql` → `schema/12-indexes.sql` ตามลำดับ (ข้าม 00, 02)
-- Google OAuth ยังไม่ทำ — Phase 1 ใช้ Email/Password เท่านั้น
-- **Title order ฝั่ง user = เหมือน admin (EN-first)** — ยืนยัน 2026-05-29 ไม่แบ่งภาษา, getDisplayTitle() ใช้ตัวเดียวร่วมกัน ไม่ต้องเพิ่ม variant
-- **Phase 3 พร้อมเริ่ม** — schema user_media + watchlogs มีแล้ว, ยังไม่มี entity/repository (= งาน Phase 3)
-- **Roadmap revised 2026-05-30** — Phase 3/4 เพิ่ม Foundation (domain→repo→usecase) tasks, Phase 6 cron แก้เป็น Vercel Cron/Edge Function (ไม่ใช่ pg_cron เพียว) + reconcile section keep-alive ให้ตรงกัน (keep-alive = standalone pg_cron SELECT 1)
-- **Phase 7 planned** — Discovery & Bulk Import (admin) ดู DECISIONS rev.3; schema (import_candidates) defer จนถึง 7b
-- **poster bug + Sync now** — แก้แล้วใน PR #6 (merged to main) แยกจาก Phase 3 — next/image host (s4.anilist.co) config พร้อมให้ Phase 3 MediaCard ใช้
-- ⚠️ **PROJECT_INSTRUCTIONS.md เปลี่ยน** (เพิ่ม Phase 7 ใน MVP Phases) — Chat ต้อง re-upload ไฟล์ใหม่ (instructions_version → 2026-05-30-v2)
+### Foundation (on main — พร้อมใช้)
+- **Pre-Phase 3 foundation merged to main** (PR #10 develop, PR #11 main) — ESLint rules, getDisplayTitle refactor, vitest + 60 tests, decisions + rules
+- **ESLint dependency rules active** — `domain/` + `repositories/` มี `no-restricted-imports`; violations fail ที่ CI lint step อัตโนมัติ
+- **getDisplayTitle** — single impl ที่ `domain/entities/title.ts`, re-exported จาก Media + Franchise; ห้าม inline `titleEn ?? titleRomaji ?? titleTh` ในโค้ดใหม่
+- **vitest + 60 tests** — harness ที่ `src/__tests__/utils/mockRepositories.ts`; Phase 3 usecases ใช้ harness นี้ต่อได้เลย
+- **DECISIONS.md มี 7 entries ใหม่** (Pre-Phase 3): client data layer (Server Actions + useOptimistic, TanStack Query defer), validation SoT, testing policy, ESLint enforcement, RLS pattern, atomic +1 RPC exception, optimistic UI pattern
+- **Git rule** — merge `develop → main` ห้าม `--delete-branch` (develop = long-lived branch); `[gone]` vs unpushed แยกชัดในกฎ
+
+### Phase 3 — สิ่งที่ต้องทำต่อ
+- **Phase 3 พร้อมเริ่ม** — schema `user_media` + `watchlogs` มีแล้วใน DB; ยังไม่มี entity/repository (= งาน Phase 3 Foundation)
+- **เริ่มที่ Foundation ก่อน**: UserMedia entity → IUserMediaRepository interface → SupabaseUserMediaRepository → factory → usecases (AddToLibrary, ToggleFavorite, RemoveFromLibrary, ListUserLibrary) — แล้วค่อยทำ UI
+- **RLS pattern**: `user_media` + `watchlogs` ต้องใช้ `server.ts` (session client) เท่านั้น — ห้าม service-role
+
+### ข้อมูล Admin (Phase 2 stable)
+- **Import flow**: fetchAnilistPreviewAction (fetch + dup check, ไม่ save) → saveImportAction — ห้าม auto-save
+- **src/constants/admin.ts** — `MEDIA_TYPE_LABELS`, `MEDIA_STATUS_VARIANT`, `SEASON_LABELS`, `TILE_COLORS`
+- **MediaProvider JOIN** — `findByMediaId()` ใช้ `select('*, providers(name, color)')` → entity มี `providerName`, `providerColor`
+- **next/image host** — `s4.anilist.co` config อยู่แล้ว พร้อมให้ Phase 3 MediaCard ใช้
+
+### Misc
+- Google OAuth ยังไม่ทำ — Email/Password เท่านั้น
+- ⚠️ **PROJECT_INSTRUCTIONS.md เปลี่ยน** (เพิ่ม Phase 7) — Chat ต้อง re-upload (instructions_version → 2026-05-30-v2)
