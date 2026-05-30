@@ -115,7 +115,7 @@ export default async function MediaDetailPage({
           <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
           {/* Title text */}
           <span className="relative z-10 text-[10px] font-medium text-white leading-snug">
-            {media.titleEn ?? media.titleRomaji ?? media.titleTh}
+            {getDisplayTitle(media)}
           </span>
         </div>
 
