@@ -5,6 +5,28 @@
 
 ---
 
+## [2026-05-30] Pre-Phase 3 Foundation
+
+### Architecture
+- **ESLint dependency rules** — `eslint.config.mjs` เพิ่ม `no-restricted-imports` overrides สำหรับ `domain/` และ `repositories/` — กฎ Clean Architecture บังคับ fail ที่ CI lint step อัตโนมัติ (ไม่ต้องอาศัยวินัย reviewer)
+- **getDisplayTitle shared util** — ตัด logic ซ้ำออกจาก `Media.ts` + `Franchise.ts` → `domain/entities/title.ts` เป็น single implementation; ทั้งคู่ re-export ตรงๆ ไม่มี wrapper; แก้ inline ใน admin media detail page ด้วย
+
+### Testing
+- **Vitest setup** — `vitest.config.ts` + `@/` alias ตรงกับ tsconfig
+- **Mock repository harness** — `src/__tests__/utils/mockRepositories.ts`: `createMockMediaRepository` + `createMockSyncLogRepository` + stub builders — Phase 3+ reuse ได้
+- **60 backfill unit tests** — ครอบ bug cases ที่เคยพังจริง: `episodes null→undefined` (AniList mapper), `toSyncLog EN-first`, `RetrySync PROTECTED fields stripped`, `RetrySync fetch/update fail → write failed log + rethrow`, `validateMedia movie=1ep`, `getDisplayTitle EN>Romaji>TH`, `validateFranchise/Media at-least-one-title`
+
+### Decisions + Conventions (Pre-Phase 3 section)
+- Client data layer: Server Actions + useOptimistic; TanStack Query defer ถึง search autocomplete
+- Validation SoT: Zod=shape, domain=canonical; trivial overlap documented
+- Testing policy: usecase/mapper required, no % gate, RTL defer
+- Dependency rule: ESLint built-in enforcement (ปฏิเสธ eslint-plugin-boundaries)
+- RLS pattern: user-owned tables ใช้ session client (`server.ts`) เท่านั้น
+- Atomic +1 RPC: documented exception to domain-purity (Phase 4)
+- Optimistic UI: useOptimistic + error contract `{success, message, errors?}`
+
+---
+
 ## [2026-05-30] Roadmap Revision + Phase 7 Planned
 
 ### Roadmap

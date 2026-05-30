@@ -8,9 +8,9 @@
 ## Versions (สำหรับ sync check)
 ```
 instructions_version: 2026-05-30-v2
-decisions_version: 2026-05-30-v3
+decisions_version: 2026-05-30-v4
 schema_version: 2026-05-27-v2
-claude_md_version: 2026-05-29-v4
+claude_md_version: 2026-05-30-v5
 ```
 
 ## Current Phase
@@ -57,16 +57,21 @@ claude_md_version: 2026-05-29-v4
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
-| 2026-05-30 | docs: revise roadmap Phase 3-6 (Foundation domain→repo→usecase, MediaCard poster, Phase 5 audit) + แก้ pg_cron auto-sync → Vercel Cron/Edge + reconcile keep-alive + เพิ่ม Phase 7 (Discovery & Bulk Import, admin) | DECISIONS.md, PROJECT_INSTRUCTIONS.md, CHANGELOG.md, PROGRESS.md |
-| 2026-05-29 | chore(rules): สร้าง `.claude/rules/git.md` — convention ต้องรอ CI pass ก่อน merge ทุก PR (feature→develop, develop→main) + branch naming + commit convention | .claude/rules/git.md (ใหม่) |
-| 2026-05-29 | fix(admin): poster rendering ใน media list/detail/import + Sync now button + UI consistency (PR #6) — poster ใน tile 3 ขนาด, Sync now button บน detail, revalidate detail หลัง sync, AssignProviderForm success green, RetrySyncButton message absolute, RemoveProviderButton → DeleteConfirmModal, Modal text-left | media/page.tsx, media/[id]/page.tsx, ImportPanel.tsx, RetrySyncButton.tsx, AssignProviderForm.tsx, DeleteConfirmModal.tsx, RemoveProviderButton.tsx, mediaProvider.ts, anilist.ts, Modal.tsx |
-| 2026-05-29 | fix(admin): 4 bugs จาก follow-up code review (issue #4, PR #5) — (1) toSyncLog Thai-first → EN-first; (2) media list secondary title เทียบ primaryTitle (ไม่ใช่ titleEn); (3) AniList mapper `?? undefined` (เดิม `?? 0` ทำให้ `?? 1` ไม่ทำงาน → total_episodes=0); (4) retrySync รับ fetch เป็น callback → fetch fail ก็เขียน failed sync_log + revalidate /admin/sync-logs ใน catch | src/repositories/supabase/mappers.ts, src/app/admin/media/page.tsx, src/lib/anilist/mapper.ts, src/domain/usecases/RetrySync.ts, src/app/actions/anilist.ts |
-| 2026-05-29 | fix(import): 3 bugs จาก code review + PR comment — autoSync checkbox (name="autoSync"), totalEpisodes ?? 1 (ไม่ใช่ 0), retrySyncAction revalidate /admin/sync-logs ด้วย | src/components/admin/ImportPanel.tsx, src/app/actions/anilist.ts |
+| 2026-05-30 | chore(pre-phase3): ESLint dependency rules, getDisplayTitle refactor, vitest + 60 tests, decisions + CLAUDE.md + rules update | eslint.config.mjs, domain/entities/title.ts, Media.ts, Franchise.ts, vitest.config.ts, src/__tests__/ (7 files), DECISIONS.md, CLAUDE.md, .claude/rules/ (4 files) |
+| 2026-05-30 | docs: revise roadmap Phase 3-6 + เพิ่ม Phase 7 (Discovery & Bulk Import, admin) | DECISIONS.md, PROJECT_INSTRUCTIONS.md, CHANGELOG.md, PROGRESS.md |
+| 2026-05-29 | chore(rules): สร้าง `.claude/rules/git.md` — convention ต้องรอ CI pass ก่อน merge + branch naming + commit convention | .claude/rules/git.md (ใหม่) |
+| 2026-05-29 | fix(admin): poster rendering ใน media list/detail/import + Sync now button + UI consistency (PR #6) | media/page.tsx, media/[id]/page.tsx, ImportPanel.tsx, RetrySyncButton.tsx, AssignProviderForm.tsx, DeleteConfirmModal.tsx, RemoveProviderButton.tsx, Modal.tsx |
+| 2026-05-29 | fix(admin): 4 bugs (PR #5) — toSyncLog EN-first, secondary title, AniList episodes null→undefined, retrySync fetch fail log | mappers.ts, media/page.tsx, anilist/mapper.ts, RetrySync.ts, actions/anilist.ts |
 
 ## Blockers
 [ยังไม่มี]
 
 ## Notes for Chat
+- **Pre-Phase 3 foundation done** (branch: `chore/pre-phase3-foundation`) — 4 commits, พร้อม PR เข้า develop แล้ว merge main
+- **ESLint dependency rules active** — domain/ + repositories/ มี `no-restricted-imports` fail ที่ CI ถ้าละเมิด Clean Architecture
+- **getDisplayTitle** — shared util ที่ `domain/entities/title.ts`, re-exported จาก Media + Franchise; ห้าม inline `titleEn ?? titleRomaji ?? titleTh` ในโค้ดใหม่
+- **vitest + 60 tests** — ครอบ domain entities, usecases, mappers; harness อยู่ที่ `src/__tests__/utils/mockRepositories.ts`
+- **DECISIONS.md มี 7 entries ใหม่** (Pre-Phase 3 section): client data layer, validation SoT, testing policy, ESLint enforcement, RLS pattern, atomic +1 RPC exception, optimistic UI pattern
 - **Phase 2 merged to main** (PR #3) — 120 files, 5853 insertions — พร้อมเริ่ม Phase 3
 - **3 bugs fixed หลัง code review** — (1) ImportPanel autoSync checkbox ใช้ `name="autoSync" value="true"` แล้ว (ไม่ใช่ `autoSyncCheck`); (2) `totalEpisodes ?? 1` แล้ว (ไม่ใช่ 0); (3) `retrySyncAction` revalidate `/admin/sync-logs` ด้วยแล้ว
 - **4 bugs fixed (PR #5, issue #4) — merged to main** — (1) `toSyncLog()` ใน `mappers.ts` เป็น EN-first แล้ว (Known issue เดิมแก้แล้ว); (2) media list secondary title เทียบ `primaryTitle`; (3) AniList `mapper.ts` คืน `undefined` เมื่อ episodes=null (เดิม `?? 0` ทำให้ import ได้ total_episodes=0 — กระทบ Phase 4); (4) retry-sync fetch fail บันทึก failed sync_log แล้ว
