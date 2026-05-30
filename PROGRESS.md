@@ -8,14 +8,32 @@
 ## Versions (สำหรับ sync check)
 ```
 instructions_version: 2026-05-30-v2
-decisions_version: 2026-05-30-v4
+decisions_version: 2026-05-31-v1
 schema_version: 2026-05-27-v2
 claude_md_version: 2026-05-30-v5
 ```
 
 ## Current Phase
 - **Active:** Phase 3 — User Library & Dashboard
-- **Status:** Pre-Phase 3 foundation merged to main (PR #10 → #11) — พร้อมเริ่ม Phase 3 Foundation
+- **Status:** Foundation (domain + repository + usecases) done on branch `feat/user-library` — พร้อม PR เข้า develop, รอ review + CI ก่อน merge
+
+## Phase 3 Progress
+
+### Foundation (branch: feat/user-library — รอ PR merge)
+- [x] RLS ยืนยัน — `user_media` `for all` (4 ops), `watchlogs` SELECT+INSERT only (immutable) — อยู่ใน `11-rls.sql` แล้ว, ไม่ต้อง apply เพิ่ม
+- [x] `UserMedia` entity + `UserMediaWithMedia` + `AddToLibraryInput` + 3 business-rule functions — `src/domain/entities/UserMedia.ts`
+- [x] `IUserMediaRepository` interface — `src/repositories/interfaces/IUserMediaRepository.ts`
+- [x] `SupabaseUserMediaRepository` (server.ts client, nested JOIN) + mappers + factory — `src/repositories/supabase/SupabaseUserMediaRepository.ts`
+- [x] 4 usecases: `AddToLibrary`, `ToggleFavorite`, `RemoveFromLibrary`, `ListUserLibrary` — `src/domain/usecases/`
+- [x] mock harness ขยาย (`makeUserMedia`, `makeUserMediaWithMedia`, `createMockUserMediaRepository`) — `src/__tests__/utils/mockRepositories.ts`
+- [x] 98 tests ผ่าน (38 เพิ่มใน session นี้) — `npm run lint` + `npm run typecheck` + `npm test` ผ่านทั้งหมด
+
+### Features (ยังไม่เริ่ม — หลัง Foundation merge)
+- [ ] Search — match ข้าม title_th / title_en / title_romaji + autocomplete
+- [ ] เพิ่ม media เข้า library จาก search result + เลือก Provider + audio + custom URL
+- [ ] Favorite (star) toggle + optimistic update
+- [ ] Dashboard: status='watching' OR is_favorite=true
+- [ ] MediaCard: poster จริง (next/image) + fallback color tile + Provider badge
 
 ## Phase 2 Progress
 - [x] Phase 2 schema migration — schema/ folder (13 SQL files) + types/database.ts updated
@@ -57,33 +75,40 @@ claude_md_version: 2026-05-30-v5
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
+| 2026-05-31 | feat: Phase 3 Foundation — UserMedia entity, IUserMediaRepository, SupabaseUserMediaRepository (nested JOIN), 4 usecases, mock harness ขยาย, 98 tests ผ่าน, URL resolution model documented | domain/entities/UserMedia.ts, repositories/interfaces/IUserMediaRepository.ts, repositories/supabase/SupabaseUserMediaRepository.ts, repositories/supabase/mappers.ts, repositories/index.ts, src/__tests__/ (5 files) |
+| 2026-05-31 | docs: DECISIONS.md เพิ่ม URL resolution model 3 ชั้น (providers/media_providers/user_media) | DECISIONS.md |
 | 2026-05-30 | chore(rules): เพิ่มกฎ branch cleanup — `[gone]` vs unpushed แยกชัด; merge เข้า `develop` ห้าม `--delete-branch` | .claude/rules/git.md |
 | 2026-05-30 | chore(pre-phase3): ESLint dependency rules, getDisplayTitle refactor, vitest + 60 tests, decisions + CLAUDE.md + rules update (PR #10 → #11 → main) | eslint.config.mjs, domain/entities/title.ts, Media.ts, Franchise.ts, vitest.config.ts, src/__tests__/ (7 files), DECISIONS.md, CLAUDE.md, .claude/rules/ (5 files) |
 | 2026-05-30 | docs: revise roadmap Phase 3-6 + เพิ่ม Phase 7 (Discovery & Bulk Import, admin) | DECISIONS.md, PROJECT_INSTRUCTIONS.md, CHANGELOG.md, PROGRESS.md |
-| 2026-05-29 | fix(admin): poster rendering + Sync now button + UI consistency (PR #6) | media/page.tsx, media/[id]/page.tsx, ImportPanel.tsx, RetrySyncButton.tsx, AssignProviderForm.tsx, DeleteConfirmModal.tsx, RemoveProviderButton.tsx, Modal.tsx |
-| 2026-05-29 | fix(admin): 4 bugs (PR #5) — toSyncLog EN-first, secondary title, AniList episodes null→undefined, retrySync fetch fail log | mappers.ts, media/page.tsx, anilist/mapper.ts, RetrySync.ts, actions/anilist.ts |
 
 ## Blockers
 [ยังไม่มี]
 
 ## Notes for Chat
-### Foundation (on main — พร้อมใช้)
-- **Pre-Phase 3 foundation merged to main** (PR #10 develop, PR #11 main) — ESLint rules, getDisplayTitle refactor, vitest + 60 tests, decisions + rules
-- **ESLint dependency rules active** — `domain/` + `repositories/` มี `no-restricted-imports`; violations fail ที่ CI lint step อัตโนมัติ
-- **getDisplayTitle** — single impl ที่ `domain/entities/title.ts`, re-exported จาก Media + Franchise; ห้าม inline `titleEn ?? titleRomaji ?? titleTh` ในโค้ดใหม่
-- **vitest + 60 tests** — harness ที่ `src/__tests__/utils/mockRepositories.ts`; Phase 3 usecases ใช้ harness นี้ต่อได้เลย
-- **DECISIONS.md มี 7 entries ใหม่** (Pre-Phase 3): client data layer (Server Actions + useOptimistic, TanStack Query defer), validation SoT, testing policy, ESLint enforcement, RLS pattern, atomic +1 RPC exception, optimistic UI pattern
-- **Git rule** — merge `develop → main` ห้าม `--delete-branch` (develop = long-lived branch); `[gone]` vs unpushed แยกชัดในกฎ
+### Phase 3 Foundation (branch: feat/user-library — รอ PR + merge)
+- **Foundation สร้างครบแล้ว** บน branch `feat/user-library` — ยังไม่ merge; รอ PR เข้า develop + CI ผ่าน
+- **UserMedia entity** — `src/domain/entities/UserMedia.ts`: types + 3 business-rule functions (`getEffectiveUrl`, `isDashboardItem`, `getDisplayTitle` reuse)
+- **Repository** — `IUserMediaRepository` (7 methods) + `SupabaseUserMediaRepository` (nested JOIN `media.media_providers.base_url`) + factory `createUserMediaRepository(supabase)`
+  - ⚠️ **baseUrl** มาจาก `media_providers.base_url` (match `provider_id + audio`) **ไม่ใช่** `providers.base_url` (หน้าแรก provider) — ดู DECISIONS.md § "URL Resolution Model"
+  - **SupabaseUserMediaRepository ต้องรับ server.ts client เท่านั้น** — factory caller (Server Action) ต้องสร้าง `createServerClient()` ก่อนส่งเข้า
+- **4 usecases**: `addToLibrary` (dup → error), `toggleFavorite` (flip), `removeFromLibrary`, `listUserLibrary(filter: 'all'|'dashboard')`
+- **mock harness** ขยายแล้ว: `makeUserMedia`, `makeUserMediaWithMedia`, `createMockUserMediaRepository` ใน `mockRepositories.ts`
+- **98 tests ผ่าน** (38 ใหม่: entity 17, mapper +14, usecases 13); lint + typecheck ผ่าน
 
-### Phase 3 — สิ่งที่ต้องทำต่อ
-- **Phase 3 พร้อมเริ่ม** — schema `user_media` + `watchlogs` มีแล้วใน DB; ยังไม่มี entity/repository (= งาน Phase 3 Foundation)
-- **เริ่มที่ Foundation ก่อน**: UserMedia entity → IUserMediaRepository interface → SupabaseUserMediaRepository → factory → usecases (AddToLibrary, ToggleFavorite, RemoveFromLibrary, ListUserLibrary) — แล้วค่อยทำ UI
-- **RLS pattern**: `user_media` + `watchlogs` ต้องใช้ `server.ts` (session client) เท่านั้น — ห้าม service-role
+### Phase 3 Features — สิ่งที่ต้องทำต่อ (หลัง Foundation merge)
+- **Server Actions** สำหรับ add/favorite/remove (เรียก usecases + return `{success, message, errors?}`)
+- **Search + autocomplete** (TanStack Query candidate สำหรับ dedup/stale-while-revalidate)
+- **Dashboard page** — filter `listUserLibrary(userId, 'dashboard')` → `useOptimistic` สำหรับ favorite toggle
+- **MediaCard** — poster (next/image `s4.anilist.co`), fallback color tile, Provider badge
+
+### Foundation (on main — stable)
+- **Pre-Phase 3 foundation** (PR #11 → main): ESLint dependency rules, `getDisplayTitle` shared util, vitest + 60 tests
+- **ESLint rules** — `domain/` + `repositories/` `no-restricted-imports` fail ที่ CI อัตโนมัติ
+- **Git rule** — merge `develop → main` ห้าม `--delete-branch`; `[gone]` vs no-tracking แยกชัด
 
 ### ข้อมูล Admin (Phase 2 stable)
-- **Import flow**: fetchAnilistPreviewAction (fetch + dup check, ไม่ save) → saveImportAction — ห้าม auto-save
+- **Import flow**: fetchAnilistPreviewAction → saveImportAction — ห้าม auto-save
 - **src/constants/admin.ts** — `MEDIA_TYPE_LABELS`, `MEDIA_STATUS_VARIANT`, `SEASON_LABELS`, `TILE_COLORS`
-- **MediaProvider JOIN** — `findByMediaId()` ใช้ `select('*, providers(name, color)')` → entity มี `providerName`, `providerColor`
 - **next/image host** — `s4.anilist.co` config อยู่แล้ว พร้อมให้ Phase 3 MediaCard ใช้
 
 ### Misc

@@ -1,7 +1,7 @@
 # ANIMORIZE — DECISIONS.md
 > บันทึกเหตุผลการตัดสินใจทุกอย่างในโปรเจค
 > อัปเดตทุกครั้งที่มีการเปลี่ยน tech, approach, หรือ scope
-> อัปเดตล่าสุด: 2026-05-30
+> อัปเดตล่าสุด: 2026-05-31
 
 ---
 
@@ -476,6 +476,27 @@ Schema ปัจจุบันรองรับได้ด้วย `air_date
 ### ⚠️ ต้อง confirm ตอนเริ่ม
 1. notification ขึ้นที่ไหน — admin dashboard "Needs attention" inbox (มีอยู่แล้ว) เพิ่ม section?
 2. cron mechanism (7c) ใช้ตัวเดียวกับ auto-sync Phase 6
+
+---
+
+## Phase 3 Foundation Decisions
+> บันทึก 2026-05-31 — เคาะระหว่างสร้าง UserMedia entity + repository
+
+### URL Resolution Model — 3 ชั้น (เคาะ 2026-05-31)
+```
+providers.base_url       — หน้าแรกของ provider (e.g. bilibili.com)
+media_providers.base_url — ลิงก์เรื่องนี้บน provider (admin-managed; อาจมาจาก AniList import)
+user_media.custom_url    — user override (e.g. ชี้ไป /play หรือ episode ที่ bookmark ไว้)
+
+Effective URL = custom_url ?? media_providers.base_url
+```
+**keyed by `(media_id, provider_id, audio)` unique** → sub/dub แยกลิงก์ได้ในเรื่องเดียวกัน
+
+**ปฏิเสธ:** ใช้ `providers.base_url` โดยตรง — เป็น provider homepage ไม่ใช่ลิงก์เรื่อง
+
+**Per-episode URL = future/post-MVP** (ต้องการ table ใหม่ key `media+episode`; `watchlogs` ปัจจุบันเก็บแค่ `episode_number`, ไม่มี URL)
+
+**Implementation:** `getEffectiveUrl(customUrl, baseUrl)` ใน `domain/entities/UserMedia.ts`; `baseUrl` ดึงจาก nested JOIN `media.media_providers.base_url` match `(provider_id, audio)` ใน `toUserMediaWithMedia` mapper
 
 ---
 
