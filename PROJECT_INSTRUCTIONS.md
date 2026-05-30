@@ -225,4 +225,5 @@ Phase 3  User Library & Dashboard
 Phase 4  Progress Tracking + Watchlog
 Phase 5  UX Polish
 Phase 6  Extended Features
+Phase 7  Discovery & Bulk Import (admin) — forward-only, lean-cache candidates
 ```
