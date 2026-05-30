@@ -1,3 +1,5 @@
+export { getDisplayTitle } from '@/domain/entities/title';
+
 export interface Franchise {
   id: string;
   titleTh: string | null;
@@ -35,8 +37,3 @@ export function validateFranchise(data: {
   }
 }
 
-export function getDisplayTitle(
-  franchise: Pick<Franchise, 'titleTh' | 'titleEn' | 'titleRomaji'>,
-): string {
-  return franchise.titleEn ?? franchise.titleRomaji ?? franchise.titleTh ?? '';
-}
