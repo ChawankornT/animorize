@@ -115,6 +115,78 @@ UI            → app/ + components/         (render เท่านั้น)
 
 ---
 
+## Pre-Phase 3 Foundation Decisions
+> บันทึก 2026-05-30 — เคาะก่อนเริ่ม Phase 3 เพื่อให้โค้ด Phase 3 เกิดมาสะอาด
+
+### Client Data Layer: Server Actions + useOptimistic (ไม่ wire TanStack Query ล่วงหน้า)
+**ปฏิเสธ:** wire TanStack Query ตั้งแต่ต้น Phase 3
+**เหตุผล:**
+- Architecture เป็น Server Components (อ่าน) + Server Actions (เขียน) อยู่แล้ว → TanStack Query ส่วนใหญ่ซ้ำซ้อน
+- `useOptimistic` ครอบ optimistic UX ได้ตรงๆ โดยไม่ต้องเพิ่ม abstraction
+- Candidate เดียวที่ TanStack Query จะ justify ได้ตอนนี้คือ search autocomplete (dedup, stale-while-revalidate) — adopt เฉพาะตอนสร้าง search จริง ไม่ wire ล่วงหน้า
+- TanStack Query ยังคง locked stack (available) — ไม่ได้ตัดออก แค่ defer จนมีเหตุผลชัดเจน
+
+### Validation Single Source of Truth
+**กฎ:**
+- Zod = ตรวจรูปแบบ/ความครบของ input ที่ขอบ Server Action (parse untrusted input → typed)
+- Domain entities (`validateMedia`, `validateFranchise` ฯลฯ) = business invariant ที่เป็น canonical
+- ห้าม business rule เดียวกัน implement ซ้ำทั้ง 2 ที่ — ถ้าทับซ้อนให้ domain เป็น canonical
+
+**Overlap ที่ยอมรับ (trivial):**
+- `franchiseSchema.refine(at-least-one-title)` + `validateFranchise` ทั้งคู่เช็ค at-least-one-title
+- `mediaSchema.refine(at-least-one-title)` + `validateMedia` เช่นกัน
+- `providerFields` Zod slug/color regex + `validateProvider` เช่นกัน
+- เหตุผลที่ยอมรับ: Zod ให้ user-facing error message ที่ formatted; domain เป็น safety net ถ้า action ถูก call bypass UI — ไม่ใช่ logic ซ้อน แต่เป็น defense in depth ที่ตั้งใจ
+- ถ้า rule เปลี่ยน → แก้ domain ก่อนเสมอ แล้วค่อย sync Zod message
+
+### Testing Policy (MVP)
+**กฎ:**
+- ไม่ตั้ง coverage % gate — CI รัน test ทุก PR แต่ไม่ fail บน threshold
+- usecase และ mapper ใหม่ทุกตัวต้องมาพร้อม unit test (pure, mock repository, ไม่ต่อ DB)
+- Mock repository harness อยู่ที่ `src/__tests__/utils/mockRepositories.ts` — Phase 3+ reuse ได้
+- Priority: `domain/usecases/` + mappers + Zod schema (admin input)
+- RTL/component test = defer (ROI ต่ำสำหรับ solo, ทบทวน Phase 5)
+
+### Dependency Rule Enforcement: ESLint no-restricted-imports
+**ปฏิเสธ:** `eslint-plugin-boundaries` / วินัยมนุษย์เพียงอย่างเดียว
+**เหตุผล:**
+- กฎ architecture ที่พึ่งวินัยมนุษย์จะถูกละเมิดเงียบ → ให้เครื่องบังคับแทนการ review ด้วยตา
+- `no-restricted-imports` เป็น built-in ไม่ต้องเพิ่ม dependency
+- ปฏิเสธ `eslint-plugin-boundaries` เพราะเพิ่ม dependency โดยไม่จำเป็นสำหรับกฎระดับนี้
+
+**กฎที่บังคับ (ดู `eslint.config.mjs`):**
+- `src/domain/**` — ห้าม import: react, next, @supabase/*, @/lib/supabase/*, @/repositories/supabase/* (implementations), @/hooks/*, @/components/*, @/app/*, @/stores/*
+- `src/repositories/**` — ห้าม import: react, next, @/hooks/*, @/components/*, @/app/*, @/stores/*
+- **อนุญาต:** `@/repositories/interfaces/*` ใน domain (dependency inversion — usecase import interface type ได้)
+
+### RLS Pattern สำหรับ User-owned Tables (เตรียม Phase 3/4 — ยังไม่ implement)
+**กฎ:**
+- `user_media` / `watchlogs` = per-user data ตัวแรกของโปรเจกต์
+- Policy ครบ 4 operation: `auth.uid() = user_id` สำหรับ SELECT/INSERT/UPDATE/DELETE
+- เขียน RLS ตั้งแต่ไฟล์ schema แรก ห้าม migrate table แล้วค่อย add policy ทีหลัง
+- Repository ที่ query user data ต้องใช้ `server.ts` (session-scoped client) เท่านั้น — ห้าม service-role (bypass RLS)
+- Admin content (providers/franchises/media) ใช้ `is_admin()` ตามเดิม
+
+**เหตุผล:** จุดที่ prod หลุดบ่อยคือ client ผิดตัว (service-role bypass) ไม่ใช่ policy ผิด
+
+### Atomic +1 Episode ผ่าน Postgres RPC (Phase 4) — Documented Exception
+**กฎ:**
+- Phase 4: increment episode + insert watchlog + auto-complete (`current = total → status='completed'`) รวมใน Postgres function (RPC) เดียว เรียกผ่าน repository
+- usecase `IncrementEpisode` ยัง orchestrate (เรียก repo method ที่ wrap RPC) แต่ atomic step อยู่ DB
+- นี่คือ **ข้อยกเว้นที่ตั้งใจของกฎ "business logic ใน domain/usecases เท่านั้น"**
+
+**เหตุผล:** read-modify-write 2 ตารางแยกใน Server Action มี race condition (double-click / หลาย tab → episode นับซ้อน / watchlog ซ้ำ) — atomicity สำคัญกว่าความบริสุทธิ์ของ layer ในเคสนี้
+**ปฏิเสธ:** ยอม non-atomic + unique constraint กัน watchlog ซ้ำ
+
+### Optimistic UI Pattern: useOptimistic + Server Action
+**กฎ:**
+- ตั้งมาตรฐานด้วย favorite toggle (Phase 3 งานแรก — stakes ต่ำสุด)
+- Pattern: `useOptimistic` + Server Action ที่ return `{ success, message, errors? }`
+- action fail → rollback optimistic state + toast error
+- reuse pattern เดียวกันกับ +1 episode (Phase 4) และ operation อื่นที่ต้องการ optimistic UX
+
+---
+
 ## Data Model Decisions
 
 ### Title Display Order: English > Romaji > Thai (เปลี่ยนจาก Thai-first)

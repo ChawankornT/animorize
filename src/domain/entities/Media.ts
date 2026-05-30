@@ -1,6 +1,7 @@
 import type { MediaType, AiringStatus } from '@/types/database';
 
 export type { MediaType, AiringStatus };
+export { getDisplayTitle } from '@/domain/entities/title';
 
 export interface Media {
   id: string;
@@ -84,11 +85,6 @@ export function validateMedia(data: {
   }
 }
 
-export function getDisplayTitle(
-  media: Pick<Media, 'titleTh' | 'titleEn' | 'titleRomaji'>,
-): string {
-  return media.titleEn ?? media.titleRomaji ?? media.titleTh ?? '';
-}
 
 export function isTrackable(media: Pick<Media, 'mediaType'>): boolean {
   return media.mediaType !== 'movie' && media.mediaType !== 'special';
