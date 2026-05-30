@@ -21,7 +21,7 @@ Hook        → hooks/                            (orchestrate usecases → UI)
 UI          → app/ + components/                (render เท่านั้น)
 ```
 
-Dependency rule: ชั้นในห้าม import ชั้นนอก
+Dependency rule: ชั้นในห้าม import ชั้นนอก — **บังคับโดย ESLint** (`no-restricted-imports` ใน `eslint.config.mjs`)
 
 ```
 src/
@@ -41,10 +41,12 @@ src/
 
 ## Conventions
 **DO:** Server Components default / Mutations ผ่าน Server Actions / Zod validate ทุก form /
-loading.tsx + error.tsx ทุก route group / logic ใน domain/usecases/ / DB ผ่าน repository interface
+loading.tsx + error.tsx ทุก route group / logic ใน domain/usecases/ / DB ผ่าน repository interface /
+usecase + mapper ใหม่ทุกตัวต้องมาพร้อม unit test / user-owned table ใช้ RLS `auth.uid()=user_id` + `server.ts` client เท่านั้น
 
 **DON'T:** ❌ `any` / ❌ `console.log` prod / ❌ AniList จาก client / ❌ inline style /
 ❌ install package ไม่บันทึก DECISIONS.md / ❌ แก้ types/database.ts / ❌ import Supabase ใน domain/
+❌ service-role client สำหรับ user-owned table (bypass RLS)
 
 **Client boundary:** pure utility functions (ไม่ใช้ React hooks / browser API) ต้องอยู่ในไฟล์แยกที่ไม่มี `'use client'`
 เพื่อให้ Server Components import ได้ — ดูตัวอย่าง `components/ui/button-variants.ts`
@@ -56,7 +58,7 @@ UseCases: `IncrementEpisode.ts` / Repos: `IMediaRepository.ts` / Actions: `updat
 ## Key Business Rules
 - movie/special → total_episodes=1, toggle "Watched" / ova → episode tracking ปกติ
 - +1 Episode: current_episode++ → INSERT watchlog → ถ้า current=total → status='completed'
-- Title: title_en > title_romaji > title_th
+- Title: title_en > title_romaji > title_th — impl เดียวที่ `domain/entities/title.ts#getDisplayTitle`, re-exported จาก Media + Franchise
 - Dashboard: status='watching' OR is_favorite=true
 - Provider URL: custom_url ?? base_url
 - Auto-sync: system enabled AND media.auto_sync AND airing_status='ongoing'
