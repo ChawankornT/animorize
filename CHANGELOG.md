@@ -5,28 +5,6 @@
 
 ---
 
-## [2026-05-31] Phase 3 Foundation — User Library Domain Layer
-
-### Domain
-- **UserMedia entity** — `src/domain/entities/UserMedia.ts`: `UserMedia`, `UserMediaWithMedia`, `AddToLibraryInput`; 3 business-rule functions: `getDisplayTitle` (reuse จาก title.ts), `getEffectiveUrl(customUrl, baseUrl)`, `isDashboardItem(userMedia)`
-- **URL resolution model documented** — 3 ชั้น: `providers.base_url` / `media_providers.base_url` / `user_media.custom_url`; effective URL = `custom_url ?? media_providers.base_url`; keyed by `(provider_id, audio)` → sub/dub แยกลิงก์ได้
-- **4 usecases**: `AddToLibrary` (dup check → error), `ToggleFavorite` (flip), `RemoveFromLibrary`, `ListUserLibrary` (filter: all | dashboard)
-
-### Repository
-- **IUserMediaRepository** — `src/repositories/interfaces/IUserMediaRepository.ts`: 7 methods (add, findByUserId, findByUserAndMedia, updateFavorite, updateStatus, updateProvider, remove)
-- **SupabaseUserMediaRepository** — nested 2-level JOIN: `media(... media_providers(provider_id, audio, base_url)), providers(name, color)`; baseUrl resolved by `(provider_id, audio)` match; uses server.ts client
-- **mappers**: `toUserMedia`, `toUserMediaWithMedia`, `fromAddToLibraryInput` เพิ่มใน `mappers.ts`
-- **factory wired** — `createUserMediaRepository()` ใน `repositories/index.ts`
-
-### Testing
-- **38 tests เพิ่ม** (รวม 98 tests): entity (17), mapper (14 เพิ่ม จาก 4 เดิม), usecases (13), ผ่านทั้งหมด
-- **mock harness ขยาย** — `makeUserMedia`, `makeUserMediaWithMedia`, `createMockUserMediaRepository` (vi.fn() style) ใน `mockRepositories.ts`
-
-### Decisions
-- URL resolution model 3 ชั้น — ดู DECISIONS.md § "Phase 3 Foundation Decisions"
-
----
-
 ## [2026-05-30] Pre-Phase 3 Foundation
 
 ### Architecture

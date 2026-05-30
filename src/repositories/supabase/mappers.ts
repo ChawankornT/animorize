@@ -5,7 +5,6 @@ import type { Media, CreateMediaInput, UpdateMediaInput } from '@/domain/entitie
 import type { MediaProvider, CreateMediaProviderInput } from '@/domain/entities/MediaProvider';
 import type { SyncLog, CreateSyncLogInput } from '@/domain/entities/SyncLog';
 import type { SystemSettings } from '@/domain/entities/SystemSettings';
-import type { UserMedia, UserMediaWithMedia, AddToLibraryInput } from '@/domain/entities/UserMedia';
 
 type ProviderRow = Database['public']['Tables']['providers']['Row'];
 type FranchiseRow = Database['public']['Tables']['franchises']['Row'];
@@ -13,7 +12,6 @@ type MediaRow = Database['public']['Tables']['media']['Row'];
 type MediaProviderRow = Database['public']['Tables']['media_providers']['Row'];
 type SyncLogRow = Database['public']['Tables']['sync_logs']['Row'];
 type SystemSettingsRow = Database['public']['Tables']['system_settings']['Row'];
-type UserMediaRow = Database['public']['Tables']['user_media']['Row'];
 
 type MediaProviderRowWithJoin = MediaProviderRow & {
   providers?: { name: string; color: string } | null;
@@ -225,79 +223,5 @@ export function fromCreateSyncLogInput(
     media_id: input.mediaId,
     result: input.result,
     error_message: input.errorMessage ?? null,
-  };
-}
-
-// ─── UserMedia mappers ────────────────────────────────────────────────────────
-
-type UserMediaRowWithJoin = UserMediaRow & {
-  media?: {
-    title_th: string | null;
-    title_en: string | null;
-    title_romaji: string | null;
-    poster_url: string | null;
-    total_episodes: number;
-    media_type: string;
-    media_providers?: Array<{
-      provider_id: string;
-      audio: string;
-      base_url: string | null;
-    }> | null;
-  } | null;
-  providers?: { name: string; color: string } | null;
-};
-
-export function toUserMedia(row: UserMediaRow): UserMedia {
-  return {
-    id: row.id,
-    userId: row.user_id,
-    mediaId: row.media_id,
-    providerId: row.provider_id,
-    audio: row.audio,
-    status: row.status,
-    currentEpisode: row.current_episode,
-    isFavorite: row.is_favorite,
-    customUrl: row.custom_url,
-    startedAt: row.started_at,
-    completedAt: row.completed_at,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
-}
-
-export function toUserMediaWithMedia(row: UserMediaRowWithJoin): UserMediaWithMedia {
-  const mediaProviders = row.media?.media_providers ?? [];
-  const providerEntry = row.provider_id
-    ? mediaProviders.find(
-        (mp) => mp.provider_id === row.provider_id && mp.audio === row.audio,
-      )
-    : undefined;
-
-  return {
-    ...toUserMedia(row),
-    titleTh: row.media?.title_th ?? null,
-    titleEn: row.media?.title_en ?? null,
-    titleRomaji: row.media?.title_romaji ?? null,
-    posterUrl: row.media?.poster_url ?? null,
-    totalEpisodes: row.media?.total_episodes ?? 0,
-    mediaType: row.media?.media_type ?? '',
-    providerName: row.providers?.name ?? null,
-    providerColor: row.providers?.color ?? null,
-    baseUrl: providerEntry?.base_url ?? null,
-  };
-}
-
-export function fromAddToLibraryInput(
-  input: AddToLibraryInput,
-): Database['public']['Tables']['user_media']['Insert'] {
-  return {
-    user_id: input.userId,
-    media_id: input.mediaId,
-    provider_id: input.providerId ?? null,
-    audio: input.audio ?? 'sub',
-    status: input.status ?? 'plan_to_watch',
-    current_episode: 0,
-    is_favorite: false,
-    custom_url: input.customUrl ?? null,
   };
 }
