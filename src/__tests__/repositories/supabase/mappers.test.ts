@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { toSyncLog, toProvider, toMedia, toFranchise } from '@/repositories/supabase/mappers';
+import { toSyncLog, toProvider, toMedia, toFranchise, toUserMedia, toUserMediaWithMedia, fromAddToLibraryInput } from '@/repositories/supabase/mappers';
 import type { Database } from '@/types/database';
 
 type SyncLogRow = Database['public']['Tables']['sync_logs']['Row'];
@@ -159,5 +159,185 @@ describe('toFranchise', () => {
     expect(result.titleTh).toBe('TH');
     expect(result.titleEn).toBe('EN');
     expect(result.titleRomaji).toBe('Romaji');
+  });
+});
+
+type UserMediaRow = Database['public']['Tables']['user_media']['Row'];
+
+function makeUserMediaRow(overrides: Partial<UserMediaRow> = {}): UserMediaRow {
+  return {
+    id: 'um-1',
+    user_id: 'user-1',
+    media_id: 'media-1',
+    provider_id: null,
+    audio: 'sub',
+    status: 'plan_to_watch',
+    current_episode: 0,
+    is_favorite: false,
+    custom_url: null,
+    started_at: null,
+    completed_at: null,
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+    ...overrides,
+  };
+}
+
+describe('toUserMedia', () => {
+  it('maps all fields from snake_case to camelCase', () => {
+    const row = makeUserMediaRow({
+      provider_id: 'prov-1',
+      audio: 'dub',
+      status: 'watching',
+      current_episode: 5,
+      is_favorite: true,
+      custom_url: 'https://custom.url',
+    });
+    const result = toUserMedia(row);
+    expect(result).toEqual({
+      id: 'um-1',
+      userId: 'user-1',
+      mediaId: 'media-1',
+      providerId: 'prov-1',
+      audio: 'dub',
+      status: 'watching',
+      currentEpisode: 5,
+      isFavorite: true,
+      customUrl: 'https://custom.url',
+      startedAt: null,
+      completedAt: null,
+      createdAt: '2026-01-01T00:00:00Z',
+      updatedAt: '2026-01-01T00:00:00Z',
+    });
+  });
+
+  it('handles all nullable fields as null', () => {
+    const result = toUserMedia(makeUserMediaRow());
+    expect(result.providerId).toBeNull();
+    expect(result.customUrl).toBeNull();
+    expect(result.startedAt).toBeNull();
+    expect(result.completedAt).toBeNull();
+  });
+});
+
+describe('toUserMediaWithMedia', () => {
+  it('resolves baseUrl from matching (provider_id, audio) in media_providers', () => {
+    const row = {
+      ...makeUserMediaRow({ provider_id: 'prov-1', audio: 'sub' }),
+      media: {
+        title_th: null,
+        title_en: 'Test Anime',
+        title_romaji: null,
+        poster_url: 'https://poster.url',
+        total_episodes: 12,
+        media_type: 'anime',
+        media_providers: [
+          { provider_id: 'prov-1', audio: 'sub', base_url: 'https://show.url/sub' },
+          { provider_id: 'prov-1', audio: 'dub', base_url: 'https://show.url/dub' },
+        ],
+      },
+      providers: { name: 'Bilibili', color: '#FF6600' },
+    };
+    const result = toUserMediaWithMedia(row);
+    expect(result.baseUrl).toBe('https://show.url/sub');
+    expect(result.titleEn).toBe('Test Anime');
+    expect(result.providerName).toBe('Bilibili');
+    expect(result.providerColor).toBe('#FF6600');
+    expect(result.totalEpisodes).toBe(12);
+  });
+
+  it('returns baseUrl=null when provider_id is null', () => {
+    const row = {
+      ...makeUserMediaRow({ provider_id: null }),
+      media: {
+        title_en: 'Test',
+        title_th: null,
+        title_romaji: null,
+        poster_url: null,
+        total_episodes: 1,
+        media_type: 'movie',
+        media_providers: [{ provider_id: 'prov-1', audio: 'sub', base_url: 'https://show.url' }],
+      },
+      providers: null,
+    };
+    const result = toUserMediaWithMedia(row);
+    expect(result.baseUrl).toBeNull();
+    expect(result.providerName).toBeNull();
+    expect(result.providerColor).toBeNull();
+  });
+
+  it('returns baseUrl=null when no matching (provider_id, audio) entry found', () => {
+    const row = {
+      ...makeUserMediaRow({ provider_id: 'prov-1', audio: 'dub' }),
+      media: {
+        title_en: 'Test',
+        title_th: null,
+        title_romaji: null,
+        poster_url: null,
+        total_episodes: 12,
+        media_type: 'anime',
+        // only sub entry, user selected dub
+        media_providers: [{ provider_id: 'prov-1', audio: 'sub', base_url: 'https://show.url' }],
+      },
+      providers: { name: 'Bilibili', color: '#FF6600' },
+    };
+    const result = toUserMediaWithMedia(row);
+    expect(result.baseUrl).toBeNull();
+  });
+
+  it('returns baseUrl=null when media_providers is empty', () => {
+    const row = {
+      ...makeUserMediaRow({ provider_id: 'prov-1', audio: 'sub' }),
+      media: {
+        title_en: 'Test',
+        title_th: null,
+        title_romaji: null,
+        poster_url: null,
+        total_episodes: 12,
+        media_type: 'anime',
+        media_providers: [],
+      },
+      providers: { name: 'Bilibili', color: '#FF6600' },
+    };
+    const result = toUserMediaWithMedia(row);
+    expect(result.baseUrl).toBeNull();
+  });
+
+  it('handles null media join gracefully', () => {
+    const row = { ...makeUserMediaRow(), media: null, providers: null };
+    const result = toUserMediaWithMedia(row);
+    expect(result.titleEn).toBeNull();
+    expect(result.posterUrl).toBeNull();
+    expect(result.totalEpisodes).toBe(0);
+    expect(result.baseUrl).toBeNull();
+  });
+});
+
+describe('fromAddToLibraryInput', () => {
+  it('maps required fields and applies defaults', () => {
+    const result = fromAddToLibraryInput({ userId: 'user-1', mediaId: 'media-1' });
+    expect(result.user_id).toBe('user-1');
+    expect(result.media_id).toBe('media-1');
+    expect(result.audio).toBe('sub');
+    expect(result.status).toBe('plan_to_watch');
+    expect(result.current_episode).toBe(0);
+    expect(result.is_favorite).toBe(false);
+    expect(result.provider_id).toBeNull();
+    expect(result.custom_url).toBeNull();
+  });
+
+  it('maps optional fields when provided', () => {
+    const result = fromAddToLibraryInput({
+      userId: 'user-1',
+      mediaId: 'media-1',
+      providerId: 'prov-1',
+      audio: 'dub',
+      status: 'watching',
+      customUrl: 'https://custom.url',
+    });
+    expect(result.provider_id).toBe('prov-1');
+    expect(result.audio).toBe('dub');
+    expect(result.status).toBe('watching');
+    expect(result.custom_url).toBe('https://custom.url');
   });
 });
