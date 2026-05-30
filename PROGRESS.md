@@ -7,8 +7,8 @@
 
 ## Versions (สำหรับ sync check)
 ```
-instructions_version: 2026-05-24-v1
-decisions_version: 2026-05-29-v2
+instructions_version: 2026-05-30-v2
+decisions_version: 2026-05-30-v3
 schema_version: 2026-05-27-v2
 claude_md_version: 2026-05-29-v4
 ```
@@ -57,11 +57,11 @@ claude_md_version: 2026-05-29-v4
 ## Recent Changes (last 5)
 | วันที่ | เปลี่ยนอะไร | เปลี่ยนในไฟล์ไหน |
 |--------|------------|----------------|
+| 2026-05-30 | docs: revise roadmap Phase 3-6 (Foundation domain→repo→usecase, MediaCard poster, Phase 5 audit) + แก้ pg_cron auto-sync → Vercel Cron/Edge + reconcile keep-alive + เพิ่ม Phase 7 (Discovery & Bulk Import, admin) | DECISIONS.md, PROJECT_INSTRUCTIONS.md, CHANGELOG.md, PROGRESS.md |
 | 2026-05-29 | chore(rules): สร้าง `.claude/rules/git.md` — convention ต้องรอ CI pass ก่อน merge ทุก PR (feature→develop, develop→main) + branch naming + commit convention | .claude/rules/git.md (ใหม่) |
 | 2026-05-29 | fix(admin): poster rendering ใน media list/detail/import + Sync now button + UI consistency (PR #6) — poster ใน tile 3 ขนาด, Sync now button บน detail, revalidate detail หลัง sync, AssignProviderForm success green, RetrySyncButton message absolute, RemoveProviderButton → DeleteConfirmModal, Modal text-left | media/page.tsx, media/[id]/page.tsx, ImportPanel.tsx, RetrySyncButton.tsx, AssignProviderForm.tsx, DeleteConfirmModal.tsx, RemoveProviderButton.tsx, mediaProvider.ts, anilist.ts, Modal.tsx |
 | 2026-05-29 | fix(admin): 4 bugs จาก follow-up code review (issue #4, PR #5) — (1) toSyncLog Thai-first → EN-first; (2) media list secondary title เทียบ primaryTitle (ไม่ใช่ titleEn); (3) AniList mapper `?? undefined` (เดิม `?? 0` ทำให้ `?? 1` ไม่ทำงาน → total_episodes=0); (4) retrySync รับ fetch เป็น callback → fetch fail ก็เขียน failed sync_log + revalidate /admin/sync-logs ใน catch | src/repositories/supabase/mappers.ts, src/app/admin/media/page.tsx, src/lib/anilist/mapper.ts, src/domain/usecases/RetrySync.ts, src/app/actions/anilist.ts |
 | 2026-05-29 | fix(import): 3 bugs จาก code review + PR comment — autoSync checkbox (name="autoSync"), totalEpisodes ?? 1 (ไม่ใช่ 0), retrySyncAction revalidate /admin/sync-logs ด้วย | src/components/admin/ImportPanel.tsx, src/app/actions/anilist.ts |
-| 2026-05-29 | Admin UI redesign ตาม design file (7 หน้า): Dashboard → "Needs attention" inbox, Providers list → row+chip, Media list → EN title+swatch+Season+AutoSync columns, Media detail → color tile 110×156, Provider form → color picker swatch, Import panel → 3-step redesign, Franchises list → sub-title | src/app/admin/page.tsx, providers/page.tsx, media/page.tsx, media/[id]/page.tsx, franchises/page.tsx, import/page.tsx, src/components/admin/ProviderForm.tsx, ImportPanel.tsx |
 
 ## Blockers
 [ยังไม่มี]
@@ -81,3 +81,7 @@ claude_md_version: 2026-05-29-v4
 - Google OAuth ยังไม่ทำ — Phase 1 ใช้ Email/Password เท่านั้น
 - **Title order ฝั่ง user = เหมือน admin (EN-first)** — ยืนยัน 2026-05-29 ไม่แบ่งภาษา, getDisplayTitle() ใช้ตัวเดียวร่วมกัน ไม่ต้องเพิ่ม variant
 - **Phase 3 พร้อมเริ่ม** — schema user_media + watchlogs มีแล้ว, ยังไม่มี entity/repository (= งาน Phase 3)
+- **Roadmap revised 2026-05-30** — Phase 3/4 เพิ่ม Foundation (domain→repo→usecase) tasks, Phase 6 cron แก้เป็น Vercel Cron/Edge Function (ไม่ใช่ pg_cron เพียว) + reconcile section keep-alive ให้ตรงกัน (keep-alive = standalone pg_cron SELECT 1)
+- **Phase 7 planned** — Discovery & Bulk Import (admin) ดู DECISIONS rev.3; schema (import_candidates) defer จนถึง 7b
+- **poster bug + Sync now** — แก้แล้วใน PR #6 (merged to main) แยกจาก Phase 3 — next/image host (s4.anilist.co) config พร้อมให้ Phase 3 MediaCard ใช้
+- ⚠️ **PROJECT_INSTRUCTIONS.md เปลี่ยน** (เพิ่ม Phase 7 ใน MVP Phases) — Chat ต้อง re-upload ไฟล์ใหม่ (instructions_version → 2026-05-30-v2)

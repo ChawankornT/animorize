@@ -5,6 +5,20 @@
 
 ---
 
+## [2026-05-30] Roadmap Revision + Phase 7 Planned
+
+### Roadmap
+- Phase 3/4 เพิ่ม Foundation tasks (domain entity → repository → usecase ก่อน UI) ให้ตรง Clean Architecture
+- Phase 3 เพิ่ม task render poster จริงใน MediaCard + ระบุ search match 3 ภาษา / display EN-first
+- Phase 5 reframe loading/error boundary เป็น audit (convention บังคับตั้งแต่ต้น)
+- Phase 6 แก้: auto-sync cron — pg_cron เพียว ๆ เรียก AniList ไม่ได้ → Vercel Cron/Edge Function + pg_net (+ reconcile section "Supabase pg_cron Keep-alive" ให้ตรงกัน: keep-alive = standalone `SELECT 1`); แยก Category page (browse media เรา) ออกจาก Phase 7 discovery
+
+### Decisions
+- เพิ่ม Phase 7 — Discovery & Bulk Import (admin-side): forward-only discovery, lean-cache candidates (re-fetch on import), defer import_candidates schema จนถึง 7b, preview ก่อน save ยังอยู่
+- ดู DECISIONS.md หัวข้อ "Phase 7 — Discovery & Bulk Import (detail) rev.3"
+
+---
+
 ## [2026-05-29] Admin UI Fixes — Poster + Sync + Consistency (PR #6)
 
 ### Bug Fixes
