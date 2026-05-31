@@ -504,6 +504,25 @@ Schema ปัจจุบันรองรับได้ด้วย `air_date
 
 ---
 
+## User-facing AniList Import — Deferred (post-Phase 7)
+> บันทึก 2026-05-31
+
+**สถานะ:** ยังไม่ทำ — Phase 3 user เพิ่มเรื่องจาก catalog (search) เท่านั้น
+**ทบทวนเมื่อ:** จบ Phase 7 (discovery/candidates พร้อม)
+
+### ไอเดียที่ลอยไว้
+- user ส่ง "request" เรื่องที่อยากได้ (อาจมาจาก AniList list ของตัวเอง) → เข้า queue
+- admin review/approve → import เข้า catalog → ค่อย add เข้า library ของ user
+- ต่อกับ Phase 7 candidates ได้ (request ที่ match anilist_id เดิม = dedup; ที่ยังไม่มีใน catalog = candidate ใหม่)
+- รักษา boundary เดิม: ยิง AniList = ฝั่ง server/admin เท่านั้น ห้าม client
+
+### ⚠️ ต้องเคาะตอนเริ่ม
+- schema ของ request queue
+- จุดที่ admin เห็น (inbox "Needs attention"?)
+- ความสัมพันธ์กับ import_candidates ของ Phase 7
+
+---
+
 ## Phase 3 Foundation Decisions
 > บันทึก 2026-05-31 — เคาะระหว่างสร้าง UserMedia entity + repository
 
