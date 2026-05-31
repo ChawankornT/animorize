@@ -113,6 +113,31 @@ UI            → app/ + components/         (render เท่านั้น)
 - Over-engineering สำหรับ MVP
 - ทบทวนเมื่อ: scale เกิน Vercel, ต้องการ custom backend, หรือ self-host
 
+### Branch protection — `main` off-limits mid-phase (incident-driven)
+> บันทึก 2026-05-31 — เพิ่มหลังเกิดเหตุ PR หลุดเข้า `main` ทั้งที่กฎระบุไว้
+
+**กฎ:**
+- ระหว่าง phase: `feature/*` / `fix/*` → PR เข้า `develop` เท่านั้น
+- `main` update เฉพาะ release PR `develop` → `main` ที่เจ้าของอนุมัติเองตอนปิด phase
+- ยกเว้น: เจ้าของเปิด PR เอง และเป็น `develop` → `main` เท่านั้น — ห้ามข้าม branch
+- ก่อนเปิด PR ทุกครั้ง: **verify base branch** — CI guard (`check-branch-target` job ใน ci.yml) fail อัตโนมัติถ้า base=main และ head≠develop
+
+**เหตุผล:** เคยมี PR หลุดเข้า `main` โดยตรงทั้งที่กฎระบุชัด — กฎที่พึ่งวินัยเพียงอย่างเดียวพัง ต้องให้เครื่องบังคับ (CI guard) ควบคู่กัน
+
+### UI work gated on Claude Design handoff
+> บันทึก 2026-05-31
+
+**กฎ:**
+- ก่อน implement UI component/screen ใดๆ: ต้อง fetch Claude Design handoff bundle ล่าสุดก่อน
+- verify ว่ามี screen/component ที่เกี่ยวข้องใน bundle — ถ้าไม่มี → สั่ง design ก่อน implement
+- `BRAND.md` = source of truth ของ token/spec ทุกอย่าง
+- ห้ามประดิษฐ์ UI เอง — recreate จาก spec เท่านั้น
+
+**เหตุผล:**
+- ป้องกัน UI drift จาก design system (เกิดเมื่อ implement โดยไม่มี spec)
+- export ใหม่ = ลิงก์ใหม่เสมอ → ต้องยืนยัน URL กับเจ้าของก่อนใช้ ไม่ cache ลิงก์เก่า
+- ลด rework (ทำซ้ำหลัง design เปลี่ยน)
+
 ---
 
 ## Pre-Phase 3 Foundation Decisions

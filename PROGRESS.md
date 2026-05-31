@@ -8,9 +8,9 @@
 ## Versions (สำหรับ sync check)
 ```
 instructions_version: 2026-05-30-v2
-decisions_version: 2026-05-31-v1
+decisions_version: 2026-05-31-v2
 schema_version: 2026-05-27-v2
-claude_md_version: 2026-05-30-v5
+claude_md_version: 2026-05-31-v1
 ```
 
 ## Current Phase
