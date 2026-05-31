@@ -5,6 +5,18 @@
 
 ---
 
+## [2026-05-31] chore(rules): branch protection + UI design workflow gating
+
+### Rules & Conventions
+- **`.claude/rules/git.md`** — เพิ่ม callout ⛔ ที่หัวข้อ Branch: ห้าม PR เข้า `main` ระหว่าง phase; เพิ่มหมายเหตุเหตุการณ์จริง "เคยมี PR หลุด"
+- **`.claude/rules/ui.md`** — สร้างใหม่: กฎ UI/Design workflow — fetch Claude Design handoff bundle ก่อน implement เสมอ; ห้ามประดิษฐ์ UI เอง
+- **`CLAUDE.md`** — เพิ่มหัวข้อ "Git & Deploy" + "UI / Design workflow"
+- **`DECISIONS.md`** — เพิ่ม 2 หัวข้อ: "Branch protection — main off-limits mid-phase" + "UI work gated on Claude Design handoff"
+- **`ci.yml`** — เพิ่ม `check-branch-target` job: fail อัตโนมัติเมื่อ PR base=main และ head≠develop
+- **`.github/PULL_REQUEST_TEMPLATE.md`** — สร้างใหม่: reminder verify base branch + checklist
+
+---
+
 ## [2026-05-31] Phase 3 Foundation — User Library Domain Layer
 
 ### Domain
