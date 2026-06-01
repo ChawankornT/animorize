@@ -10,7 +10,7 @@
 
 ```
 instructions_version: 2026-05-30-v2
-decisions_version: 2026-05-31-v2
+decisions_version: 2026-06-01-v1
 schema_version: 2026-05-27-v2
 claude_md_version: 2026-05-31-v1
 ```
@@ -18,7 +18,7 @@ claude_md_version: 2026-05-31-v1
 ## Current Phase
 
 - **Active:** Phase 3 — User Library & Dashboard
-- **Status:** Part 2a merged to develop (PR #16) — พร้อมเริ่ม Part 2b (Search + Add-to-library)
+- **Status:** Part 2b implemented — Search + Add-to-library modal + TanStack Query (search only) — PR pending
 
 ## Phase 3 Progress
 
@@ -45,11 +45,25 @@ claude_md_version: 2026-05-31-v1
 - [x] `/dev/components` — MediaCard (6 library states + 3 search) + ProviderBadge + StatusPill previews
 - [x] 98 tests ผ่าน — lint ✅ typecheck ✅
 
-### Features — Part 2b / 2c (ยังไม่เริ่ม)
+### Features — Part 2b (in progress)
 
-- [ ] Search — match ข้าม title_th / title_en / title_romaji + autocomplete
-- [ ] เพิ่ม media เข้า library จาก search result + เลือก Provider + audio + custom URL
-- [ ] Dashboard: status='watching' OR is_favorite=true (wire FavoriteButton + MediaCard.Library)
+- [x] `sanitizeSearchTerm` shared helper — `lib/supabase/sanitizeSearchTerm.ts` (strip ILIKE wildcards + PostgREST structural chars, preserve Thai/Unicode)
+- [x] `IMediaRepository.findAll({ search? })` + `listMedia` usecase search option — `SupabaseMediaRepository` `.or()` across 3 title columns
+- [x] Backport franchise search sanitize — `SupabaseFranchiseRepository.findAll` ใช้ shared helper เดียวกัน
+- [x] `UpdateLibraryProvider` thin usecase — `domain/usecases/UpdateLibraryProvider.ts`
+- [x] Server Actions append — `searchMediaAction`, `getAddToLibraryDataAction` (combined parallel), `addToLibraryAction`, `changeLibraryProviderAction` ใน `app/actions/userMedia.ts`
+- [x] `QueryProvider` (scoped) — `components/providers/QueryProvider.tsx` + `(main)/search/layout.tsx`
+- [x] Search page — `(main)/search/page.tsx` (server shell + cross-ref library Set) + `SearchView.tsx` (TanStack Query autocomplete, debounce 300ms)
+- [x] Add-to-library modal — `AddToLibraryModal.tsx` (single-action parallel fetch, all providers dropdown, audio segmented sub/dub, custom URL validation, dup toast)
+- [x] `MediaCard.Search` — "In library" state (check icon) when `onAdd` is undefined (ไม่แสดงปุ่ม Add ที่คลิกไม่ได้)
+- [x] `(main)/search/loading.tsx` + `error.tsx`
+- [x] 111 tests ผ่าน — lint ✅ typecheck ✅
+- [x] DECISIONS.md updated — TanStack Query adoption + Package Change Log
+- [ ] ⏳ PR pending
+
+### Features — Part 2c (ยังไม่เริ่ม)
+
+- [ ] Dashboard: full library (tab All) + sections (Currently watching / Favorites / All titles)
 
 ## Phase 2 Progress
 
@@ -95,11 +109,11 @@ claude_md_version: 2026-05-31-v1
 
 | วันที่     | เปลี่ยนอะไร                                                                                                                                      | เปลี่ยนในไฟล์ไหน                                                                                                                  |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-01 | feat(phase3): Part 2b — Search + Add-to-library modal + TanStack Query (search) + sanitize helper + franchise backport                            | components/media/ (SearchView, AddToLibraryModal), components/providers/QueryProvider, app/(main)/search/, app/actions/userMedia.ts, domain/usecases/UpdateLibraryProvider, lib/supabase/sanitizeSearchTerm, repositories/ (interface+impl search) |
 | 2026-06-01 | feat(phase3): Part 2a — MediaCard (2 variants) + FavoriteButton (optimistic) + SetFavorite usecase + actions + Icon/ProviderBadge/StatusPill      | components/media/ (4 files), components/ui/Icon.tsx, constants/userMedia.ts, domain/usecases/SetFavorite.ts, app/actions/userMedia.ts, hooks/useToast.ts |
 | 2026-05-31 | docs: DECISIONS.md เพิ่ม "User-facing AniList Import — Deferred (post-Phase 7)" — ไอเดีย request queue + ต้องเคาะตอนเริ่ม                        | DECISIONS.md                                                                                                                      |
 | 2026-05-31 | chore(rules): branch protection loud + UI design workflow gating (PR #15 → develop) — CI guard check-branch-target + build job สำหรับ release PR | .claude/rules/git.md, .claude/rules/ui.md (ใหม่), CLAUDE.md, DECISIONS.md, ci.yml, PULL_REQUEST_TEMPLATE.md (ใหม่)                |
 | 2026-05-31 | feat(phase3): Phase 3 Foundation merged to develop (PR #14) — UserMedia entity, repo, 4 usecases, 98 tests                                       | domain/entities/UserMedia.ts, repositories/ (3 files), domain/usecases/ (4 files), src/**tests**/ (5 files), mappers.ts, index.ts |
-| 2026-05-31 | docs: DECISIONS.md เพิ่ม URL resolution model 3 ชั้น + Phase 3 Foundation section                                                                | DECISIONS.md                                                                                                                      |
 
 ## Blockers
 
@@ -131,18 +145,28 @@ claude_md_version: 2026-05-31-v1
 - **usecases**: `addToLibrary` (dup→error) · `setFavorite` (idempotent) · `removeFromLibrary` · `listUserLibrary('all'|'dashboard')`
 - **mock harness**: `makeUserMedia`, `makeUserMediaWithMedia`, `createMockUserMediaRepository`
 
-### Phase 3 Features — ต้องทำต่อ (Part 2b)
+### Phase 3 Part 2b (PR pending)
 
-- **`searchMediaAction`** — append ใน `app/actions/userMedia.ts`; return `Media[]` ตรงๆ (ไม่ใช่ `{success}`)
-- **`addToLibraryAction`** — append ใน `app/actions/userMedia.ts`; Zod validate + `getUser()` + revalidatePath
-- **`(main)/search` page** — TanStack Query สำหรับ autocomplete (dedup/stale-while-revalidate); result grid = `MediaCard.Search`; library cross-reference ด้วย Set (ไม่ N+1)
-- **Add-to-library modal** — Provider select + Audio segmented + Custom URL; ตาม `screens/modal.jsx` ใน bundle
+- **`sanitizeSearchTerm`** — `lib/supabase/sanitizeSearchTerm.ts`: shared helper strip ILIKE wildcards (`%_`) + PostgREST structural chars, preserve Thai/Unicode — ใช้ทั้ง media + franchise (backport)
+- **`IMediaRepository.findAll({ search? })`** — `.or()` across `title_en`, `title_romaji`, `title_th`; `listMedia` usecase pass-through
+- **`UpdateLibraryProvider`** — thin usecase wrap `repo.updateProvider`
+- **Server Actions** (append ใน `app/actions/userMedia.ts`):
+  - `searchMediaAction(query)` — read, return `Media[]` ตรงๆ
+  - `getAddToLibraryDataAction(mediaId)` — **single action** ดึง allProviders + mediaProviders parallel ฝั่ง server (ลด network roundtrips)
+  - `addToLibraryAction(input)` — Zod + getUser + addToLibrary; empty customUrl → undefined (ไม่ส่ง `""` เข้า `.url()`)
+  - `changeLibraryProviderAction(id, input)` — ชื่อไม่ชน admin `updateProviderAction`
+- **QueryProvider** — scoped ที่ `(main)/search/layout.tsx` เท่านั้น (ไม่ mount root)
+- **SearchView** — TanStack Query `useQuery` + debounce 300ms + library cross-ref Set (ไม่ N+1)
+- **AddToLibraryModal** — provider dropdown แสดง **ทุก provider ในระบบ** (admin-assigned = default เท่านั้น ไม่จำกัดตัวเลือก); audio แสดง sub + dub เสมอ; labels: `sub` = "original · sub", `dub` = "thai · dub"; poster image + tile color fallback
+- **MediaCard.Search** — `onAdd` undefined → แสดง "In library" + check icon แทนปุ่ม Add
+- **@tanstack/react-query** — `^5.100.14` install แล้วก่อนหน้า; DECISIONS.md Package Change Log updated
 
 ### Git state (สำคัญ)
 
 - **develop** — มี Foundation (PR #14) + rules (PR #15) + Part 2a (PR #16) ✅
+- **feature/phase3-part2b-search-add** — Part 2b (PR pending)
 - **main** — ยังเป็น reverted state (PR #13 Revert) — update เมื่อปิด phase เท่านั้น
-- Design bundle ล่าสุด (verified 2026-06-01): `https://api.anthropic.com/v1/design/h/pfsybr1BWpc_2vfPNSlEuQ`
+- Design bundle ล่าสุด (verified 2026-06-01): `https://api.anthropic.com/v1/design/h/Kp6d3N-GioWAaNXPRJr12w`
 
 ### ข้อมูล Admin (Phase 2 stable)
 
@@ -155,4 +179,4 @@ claude_md_version: 2026-05-31-v1
 - Google OAuth ยังไม่ทำ — Email/Password เท่านั้น
 - ⚠️ **PROJECT_INSTRUCTIONS.md เปลี่ยน** (เพิ่ม Phase 7) — Chat ต้อง re-upload (instructions_version → 2026-05-30-v2)
 - ⚠️ **CLAUDE.md เปลี่ยน** (เพิ่ม Git & Deploy + UI/Design workflow) — claude_md_version → 2026-05-31-v1
-- ⚠️ **DECISIONS.md เปลี่ยน** (เพิ่ม user-facing AniList import deferred + branch protection + UI handoff gate) — decisions_version → 2026-05-31-v2
+- ⚠️ **DECISIONS.md เปลี่ยน** (เพิ่ม TanStack Query adoption update + Package Change Log) — decisions_version → 2026-06-01-v1

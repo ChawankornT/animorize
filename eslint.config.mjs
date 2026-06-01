@@ -12,6 +12,7 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    ".design-bundle/**",
   ]),
 
   // ── Clean Architecture: Domain layer ─────────────────────────────────────────

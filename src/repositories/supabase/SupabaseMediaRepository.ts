@@ -6,6 +6,7 @@ import {
   fromCreateMediaInput,
   fromUpdateMediaInput,
 } from '@/repositories/supabase/mappers';
+import { sanitizeSearchTerm } from '@/lib/supabase/sanitizeSearchTerm';
 
 export class SupabaseMediaRepository implements IMediaRepository {
   constructor(private readonly supabase: SupabaseDb) {}
@@ -14,6 +15,7 @@ export class SupabaseMediaRepository implements IMediaRepository {
     franchiseId?: string;
     mediaType?: MediaType;
     airingStatus?: AiringStatus;
+    search?: string;
   }): Promise<Media[]> {
     let query = this.supabase
       .from('media')
@@ -23,6 +25,15 @@ export class SupabaseMediaRepository implements IMediaRepository {
     if (options?.franchiseId) query = query.eq('franchise_id', options.franchiseId);
     if (options?.mediaType) query = query.eq('media_type', options.mediaType);
     if (options?.airingStatus) query = query.eq('airing_status', options.airingStatus);
+
+    if (options?.search) {
+      const q = sanitizeSearchTerm(options.search);
+      if (q) {
+        query = query.or(
+          `title_en.ilike.%${q}%,title_romaji.ilike.%${q}%,title_th.ilike.%${q}%`,
+        );
+      }
+    }
 
     const { data, error } = await query;
     if (error) throw new Error(`Failed to list media: ${error.message}`);

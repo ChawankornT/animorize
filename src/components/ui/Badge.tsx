@@ -19,7 +19,7 @@ const variantStyles: Record<BadgeVariant, string> = {
   info:
     'bg-info-bg text-info border-transparent',
   count:
-    'bg-primary text-inverse border-transparent h-[18px]',
+    'bg-primary text-inverse border-transparent h-4.5',
 };
 
 export function Badge({
