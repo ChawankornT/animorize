@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Search, X } from 'lucide-react';
-import { Icon } from '@/components/ui/Icon';
-import { MediaCard } from '@/components/media/MediaCard';
-import { AddToLibraryModal } from '@/components/media/AddToLibraryModal';
-import { searchMediaAction } from '@/app/actions/userMedia';
-import type { Media } from '@/domain/entities/Media';
-import { cn } from '@/lib/utils/cn';
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Search, X } from "lucide-react";
+import { Icon } from "@/components/ui/Icon";
+import { MediaCard } from "@/components/media/MediaCard";
+import { AddToLibraryModal } from "@/components/media/AddToLibraryModal";
+import { searchMediaAction } from "@/app/actions/userMedia";
+import type { Media } from "@/domain/entities/Media";
+import { cn } from "@/lib/utils/cn";
 
 function useDebounce(value: string, delayMs: number) {
   const [debounced, setDebounced] = useState(value);
@@ -26,7 +26,7 @@ interface SearchViewProps {
 }
 
 export function SearchView({ libraryMediaIds }: SearchViewProps) {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [modalMedia, setModalMedia] = useState<Media | null>(null);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
 
@@ -38,7 +38,7 @@ export function SearchView({ libraryMediaIds }: SearchViewProps) {
   );
 
   const { data: results = [], isFetching } = useQuery({
-    queryKey: ['search-media', debouncedQuery],
+    queryKey: ["search-media", debouncedQuery],
     queryFn: () => searchMediaAction(debouncedQuery),
     enabled: debouncedQuery.length >= 2,
   });
@@ -51,28 +51,28 @@ export function SearchView({ libraryMediaIds }: SearchViewProps) {
   }, []);
 
   const handleAdded = useCallback((mediaId: string) => {
-    setAddedIds(prev => new Set(prev).add(mediaId));
+    setAddedIds((prev) => new Set(prev).add(mediaId));
     setModalMedia(null);
   }, []);
 
   return (
     <div className="flex flex-col items-center px-6 py-8">
       {/* Search stage */}
-      <div className="w-full max-w-[720px] flex flex-col items-center text-center gap-3 pt-12 mb-8">
+      <div className="w-full max-w-180 flex flex-col items-center text-center gap-3 pt-12 mb-8">
         <h1 className="text-4xl font-medium tracking-tight leading-[1.1]">
           Find an anime, series, or movie.
         </h1>
-        <p className="text-md text-secondary max-w-[460px] mb-4">
+        <p className="text-md text-secondary max-w-115 mb-4">
           Search by Thai, English, or romaji title.
         </p>
 
         <div className="relative w-full text-left">
           <div
             className={cn(
-              'flex items-center gap-3 h-14 px-[18px] bg-page rounded-xl',
-              'border-[0.5px] border-default',
-              'transition-colors duration-fast ease-out',
-              'focus-within:border-primary',
+              "flex items-center gap-3 h-14 px-4.5 bg-page rounded-xl",
+              "border-[0.5px] border-default",
+              "transition-colors duration-fast ease-out",
+              "focus-within:border-primary",
             )}
           >
             <span className="text-tertiary shrink-0">
@@ -81,13 +81,13 @@ export function SearchView({ libraryMediaIds }: SearchViewProps) {
             <input
               type="text"
               value={query}
-              onChange={e => setQuery(e.target.value)}
+              onChange={(e) => setQuery(e.target.value)}
               placeholder="frieren, kimetsu, jujutsu…"
               className="flex-1 bg-transparent text-lg font-medium tracking-[-0.01em] text-primary placeholder:text-tertiary outline-none"
             />
             {query && (
               <button
-                onClick={() => setQuery('')}
+                onClick={() => setQuery("")}
                 className="text-tertiary hover:text-primary transition-colors duration-fast cursor-pointer"
               >
                 <Icon as={X} size={14} />
@@ -99,14 +99,14 @@ export function SearchView({ libraryMediaIds }: SearchViewProps) {
 
       {/* Results */}
       {hasQuery && (
-        <div className="w-full max-w-[960px]">
+        <div className="w-full max-w-240">
           <div className="flex justify-between items-center mb-4">
             <span className="text-sm text-secondary">
               {isFetching ? (
-                'Searching…'
+                "Searching…"
               ) : (
                 <>
-                  <b>{results.length}</b> matches for{' '}
+                  <b>{results.length}</b> matches for{" "}
                   <span className="text-primary font-medium">
                     &ldquo;{debouncedQuery}&rdquo;
                   </span>
@@ -117,7 +117,7 @@ export function SearchView({ libraryMediaIds }: SearchViewProps) {
 
           {showResults && (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {results.map(media => {
+              {results.map((media) => {
                 const inLibrary = librarySet.has(media.id);
                 return (
                   <MediaCard.Search

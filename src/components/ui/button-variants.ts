@@ -13,8 +13,8 @@ export const variantStyles: Record<ButtonVariant, string> = {
 
 export const sizeStyles: Record<ButtonSize, string> = {
   sm: 'h-7 px-2.5 text-sm gap-1.5',
-  md: 'h-[34px] px-3.5 text-md gap-2',
-  lg: 'h-[42px] px-[18px] text-lg gap-2',
+  md: 'h-8.5 px-3.5 text-md gap-2',
+  lg: 'h-10.5 px-4.5 text-lg gap-2',
 };
 
 export function buttonVariants({

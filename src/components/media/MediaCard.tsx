@@ -1,25 +1,25 @@
-import Image from 'next/image';
-import { Check, Plus } from 'lucide-react';
-import { cn } from '@/lib/utils/cn';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Icon } from '@/components/ui/Icon';
-import { ProviderBadge } from '@/components/media/ProviderBadge';
-import { getDisplayTitle } from '@/domain/entities/UserMedia';
-import { TILE_COLORS } from '@/constants/admin';
-import { STATUS_LABEL } from '@/constants/userMedia';
-import type { WatchStatus } from '@/domain/entities/UserMedia';
+import Image from "next/image";
+import { Check, Plus } from "lucide-react";
+import { cn } from "@/lib/utils/cn";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Icon } from "@/components/ui/Icon";
+import { ProviderBadge } from "@/components/media/ProviderBadge";
+import { getDisplayTitle } from "@/domain/entities/UserMedia";
+import { TILE_COLORS } from "@/constants/admin";
+import { STATUS_LABEL } from "@/constants/userMedia";
+import type { WatchStatus } from "@/domain/entities/UserMedia";
 
 // ── StatusPill ────────────────────────────────────────────────────
 
-type StatusVariant = 'default' | 'success' | 'warning' | 'error' | 'info';
+type StatusVariant = "default" | "success" | "warning" | "error" | "info";
 
 const STATUS_VARIANT: Record<WatchStatus, StatusVariant> = {
-  watching:      'success',
-  completed:     'info',
-  on_hold:       'warning',
-  dropped:       'error',
-  plan_to_watch: 'default',
+  watching: "success",
+  completed: "info",
+  on_hold: "warning",
+  dropped: "error",
+  plan_to_watch: "default",
 };
 
 function StatusPill({ status }: { status: WatchStatus }) {
@@ -35,7 +35,7 @@ function StatusPill({ status }: { status: WatchStatus }) {
 function ProgressBar({ value, total }: { value: number; total: number }) {
   const pct = total > 0 ? Math.min(100, (value / total) * 100) : 0;
   return (
-    <div className="h-[3px] rounded-pill bg-surface-2 overflow-hidden">
+    <div className="h-0.75 rounded-pill bg-surface-2 overflow-hidden">
       <div
         className="h-full rounded-[inherit] bg-primary transition-[width] duration-slow ease-out"
         style={{ width: `${pct}%` }}
@@ -56,20 +56,20 @@ function Poster({ posterUrl, titleEn, tileColorIndex }: PosterProps) {
   const tileColor = TILE_COLORS[tileColorIndex % TILE_COLORS.length];
   return (
     <div
-      className="relative aspect-[16/10] flex items-end p-3 overflow-hidden"
+      className="relative aspect-16/10 flex items-end p-3 overflow-hidden"
       style={!posterUrl ? { background: tileColor } : undefined}
     >
       {posterUrl && (
         <Image
           src={posterUrl}
-          alt={titleEn ?? ''}
+          alt={titleEn ?? ""}
           fill
           className="object-cover"
           sizes="(max-width: 768px) 50vw, 25vw"
         />
       )}
-      <div className="absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-black/55 to-transparent pointer-events-none" />
-      <span className="relative z-[2] text-[14px] font-medium leading-snug tracking-[-0.01em] text-white line-clamp-2">
+      <div className="absolute inset-x-0 bottom-0 h-[70%] bg-linear-to-t from-black/55 to-transparent pointer-events-none" />
+      <span className="relative z-2 text-sm font-medium leading-snug tracking-[-0.01em] text-white line-clamp-2">
         {titleEn}
       </span>
     </div>
@@ -99,29 +99,40 @@ interface LibraryCardProps {
   favoriteSlot?: React.ReactNode;
 }
 
-function LibraryCard({ data, showStatus = false, favoriteSlot }: LibraryCardProps) {
+function LibraryCard({
+  data,
+  showStatus = false,
+  favoriteSlot,
+}: LibraryCardProps) {
   const {
-    titleTh, titleEn, titleRomaji, posterUrl,
-    tileColorIndex = 0, status, currentEpisode, totalEpisodes,
-    providerName, providerColor,
+    titleTh,
+    titleEn,
+    titleRomaji,
+    posterUrl,
+    tileColorIndex = 0,
+    status,
+    currentEpisode,
+    totalEpisodes,
+    providerName,
+    providerColor,
   } = data;
 
   const displayTitle = getDisplayTitle({ titleEn, titleRomaji, titleTh });
-  const isPlan      = status === 'plan_to_watch';
-  const showEp      = status === 'watching' || status === 'on_hold';
+  const isPlan = status === "plan_to_watch";
+  const showEp = status === "watching" || status === "on_hold";
   const showProgress = !isPlan;
 
   return (
     <div
       className={cn(
-        'relative flex flex-col rounded-card overflow-hidden',
-        'border-[0.5px] border-default bg-page',
-        'transition-colors duration-fast ease-out hover:border-strong',
-        status === 'dropped' && 'opacity-[0.78]',
+        "relative flex flex-col rounded-card overflow-hidden",
+        "border-[0.5px] border-default bg-page",
+        "transition-colors duration-fast ease-out hover:border-strong",
+        status === "dropped" && "opacity-[0.78]",
       )}
     >
       {/* Fav button slot */}
-      <div className="absolute top-2 right-2 z-[3] w-[26px] h-[26px] rounded-pill flex items-center justify-center bg-black/55">
+      <div className="absolute top-2 right-2 z-3 w-6.5 h-6.5 rounded-pill flex items-center justify-center bg-black/55">
         {favoriteSlot}
       </div>
 
@@ -143,7 +154,9 @@ function LibraryCard({ data, showStatus = false, favoriteSlot }: LibraryCardProp
           {showStatus && <StatusPill status={status} />}
           {showEp && (
             <span className="text-[11px] text-tertiary tabular-nums whitespace-nowrap">
-              ep <span className="text-primary font-medium">{currentEpisode}</span> of {totalEpisodes}
+              ep{" "}
+              <span className="text-primary font-medium">{currentEpisode}</span>{" "}
+              of {totalEpisodes}
             </span>
           )}
         </div>
@@ -174,15 +187,23 @@ interface SearchCardProps {
 }
 
 function SearchCard({ data, onAdd }: SearchCardProps) {
-  const { titleTh, titleEn, titleRomaji, posterUrl, tileColorIndex = 0, mediaType, seasonYear } = data;
+  const {
+    titleTh,
+    titleEn,
+    titleRomaji,
+    posterUrl,
+    tileColorIndex = 0,
+    mediaType,
+    seasonYear,
+  } = data;
   const displayTitle = getDisplayTitle({ titleEn, titleRomaji, titleTh });
 
   return (
     <div
       className={cn(
-        'flex flex-col rounded-card overflow-hidden',
-        'border-[0.5px] border-default bg-page',
-        'transition-colors duration-fast ease-out hover:border-strong',
+        "flex flex-col rounded-card overflow-hidden",
+        "border-[0.5px] border-default bg-page",
+        "transition-colors duration-fast ease-out hover:border-strong",
       )}
     >
       <Poster
@@ -198,20 +219,21 @@ function SearchCard({ data, onAdd }: SearchCardProps) {
 
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-tertiary">
-            {mediaType}{seasonYear ? ` · ${seasonYear}` : ''}
+            {mediaType}
+            {seasonYear ? ` · ${seasonYear}` : ""}
           </span>
           {onAdd ? (
             <Button
               variant="ghost"
               size="sm"
-              className="h-[22px] px-2 text-[11px] ml-auto"
+              className="h-5.5 px-2 text-[11px] ml-auto"
               onClick={onAdd}
             >
               <Icon as={Plus} size={12} />
               Add
             </Button>
           ) : (
-            <span className="inline-flex items-center gap-1 h-[22px] px-2 text-[11px] text-tertiary ml-auto">
+            <span className="inline-flex items-center gap-1 h-5.5 px-2 text-[11px] text-tertiary ml-auto">
               <Icon as={Check} size={12} />
               In library
             </span>
@@ -226,7 +248,7 @@ function SearchCard({ data, onAdd }: SearchCardProps) {
 
 export const MediaCard = {
   Library: LibraryCard,
-  Search:  SearchCard,
+  Search: SearchCard,
 };
 
 export { StatusPill, ProgressBar };

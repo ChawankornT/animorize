@@ -7,7 +7,7 @@ export function ProviderBadge({ name, color }: ProviderBadgeProps) {
   return (
     <span className="inline-flex items-center gap-1.5">
       <span
-        className="shrink-0 rounded-[2px]"
+        className="shrink-0 rounded-sm"
         style={{ width: 8, height: 8, background: color }}
         aria-hidden="true"
       />

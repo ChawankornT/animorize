@@ -8,7 +8,7 @@ interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const variantStyles: Record<SkeletonVariant, string> = {
   text: 'h-3 w-full rounded-sm',
-  title: 'h-[18px] w-3/4 rounded-sm',
+  title: 'h-4.5 w-3/4 rounded-sm',
   circle: 'size-10 rounded-full',
   card: 'h-32 w-full rounded-card',
 };
