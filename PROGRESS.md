@@ -18,7 +18,7 @@ claude_md_version: 2026-05-31-v1
 ## Current Phase
 
 - **Active:** Phase 3 — User Library & Dashboard
-- **Status:** Part 2b implemented — Search + Add-to-library modal + TanStack Query (search only) — PR pending
+- **Status:** Part 2b merged to develop (PR #17) — พร้อมเริ่ม Part 2c (Library/Dashboard)
 
 ## Phase 3 Progress
 
@@ -45,7 +45,7 @@ claude_md_version: 2026-05-31-v1
 - [x] `/dev/components` — MediaCard (6 library states + 3 search) + ProviderBadge + StatusPill previews
 - [x] 98 tests ผ่าน — lint ✅ typecheck ✅
 
-### Features — Part 2b (in progress)
+### Features — Part 2b (merged to develop — PR #17 ✅)
 
 - [x] `sanitizeSearchTerm` shared helper — `lib/supabase/sanitizeSearchTerm.ts` (strip ILIKE wildcards + PostgREST structural chars, preserve Thai/Unicode)
 - [x] `IMediaRepository.findAll({ search? })` + `listMedia` usecase search option — `SupabaseMediaRepository` `.or()` across 3 title columns
@@ -59,7 +59,8 @@ claude_md_version: 2026-05-31-v1
 - [x] `(main)/search/loading.tsx` + `error.tsx`
 - [x] 111 tests ผ่าน — lint ✅ typecheck ✅
 - [x] DECISIONS.md updated — TanStack Query adoption + Package Change Log
-- [ ] ⏳ PR pending
+- [x] Tailwind v4 canonical class cleanup (arbitrary → canonical ทั้ง project)
+- [x] `.claude/rules/ui.md` — design bundle storage convention (`.design-bundle/` at root)
 
 ### Features — Part 2c (ยังไม่เริ่ม)
 
@@ -145,7 +146,7 @@ claude_md_version: 2026-05-31-v1
 - **usecases**: `addToLibrary` (dup→error) · `setFavorite` (idempotent) · `removeFromLibrary` · `listUserLibrary('all'|'dashboard')`
 - **mock harness**: `makeUserMedia`, `makeUserMediaWithMedia`, `createMockUserMediaRepository`
 
-### Phase 3 Part 2b (PR pending)
+### Phase 3 Part 2b (merged to develop — PR #17 ✅)
 
 - **`sanitizeSearchTerm`** — `lib/supabase/sanitizeSearchTerm.ts`: shared helper strip ILIKE wildcards (`%_`) + PostgREST structural chars, preserve Thai/Unicode — ใช้ทั้ง media + franchise (backport)
 - **`IMediaRepository.findAll({ search? })`** — `.or()` across `title_en`, `title_romaji`, `title_th`; `listMedia` usecase pass-through
@@ -163,8 +164,7 @@ claude_md_version: 2026-05-31-v1
 
 ### Git state (สำคัญ)
 
-- **develop** — มี Foundation (PR #14) + rules (PR #15) + Part 2a (PR #16) ✅
-- **feature/phase3-part2b-search-add** — Part 2b (PR pending)
+- **develop** — มี Foundation (PR #14) + rules (PR #15) + Part 2a (PR #16) + Part 2b (PR #17) ✅
 - **main** — ยังเป็น reverted state (PR #13 Revert) — update เมื่อปิด phase เท่านั้น
 - Design bundle ล่าสุด (verified 2026-06-01): `https://api.anthropic.com/v1/design/h/Kp6d3N-GioWAaNXPRJr12w`
 
