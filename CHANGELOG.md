@@ -5,6 +5,37 @@
 
 ---
 
+## [2026-06-01] Phase 3 Part 2a — MediaCard + FavoriteButton + domain/actions plumbing
+
+### Domain
+- **SetFavorite usecase** — `src/domain/usecases/SetFavorite.ts`: idempotent explicit setter แทน ToggleFavorite flip; เหมาะกับ optimistic UI ที่ส่ง `next` ตรงๆ ไม่ double-flip เมื่อ retry
+
+### Components
+- **Icon wrapper** — `components/ui/Icon.tsx`: `<Icon as={LucideIcon} size={16} />`, strokeWidth 1.5 ทุกตัว
+- **Sparkle** — เพิ่ม `size` prop, height auto-calculated จาก ratio 1.6:1 (viewBox 100×160)
+- **ProviderBadge** — `components/media/ProviderBadge.tsx`: swatch 8×8 radius-2px + plain text; no fill (BRAND §10.5)
+- **MediaCard** — `components/media/MediaCard.tsx` — 2 variants:
+  - `Library`: poster (next/image / fallback color tile), fav slot, StatusPill, ProgressBar (hidden plan_to_watch), ep count (watching/on_hold), dropped opacity 0.78
+  - `Search`: poster, EN title overlay, type·year meta, Add button (ghost sm h-22)
+  - sub-components: `StatusPill`, `ProgressBar`, `Poster` — re-exported
+- **FavoriteButton** — `components/media/FavoriteButton.tsx`: `useOptimistic` + motion sparkle animation (scale 0.3→1.05→1, rotate -30→0, 1100ms, ease-out cubic-bezier) + `prefers-reduced-motion` (0–120ms fade no transform) + portal Toast on error
+
+### Server Actions
+- **`app/actions/userMedia.ts`** — ไฟล์ใหม่สำหรับ user-library mutations:
+  - `toggleFavoriteAction(id, next)` — RLS-guarded, revalidatePath('/dashboard')
+  - `removeFromLibraryAction(id)` — RLS-guarded, revalidatePath('/dashboard')
+  - Part 2b จะ append `searchMediaAction` + `addToLibraryAction` ต่อในไฟล์เดียวกัน
+
+### Constants & Hooks
+- **`constants/userMedia.ts`** — `STATUS_LABEL: Record<WatchStatus, string>` (user-library concern แยกจาก constants/admin.ts)
+- **`hooks/useToast.ts`** — self-contained toast queue + auto-dismiss, render ผ่าน portal
+
+### Tests
+- SetFavorite test: ทดสอบ explicit true/false (ไม่ใช่ flip) — 3 cases
+- รวม 98 tests ผ่าน, lint clean, typecheck clean
+
+---
+
 ## [2026-05-31] chore(rules): branch protection + UI design workflow gating
 
 ### Rules & Conventions

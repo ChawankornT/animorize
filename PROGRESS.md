@@ -18,7 +18,7 @@ claude_md_version: 2026-05-31-v1
 ## Current Phase
 
 - **Active:** Phase 3 — User Library & Dashboard
-- **Status:** Foundation merged to develop (PR #14) — พร้อมเริ่ม Phase 3 Features
+- **Status:** Part 2a merged to develop (PR #16) — พร้อมเริ่ม Part 2b (Search + Add-to-library)
 
 ## Phase 3 Progress
 
@@ -32,7 +32,7 @@ claude_md_version: 2026-05-31-v1
 - [x] mock harness ขยาย (`makeUserMedia`, `makeUserMediaWithMedia`, `createMockUserMediaRepository`) — `src/__tests__/utils/mockRepositories.ts`
 - [x] 98 tests ผ่าน (38 เพิ่มใน session นี้) — `npm run lint` + `npm run typecheck` + `npm test` ผ่านทั้งหมด
 
-### Features — Part 2a (in PR — feat/phase3-card-favorite)
+### Features — Part 2a (merged to develop — PR #16 ✅)
 
 - [x] `SetFavorite` usecase + test (idempotent, replaces ToggleFavorite flip) — `src/domain/usecases/SetFavorite.ts`
 - [x] `components/ui/Icon.tsx` — lucide-react wrapper, strokeWidth 1.5
@@ -107,48 +107,48 @@ claude_md_version: 2026-05-31-v1
 
 ## Notes for Chat
 
-### Phase 3 Foundation (on develop — merged PR #14 ✅)
+### Phase 3 Part 2a (merged to develop — PR #16 ✅)
 
-- **UserMedia entity** — `src/domain/entities/UserMedia.ts`: types + 3 business-rule functions (`getEffectiveUrl`, `isDashboardItem`, `getDisplayTitle` reuse)
+- **SetFavorite usecase** — `src/domain/usecases/SetFavorite.ts`: idempotent setter (`setFavorite(repo, id, isFavorite)`) แทน ToggleFavorite flip — เหมาะกับ optimistic UI ที่ส่งค่าที่ต้องการตรงๆ
+- **Icon wrapper** — `components/ui/Icon.tsx`: `<Icon as={Star} size={16} />`, strokeWidth 1.5, ไม่มี color prop (ใช้ CSS `color` บน parent)
+- **STATUS_LABEL** — `constants/userMedia.ts`: `Record<WatchStatus, string>` สำหรับ display label (ไม่ใช่ constants/admin.ts)
+- **Sparkle** — เพิ่ม `size` prop, height = size × 1.6 (viewBox 100×160)
+- **Server Actions** — `app/actions/userMedia.ts`: `toggleFavoriteAction(id, next)` + `removeFromLibraryAction(id)` — **append ต่อ** ได้ (Part 2b จะเพิ่ม `searchMediaAction` + `addToLibraryAction` ในไฟล์เดียวกัน)
+- **ProviderBadge** — `components/media/ProviderBadge.tsx`: `name` + `color` props, swatch 8×8 radius-2px
+- **MediaCard** — `components/media/MediaCard.tsx`:
+  - `MediaCard.Library` — รับ `favoriteSlot` prop (slot สำหรับ FavoriteButton), `showStatus`, data type `LibraryCardData`
+  - `MediaCard.Search` — รับ `onAdd` callback, data type `SearchCardData`
+  - Export: `StatusPill`, `ProgressBar` ด้วย
+- **FavoriteButton** — `components/media/FavoriteButton.tsx`: `'use client'`, `useOptimistic` + motion sparkle animation (1100ms, ease-out cubic-bezier(0.16,1,0.3,1)) + portal toast on error
+- **useToast** — `hooks/useToast.ts`: self-contained toast state + auto-dismiss
+
+### Phase 3 Foundation (on develop — PR #14 ✅)
+
+- **UserMedia entity** — `src/domain/entities/UserMedia.ts`: types + `getEffectiveUrl`, `isDashboardItem`, `getDisplayTitle`
 - **Repository** — `IUserMediaRepository` (7 methods) + `SupabaseUserMediaRepository` (nested JOIN `media.media_providers.base_url`) + factory `createUserMediaRepository(supabase)`
-  - ⚠️ **baseUrl** มาจาก `media_providers.base_url` (match `provider_id + audio`) **ไม่ใช่** `providers.base_url` — ดู DECISIONS.md § "URL Resolution Model"
-  - **SupabaseUserMediaRepository ต้องรับ server.ts client เท่านั้น** (RLS) — Server Action ต้อง `createServerClient()` ก่อนส่งเข้า factory
-- **4 usecases**: `addToLibrary` (dup → error), `toggleFavorite` (flip), `removeFromLibrary`, `listUserLibrary(filter: 'all'|'dashboard')`
-- **mock harness**: `makeUserMedia`, `makeUserMediaWithMedia`, `createMockUserMediaRepository` ใน `mockRepositories.ts`
-- **98 tests ผ่าน** (entity 17, mapper +14, usecases 13); lint + typecheck ผ่าน
+  - ⚠️ **baseUrl** มาจาก `media_providers.base_url` (match `provider_id + audio`) **ไม่ใช่** `providers.base_url`
+  - **SupabaseUserMediaRepository ต้องรับ server.ts client เท่านั้น** (RLS)
+- **usecases**: `addToLibrary` (dup→error) · `setFavorite` (idempotent) · `removeFromLibrary` · `listUserLibrary('all'|'dashboard')`
+- **mock harness**: `makeUserMedia`, `makeUserMediaWithMedia`, `createMockUserMediaRepository`
 
-### Phase 3 Features — สิ่งที่ต้องทำต่อ
+### Phase 3 Features — ต้องทำต่อ (Part 2b)
 
-- **Server Actions** สำหรับ add/favorite/remove (เรียก usecases + return `{success, message, errors?}`)
-- **Search + autocomplete** (TanStack Query candidate สำหรับ dedup/stale-while-revalidate)
-- **Dashboard page** — filter `listUserLibrary(userId, 'dashboard')` → `useOptimistic` สำหรับ favorite toggle
-- **MediaCard** — poster (next/image `s4.anilist.co`), fallback color tile, Provider badge
+- **`searchMediaAction`** — append ใน `app/actions/userMedia.ts`; return `Media[]` ตรงๆ (ไม่ใช่ `{success}`)
+- **`addToLibraryAction`** — append ใน `app/actions/userMedia.ts`; Zod validate + `getUser()` + revalidatePath
+- **`(main)/search` page** — TanStack Query สำหรับ autocomplete (dedup/stale-while-revalidate); result grid = `MediaCard.Search`; library cross-reference ด้วย Set (ไม่ N+1)
+- **Add-to-library modal** — Provider select + Audio segmented + Custom URL; ตาม `screens/modal.jsx` ใน bundle
 
 ### Git state (สำคัญ)
 
-- **develop** — มี Phase 3 Foundation (PR #14) + rules update (PR #15) ✅
-- **main** — ยังเป็น reverted state (PR #13 Revert) — ยังไม่ได้ merge develop → main
-- ต้องเปิด PR develop → main เพื่อให้ main ตาม develop (จะ trigger build job อัตโนมัติ)
-
-### Foundation (stable)
-
-- **Pre-Phase 3 foundation** (PR #11 → main): ESLint dependency rules, `getDisplayTitle` shared util, vitest + 60 tests
-- **ESLint rules** — `domain/` + `repositories/` `no-restricted-imports` fail ที่ CI อัตโนมัติ
+- **develop** — มี Foundation (PR #14) + rules (PR #15) + Part 2a (PR #16) ✅
+- **main** — ยังเป็น reverted state (PR #13 Revert) — update เมื่อปิด phase เท่านั้น
+- Design bundle ล่าสุด (verified 2026-06-01): `https://api.anthropic.com/v1/design/h/pfsybr1BWpc_2vfPNSlEuQ`
 
 ### ข้อมูล Admin (Phase 2 stable)
 
 - **Import flow**: fetchAnilistPreviewAction → saveImportAction — ห้าม auto-save
 - **src/constants/admin.ts** — `MEDIA_TYPE_LABELS`, `MEDIA_STATUS_VARIANT`, `SEASON_LABELS`, `TILE_COLORS`
-- **next/image host** — `s4.anilist.co` config อยู่แล้ว พร้อมให้ Phase 3 MediaCard ใช้
-
-### Rules update (PR #15 — merged to develop ✅)
-
-- **`.claude/rules/git.md`** — callout ⛔ ห้าม PR เข้า `main` ระหว่าง phase + build required สำหรับ release PR
-- **`.claude/rules/ui.md`** (ใหม่) — บังคับ fetch Claude Design handoff bundle ก่อน implement UI; ห้ามประดิษฐ์ UI เอง
-- **`ci.yml`** — `check-branch-target` job (guard) + `build` job (runs เมื่อ base=main เท่านั้น; ใช้ Supabase secrets)
-- **`.github/PULL_REQUEST_TEMPLATE.md`** (ใหม่) — checklist base branch verify + build
-- **`CLAUDE.md`** — เพิ่มหัวข้อ "Git & Deploy" + "UI / Design workflow" → claude_md_version bump
-- **`DECISIONS.md`** — เพิ่ม 2 decisions → decisions_version bump
+- **next/image host** — `s4.anilist.co` config อยู่แล้ว
 
 ### Misc
 
