@@ -3,15 +3,17 @@
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import { createUserMediaRepository, createMediaRepository, createMediaProviderRepository } from '@/repositories';
+import { createUserMediaRepository, createMediaRepository, createMediaProviderRepository, createProviderRepository } from '@/repositories';
 import { setFavorite } from '@/domain/usecases/SetFavorite';
 import { removeFromLibrary } from '@/domain/usecases/RemoveFromLibrary';
 import { addToLibrary } from '@/domain/usecases/AddToLibrary';
 import { listMedia } from '@/domain/usecases/ListMedia';
 import { listMediaProviders } from '@/domain/usecases/ListMediaProviders';
+import { listProviders } from '@/domain/usecases/ListProviders';
 import { updateLibraryProvider } from '@/domain/usecases/UpdateLibraryProvider';
 import type { Media } from '@/domain/entities/Media';
 import type { MediaProvider } from '@/domain/entities/MediaProvider';
+import type { Provider } from '@/domain/entities/Provider';
 
 export type UserMediaActionResult = {
   success: boolean;
@@ -64,13 +66,20 @@ export async function searchMediaAction(query: string): Promise<Media[]> {
   return listMedia(repo, { search: query });
 }
 
-export async function getMediaProvidersAction(mediaId: string): Promise<MediaProvider[]> {
+export async function getAddToLibraryDataAction(mediaId: string): Promise<{
+  allProviders: Provider[];
+  mediaProviders: MediaProvider[];
+}> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
+  if (!user) return { allProviders: [], mediaProviders: [] };
 
-  const repo = createMediaProviderRepository(supabase);
-  return listMediaProviders(repo, mediaId);
+  const [allProviders, mediaProviders] = await Promise.all([
+    listProviders(createProviderRepository(supabase)),
+    listMediaProviders(createMediaProviderRepository(supabase), mediaId),
+  ]);
+
+  return { allProviders, mediaProviders };
 }
 
 const addToLibrarySchema = z.object({

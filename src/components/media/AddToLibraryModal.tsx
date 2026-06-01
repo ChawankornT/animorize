@@ -1,51 +1,27 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import Image from 'next/image';
 import { AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { Icon } from '@/components/ui/Icon';
 import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
 import { Toast } from '@/components/ui/Toast';
 import { useToast } from '@/hooks/useToast';
-import { getMediaProvidersAction, addToLibraryAction } from '@/app/actions/userMedia';
+import { getAddToLibraryDataAction, addToLibraryAction } from '@/app/actions/userMedia';
 import { getDisplayTitle } from '@/domain/entities/Media';
+import { TILE_COLORS } from '@/constants/admin';
 import type { Media } from '@/domain/entities/Media';
-import type { MediaProvider } from '@/domain/entities/MediaProvider';
+import type { Provider } from '@/domain/entities/Provider';
 import type { AudioType } from '@/domain/entities/UserMedia';
 
+const AUDIO_OPTIONS: AudioType[] = ['sub', 'dub'];
+
 const AUDIO_LABELS: Record<AudioType, string> = {
-  sub: 'original · thai sub',
+  sub: 'original · sub',
   dub: 'thai · dub',
 };
-
-interface ProviderGroup {
-  providerId: string;
-  providerName: string;
-  providerColor: string;
-  audios: AudioType[];
-}
-
-function groupProviders(providers: MediaProvider[]): ProviderGroup[] {
-  const map = new Map<string, ProviderGroup>();
-  for (const p of providers) {
-    const existing = map.get(p.providerId);
-    if (existing) {
-      if (!existing.audios.includes(p.audio)) {
-        existing.audios.push(p.audio);
-      }
-    } else {
-      map.set(p.providerId, {
-        providerId: p.providerId,
-        providerName: p.providerName,
-        providerColor: p.providerColor,
-        audios: [p.audio],
-      });
-    }
-  }
-  return Array.from(map.values());
-}
 
 interface AddToLibraryModalProps {
   media: Media;
@@ -54,8 +30,8 @@ interface AddToLibraryModalProps {
 }
 
 export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModalProps) {
-  const [providers, setProviders] = useState<MediaProvider[]>([]);
-  const [loadingProviders, setLoadingProviders] = useState(true);
+  const [allProviders, setAllProviders] = useState<Provider[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedProviderId, setSelectedProviderId] = useState<string | null>(null);
   const [selectedAudio, setSelectedAudio] = useState<AudioType>('sub');
   const [customUrl, setCustomUrl] = useState('');
@@ -63,30 +39,19 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
   const [submitting, setSubmitting] = useState(false);
   const { toasts, show: showToast, dismiss } = useToast();
 
-  const groups = useMemo(() => groupProviders(providers), [providers]);
-  const selectedGroup = useMemo(
-    () => groups.find(g => g.providerId === selectedProviderId) ?? null,
-    [groups, selectedProviderId],
-  );
-
   useEffect(() => {
     let cancelled = false;
-    getMediaProvidersAction(media.id).then(result => {
+    getAddToLibraryDataAction(media.id).then(({ allProviders: providers, mediaProviders: assigned }) => {
       if (cancelled) return;
-      setProviders(result);
-      const grouped = groupProviders(result);
-      if (grouped.length > 0) {
-        setSelectedProviderId(grouped[0].providerId);
-        setSelectedAudio(grouped[0].audios[0]);
+      setAllProviders(providers);
+      if (assigned.length > 0) {
+        setSelectedProviderId(assigned[0].providerId);
+        setSelectedAudio(assigned[0].audio);
       }
-      setLoadingProviders(false);
+      setLoading(false);
     });
     return () => { cancelled = true; };
   }, [media.id]);
-
-  const effectiveAudio = selectedGroup && !selectedGroup.audios.includes(selectedAudio)
-    ? selectedGroup.audios[0]
-    : selectedAudio;
 
   const displayTitle = getDisplayTitle({
     titleEn: media.titleEn,
@@ -115,7 +80,7 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
     const result = await addToLibraryAction({
       mediaId: media.id,
       providerId: selectedProviderId,
-      audio: effectiveAudio,
+      audio: selectedAudio,
       customUrl: customUrl || undefined,
     });
 
@@ -128,59 +93,71 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
     }
   }
 
-  const disabled = submitting || loadingProviders;
+  const disabled = submitting || loading;
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop — bg-overlay, no blur */}
       <div
         className="fixed inset-0 z-50 bg-overlay flex items-center justify-center"
         onClick={onClose}
       >
-        {/* Modal */}
+        {/* Modal — design: .modal */}
         <div
           className={cn(
             'w-[min(420px,calc(100%-32px))] bg-page rounded-modal',
             'border-[0.5px] border-default p-6',
+            'flex flex-col gap-4',
           )}
           onClick={e => e.stopPropagation()}
         >
-          {/* Header: swatch + titles */}
-          <div className="flex gap-3 items-start pb-3 border-b-[0.5px] border-default mb-4">
+          {/* Header: poster swatch + titles — design: .atl-head */}
+          <div className="flex gap-3 items-start pb-3 border-b-[0.5px] border-default">
             <div
-              className="w-11 h-[60px] rounded-[6px] shrink-0"
-              style={{ background: '#4A4A4A' }}
-            />
+              className="relative w-11 h-[60px] rounded-[6px] shrink-0 overflow-hidden"
+              style={!media.posterUrl ? { background: TILE_COLORS[media.id.charCodeAt(0) % TILE_COLORS.length] } : undefined}
+            >
+              {media.posterUrl && (
+                <Image
+                  src={media.posterUrl}
+                  alt={media.titleEn ?? ''}
+                  fill
+                  className="object-cover"
+                  sizes="44px"
+                />
+              )}
+            </div>
             <div className="flex flex-col gap-[3px] min-w-0 flex-1">
-              <h2 className="text-xl font-medium tracking-tight text-primary leading-snug">
+              <div className="text-xl font-medium tracking-tight leading-tight">
                 {media.titleEn ?? displayTitle}
-              </h2>
-              <p className="text-xs text-secondary leading-snug">
+              </div>
+              <div className="text-xs text-secondary leading-snug">
                 {media.titleRomaji && `${media.titleRomaji} · `}
                 {media.mediaType} · {media.seasonYear ?? '—'}
-              </p>
+              </div>
               {media.titleTh && (
-                <p className="text-xs text-tertiary leading-snug">{media.titleTh}</p>
+                <div className="text-xs text-tertiary leading-snug">{media.titleTh}</div>
               )}
             </div>
           </div>
 
-          {/* Form */}
+          {/* Form — design: .atl-form, gap space-4 */}
           <div className="flex flex-col gap-4">
-            {/* Provider */}
+            {/* Provider — design: Field > Select */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-secondary">Provider</label>
-              {loadingProviders ? (
+              {loading ? (
                 <div className="h-9 rounded-input bg-surface animate-pulse" />
-              ) : groups.length === 0 ? (
-                <p className="text-xs text-tertiary">No providers assigned</p>
+              ) : allProviders.length === 0 ? (
+                <p className="text-xs text-tertiary">No providers available</p>
               ) : (
                 <select
                   value={selectedProviderId ?? ''}
                   onChange={e => setSelectedProviderId(e.target.value || null)}
                   disabled={disabled}
                   className={cn(
-                    'h-9 px-3 bg-page text-md text-primary rounded-input appearance-none',
+                    'h-9 px-3 bg-page text-md rounded-input appearance-none',
+                    selectedProviderId ? 'text-primary' : 'text-tertiary',
                     'border-[0.5px] border-default',
                     'transition-colors duration-fast ease-out',
                     'hover:border-strong focus:border-primary focus:outline-none',
@@ -189,21 +166,25 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
                     "bg-[url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")]",
                   )}
                 >
-                  {groups.map(g => (
-                    <option key={g.providerId} value={g.providerId}>
-                      {g.providerName}
+                  {!selectedProviderId && (
+                    <option value="">Select a provider</option>
+                  )}
+                  {allProviders.map(p => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
                     </option>
                   ))}
                 </select>
               )}
             </div>
 
-            {/* Audio segmented */}
-            {selectedGroup && selectedGroup.audios.length > 0 && (
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-secondary">Audio</label>
-                <div className="flex border-[0.5px] border-default rounded-input overflow-hidden bg-page">
-                  {selectedGroup.audios.map(audio => (
+            {/* Audio — design: AudioSegmented, always show both sub/dub */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-secondary">Audio</label>
+              <div className="flex border-[0.5px] border-default rounded-input overflow-hidden bg-page">
+                {AUDIO_OPTIONS.map((audio, i) => {
+                  const isOn = selectedAudio === audio;
+                  return (
                     <button
                       key={audio}
                       type="button"
@@ -211,32 +192,47 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
                       onClick={() => setSelectedAudio(audio)}
                       className={cn(
                         'flex-1 inline-flex items-center justify-center gap-1.5',
-                        'h-9 px-3 bg-transparent border-none cursor-pointer',
-                        'text-sm font-medium text-secondary',
-                        'transition-colors duration-fast ease-out',
-                        'hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed',
-                        effectiveAudio === audio && 'bg-surface text-primary',
-                        audio !== selectedGroup.audios[0] && 'border-l-[0.5px] border-default',
+                        'h-9 px-3 border-none cursor-pointer',
+                        'text-sm font-medium',
+                        'transition-[background,color] duration-fast ease-out',
+                        'disabled:opacity-50 disabled:cursor-not-allowed',
+                        isOn
+                          ? 'bg-surface text-primary'
+                          : 'bg-transparent text-secondary hover:text-primary',
+                        i > 0 && 'border-l-[0.5px] border-default',
                       )}
                     >
-                      <Badge
+                      <span
                         className={cn(
-                          effectiveAudio === audio && 'bg-primary text-inverse border-transparent',
+                          'inline-flex items-center h-5 px-2 rounded-pill text-xs font-medium border-[0.5px]',
+                          isOn
+                            ? 'border-transparent'
+                            : 'border-default bg-page text-secondary',
                         )}
+                        style={isOn ? { background: 'var(--text-primary)', color: 'var(--text-inverse)' } : undefined}
                       >
                         {audio}
-                      </Badge>
+                      </span>
                       {AUDIO_LABELS[audio]}
                     </button>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
-            )}
+            </div>
 
-            {/* Custom URL */}
+            {/* Custom URL — design: Field > TextInput + hint/error */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-secondary">Custom URL</label>
-              <div className="relative">
+              <div
+                className={cn(
+                  'flex items-center gap-2 h-9 px-3 bg-page rounded-input',
+                  'border-[0.5px] border-default',
+                  'transition-colors duration-fast ease-out',
+                  'hover:border-strong focus-within:border-primary',
+                  urlError && 'border-error hover:border-error focus-within:border-error',
+                  disabled && 'opacity-50 pointer-events-none',
+                )}
+              >
                 <input
                   type="text"
                   value={customUrl}
@@ -246,17 +242,10 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
                   }}
                   placeholder="https://..."
                   disabled={disabled}
-                  className={cn(
-                    'w-full h-9 px-3 bg-page text-md text-primary rounded-input',
-                    'border-[0.5px] border-default placeholder:text-tertiary',
-                    'transition-colors duration-fast ease-out',
-                    'hover:border-strong focus:border-primary focus:outline-none',
-                    'disabled:opacity-50 disabled:pointer-events-none',
-                    urlError && 'border-error hover:border-error focus:border-error pr-9',
-                  )}
+                  className="flex-1 bg-transparent text-md text-primary placeholder:text-tertiary outline-none w-full"
                 />
                 {urlError && (
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-error">
+                  <span className="text-error shrink-0">
                     <Icon as={AlertCircle} size={14} />
                   </span>
                 )}
@@ -271,8 +260,8 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center justify-end gap-2 mt-6">
+          {/* Actions — design: .modal-actions, justify-end, gap space-2, mt space-2 */}
+          <div className="flex items-center justify-end gap-2 mt-2">
             <Button variant="secondary" size="md" disabled={disabled} onClick={onClose}>
               Cancel
             </Button>

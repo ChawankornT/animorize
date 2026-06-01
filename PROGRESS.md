@@ -51,10 +51,11 @@ claude_md_version: 2026-05-31-v1
 - [x] `IMediaRepository.findAll({ search? })` + `listMedia` usecase search option — `SupabaseMediaRepository` `.or()` across 3 title columns
 - [x] Backport franchise search sanitize — `SupabaseFranchiseRepository.findAll` ใช้ shared helper เดียวกัน
 - [x] `UpdateLibraryProvider` thin usecase — `domain/usecases/UpdateLibraryProvider.ts`
-- [x] Server Actions append — `searchMediaAction`, `getMediaProvidersAction`, `addToLibraryAction`, `changeLibraryProviderAction` ใน `app/actions/userMedia.ts`
+- [x] Server Actions append — `searchMediaAction`, `getAddToLibraryDataAction` (combined parallel), `addToLibraryAction`, `changeLibraryProviderAction` ใน `app/actions/userMedia.ts`
 - [x] `QueryProvider` (scoped) — `components/providers/QueryProvider.tsx` + `(main)/search/layout.tsx`
 - [x] Search page — `(main)/search/page.tsx` (server shell + cross-ref library Set) + `SearchView.tsx` (TanStack Query autocomplete, debounce 300ms)
-- [x] Add-to-library modal — `AddToLibraryModal.tsx` (lazy provider fetch, provider grouping, audio segmented, custom URL validation, dup toast)
+- [x] Add-to-library modal — `AddToLibraryModal.tsx` (single-action parallel fetch, all providers dropdown, audio segmented sub/dub, custom URL validation, dup toast)
+- [x] `MediaCard.Search` — "In library" state (check icon) when `onAdd` is undefined (ไม่แสดงปุ่ม Add ที่คลิกไม่ได้)
 - [x] `(main)/search/loading.tsx` + `error.tsx`
 - [x] 111 tests ผ่าน — lint ✅ typecheck ✅
 - [x] DECISIONS.md updated — TanStack Query adoption + Package Change Log
@@ -151,12 +152,13 @@ claude_md_version: 2026-05-31-v1
 - **`UpdateLibraryProvider`** — thin usecase wrap `repo.updateProvider`
 - **Server Actions** (append ใน `app/actions/userMedia.ts`):
   - `searchMediaAction(query)` — read, return `Media[]` ตรงๆ
-  - `getMediaProvidersAction(mediaId)` — lazy fetch สำหรับ modal (ไม่ pre-fetch N queries)
+  - `getAddToLibraryDataAction(mediaId)` — **single action** ดึง allProviders + mediaProviders parallel ฝั่ง server (ลด network roundtrips)
   - `addToLibraryAction(input)` — Zod + getUser + addToLibrary; empty customUrl → undefined (ไม่ส่ง `""` เข้า `.url()`)
   - `changeLibraryProviderAction(id, input)` — ชื่อไม่ชน admin `updateProviderAction`
 - **QueryProvider** — scoped ที่ `(main)/search/layout.tsx` เท่านั้น (ไม่ mount root)
 - **SearchView** — TanStack Query `useQuery` + debounce 300ms + library cross-ref Set (ไม่ N+1)
-- **AddToLibraryModal** — lazy provider fetch, group flat `MediaProvider[]` by `providerId` → dropdown + audio segmented; audio labels: `sub` = "original · thai sub", `dub` = "thai · dub"
+- **AddToLibraryModal** — provider dropdown แสดง **ทุก provider ในระบบ** (admin-assigned = default เท่านั้น ไม่จำกัดตัวเลือก); audio แสดง sub + dub เสมอ; labels: `sub` = "original · sub", `dub` = "thai · dub"; poster image + tile color fallback
+- **MediaCard.Search** — `onAdd` undefined → แสดง "In library" + check icon แทนปุ่ม Add
 - **@tanstack/react-query** — `^5.100.14` install แล้วก่อนหน้า; DECISIONS.md Package Change Log updated
 
 ### Git state (สำคัญ)
@@ -164,7 +166,7 @@ claude_md_version: 2026-05-31-v1
 - **develop** — มี Foundation (PR #14) + rules (PR #15) + Part 2a (PR #16) ✅
 - **feature/phase3-part2b-search-add** — Part 2b (PR pending)
 - **main** — ยังเป็น reverted state (PR #13 Revert) — update เมื่อปิด phase เท่านั้น
-- Design bundle ล่าสุด (verified 2026-06-01): `https://api.anthropic.com/v1/design/h/U6nzQ7JRQdqVZ9epSE60Rw`
+- Design bundle ล่าสุด (verified 2026-06-01): `https://api.anthropic.com/v1/design/h/Kp6d3N-GioWAaNXPRJr12w`
 
 ### ข้อมูล Admin (Phase 2 stable)
 

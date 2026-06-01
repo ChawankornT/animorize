@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Plus } from 'lucide-react';
+import { Check, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -200,15 +200,22 @@ function SearchCard({ data, onAdd }: SearchCardProps) {
           <span className="text-[11px] text-tertiary">
             {mediaType}{seasonYear ? ` · ${seasonYear}` : ''}
           </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-[22px] px-2 text-[11px] ml-auto"
-            onClick={onAdd}
-          >
-            <Icon as={Plus} size={12} />
-            Add
-          </Button>
+          {onAdd ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-[22px] px-2 text-[11px] ml-auto"
+              onClick={onAdd}
+            >
+              <Icon as={Plus} size={12} />
+              Add
+            </Button>
+          ) : (
+            <span className="inline-flex items-center gap-1 h-[22px] px-2 text-[11px] text-tertiary ml-auto">
+              <Icon as={Check} size={12} />
+              In library
+            </span>
+          )}
         </div>
       </div>
     </div>
