@@ -151,6 +151,8 @@ UI            → app/ + components/         (render เท่านั้น)
 - Candidate เดียวที่ TanStack Query จะ justify ได้ตอนนี้คือ search autocomplete (dedup, stale-while-revalidate) — adopt เฉพาะตอนสร้าง search จริง ไม่ wire ล่วงหน้า
 - TanStack Query ยังคง locked stack (available) — ไม่ได้ตัดออก แค่ defer จนมีเหตุผลชัดเจน
 
+> **Update 2026-06-01 (Part 2b):** adopted สำหรับ search autocomplete ตามแผน — scoped ที่ `(main)/search/layout.tsx` เท่านั้น; mutation อื่นยังเป็น Server Actions + useOptimistic
+
 ### Validation Single Source of Truth
 **กฎ:**
 - Zod = ตรวจรูปแบบ/ความครบของ input ที่ขอบ Server Action (parse untrusted input → typed)
@@ -567,3 +569,4 @@ Bundle (first load) <  200KB
 | 2025-05 | eslint, eslint-config-next | ^9 / 16.0.5 | Linting |
 | 2026-05 | tsc-files | ^1.1.4 | Type-check staged files only ใน lint-staged (ไม่ต้อง run tsc ทั้ง project ทุก commit) |
 | 2026-05-30 | lucide-react | ^1.17.0 | Icon library สำหรับ UI (Phase 3+: MediaCard, Provider badge, nav) — tree-shakeable, ไม่มี runtime dependency |
+| 2026-06-01 | @tanstack/react-query | ^5.100.14 | Server state เฉพาะ search autocomplete (dedup + stale-while-revalidate); adopt ตามที่ §"Client Data Layer" predict ไว้ — ยังไม่ wire ที่อื่น |

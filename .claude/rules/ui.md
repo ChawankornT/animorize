@@ -23,3 +23,10 @@
 - **fetch design bundle ก่อนสร้าง UI component เสมอ** ไม่ว่าจะเป็น page ใหม่หรือ component ใหม่
 - export ใหม่จาก Claude Design = ลิงก์ใหม่ → อย่า cache ลิงก์เก่าไว้ใช้ข้ามครั้ง
 - ถ้าไม่มีลิงก์ให้ใช้ → **ถามเจ้าของ** อย่าเดา
+
+## Design bundle storage
+
+- download + extract ที่ **`.design-bundle/`** (project root) — อยู่ใน `.gitignore` แล้ว
+- เวอร์ชันใหม่มา → **ลบ `.design-bundle/` ทั้ง folder ก่อน** แล้ว extract ใหม่ (ป้องกันไฟล์เก่าค้าง)
+- ขั้นตอน: `rm -rf .design-bundle && mkdir .design-bundle && cp <downloaded-file> .design-bundle/bundle.tar.gz && cd .design-bundle && tar xzf bundle.tar.gz`
+- อ่าน spec จาก `.design-bundle/<project>/project/screens/` — ไม่ต้อง render ใน browser

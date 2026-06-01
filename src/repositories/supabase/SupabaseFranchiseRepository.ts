@@ -6,6 +6,7 @@ import {
   fromCreateFranchiseInput,
   fromUpdateFranchiseInput,
 } from '@/repositories/supabase/mappers';
+import { sanitizeSearchTerm } from '@/lib/supabase/sanitizeSearchTerm';
 
 export class SupabaseFranchiseRepository implements IFranchiseRepository {
   constructor(private readonly supabase: SupabaseDb) {}
@@ -17,10 +18,12 @@ export class SupabaseFranchiseRepository implements IFranchiseRepository {
       .order('title_en');
 
     if (options?.search) {
-      const term = options.search;
-      query = query.or(
-        `title_th.ilike.%${term}%,title_en.ilike.%${term}%,title_romaji.ilike.%${term}%`,
-      );
+      const q = sanitizeSearchTerm(options.search);
+      if (q) {
+        query = query.or(
+          `title_th.ilike.%${q}%,title_en.ilike.%${q}%,title_romaji.ilike.%${q}%`,
+        );
+      }
     }
 
     const { data, error } = await query;

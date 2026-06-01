@@ -15,6 +15,7 @@ export async function listMedia(
     franchiseId?: string;
     mediaType?: MediaType;
     airingStatus?: AiringStatus;
+    search?: string;
   },
 ): Promise<Media[]> {
   return repository.findAll(options);

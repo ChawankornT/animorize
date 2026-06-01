@@ -1,10 +1,17 @@
 'use server';
 
+import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import { createUserMediaRepository } from '@/repositories';
+import { createUserMediaRepository, createMediaRepository, createMediaProviderRepository } from '@/repositories';
 import { setFavorite } from '@/domain/usecases/SetFavorite';
 import { removeFromLibrary } from '@/domain/usecases/RemoveFromLibrary';
+import { addToLibrary } from '@/domain/usecases/AddToLibrary';
+import { listMedia } from '@/domain/usecases/ListMedia';
+import { listMediaProviders } from '@/domain/usecases/ListMediaProviders';
+import { updateLibraryProvider } from '@/domain/usecases/UpdateLibraryProvider';
+import type { Media } from '@/domain/entities/Media';
+import type { MediaProvider } from '@/domain/entities/MediaProvider';
 
 export type UserMediaActionResult = {
   success: boolean;
@@ -45,5 +52,90 @@ export async function removeFromLibraryAction(
   } catch (error) {
     console.error('[removeFromLibraryAction]', error);
     return { success: false, message: 'Failed to remove from library' };
+  }
+}
+
+export async function searchMediaAction(query: string): Promise<Media[]> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const repo = createMediaRepository(supabase);
+  return listMedia(repo, { search: query });
+}
+
+export async function getMediaProvidersAction(mediaId: string): Promise<MediaProvider[]> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const repo = createMediaProviderRepository(supabase);
+  return listMediaProviders(repo, mediaId);
+}
+
+const addToLibrarySchema = z.object({
+  mediaId: z.string().uuid(),
+  providerId: z.string().uuid().nullable().optional(),
+  audio: z.enum(['sub', 'dub']).optional(),
+  customUrl: z.string().url().nullable().optional(),
+});
+
+export async function addToLibraryAction(
+  input: z.infer<typeof addToLibrarySchema>,
+): Promise<UserMediaActionResult> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, message: 'Unauthorized' };
+
+  const parsed = addToLibrarySchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false, message: 'Invalid input' };
+  }
+
+  try {
+    const repo = createUserMediaRepository(supabase);
+    await addToLibrary(repo, { userId: user.id, ...parsed.data });
+    revalidatePath('/dashboard');
+    return { success: true, message: 'Added to library' };
+  } catch (error) {
+    const message = error instanceof Error && error.message.includes('already in your library')
+      ? 'Already in your library.'
+      : 'Failed to add to library';
+    console.error('[addToLibraryAction]', error);
+    return { success: false, message };
+  }
+}
+
+const changeLibraryProviderSchema = z.object({
+  providerId: z.string().uuid().nullable(),
+  audio: z.enum(['sub', 'dub']),
+  customUrl: z.string().url().nullable().optional(),
+});
+
+export async function changeLibraryProviderAction(
+  userMediaId: string,
+  input: z.infer<typeof changeLibraryProviderSchema>,
+): Promise<UserMediaActionResult> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, message: 'Unauthorized' };
+
+  const parsed = changeLibraryProviderSchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false, message: 'Invalid input' };
+  }
+
+  try {
+    const repo = createUserMediaRepository(supabase);
+    await updateLibraryProvider(repo, userMediaId, {
+      providerId: parsed.data.providerId,
+      audio: parsed.data.audio,
+      customUrl: parsed.data.customUrl ?? null,
+    });
+    revalidatePath('/dashboard');
+    return { success: true, message: 'Provider updated' };
+  } catch (error) {
+    console.error('[changeLibraryProviderAction]', error);
+    return { success: false, message: 'Failed to update provider' };
   }
 }

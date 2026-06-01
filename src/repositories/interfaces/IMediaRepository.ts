@@ -5,6 +5,7 @@ export interface IMediaRepository {
     franchiseId?: string;
     mediaType?: MediaType;
     airingStatus?: AiringStatus;
+    search?: string;
   }): Promise<Media[]>;
   findById(id: string): Promise<Media | null>;
   findByAnilistId(anilistId: number): Promise<Media | null>;
