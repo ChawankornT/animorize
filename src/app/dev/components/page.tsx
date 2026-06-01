@@ -10,6 +10,10 @@ import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { Toast } from '@/components/ui/Toast';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { MediaCard } from '@/components/media/MediaCard';
+import { ProviderBadge } from '@/components/media/ProviderBadge';
+import { StatusPill } from '@/components/media/MediaCard';
+import type { WatchStatus } from '@/domain/entities/UserMedia';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -189,6 +193,77 @@ export default function ComponentsPage() {
           <Toast variant="error" title="Import failed" description="Could not fetch data from AniList" onClose={() => {}} />
           <Toast variant="info" title="Sync complete" description="3 titles updated" onClose={() => {}} />
         </div>
+      </Section>
+
+      {/* MediaCard — Library variant */}
+      <Section title="MediaCard — Library">
+        <div className="grid grid-cols-4 gap-3">
+          {([
+            { status: 'watching',      label: 'Watching',      ep: 7,  total: 11, fav: true  },
+            { status: 'plan_to_watch', label: 'Plan to watch', ep: 0,  total: 12, fav: false },
+            { status: 'on_hold',       label: 'On hold',       ep: 3,  total: 24, fav: false },
+            { status: 'completed',     label: 'Completed',     ep: 24, total: 24, fav: false },
+            { status: 'dropped',       label: 'Dropped',       ep: 2,  total: 13, fav: false },
+            { status: 'watching',      label: 'With poster',   ep: 4,  total: 26, fav: true  },
+          ] as const).map(({ status, label, ep, total, fav }, i) => (
+            <div key={label} className="flex flex-col gap-1">
+              <MediaCard.Library
+                data={{
+                  titleEn: 'Sousou no Frieren',
+                  titleRomaji: 'Sousou no Frieren',
+                  titleTh: null,
+                  posterUrl: i === 5 ? 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx154587-hWgxGCCzHDAd.jpg' : null,
+                  tileColorIndex: i,
+                  status: status as WatchStatus,
+                  currentEpisode: ep,
+                  totalEpisodes: total,
+                  isFavorite: fav,
+                  providerName: 'Crunchyroll',
+                  providerColor: '#F47521',
+                }}
+                showStatus
+              />
+              <p className="text-[11px] text-tertiary text-center font-mono">{label}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      {/* MediaCard — Search variant */}
+      <Section title="MediaCard — Search">
+        <div className="grid grid-cols-4 gap-3">
+          {[
+            { title: 'Sousou no Frieren', type: 'anime', year: 2023, poster: null },
+            { title: 'Bocchi the Rock!',  type: 'anime', year: 2022, poster: null },
+            { title: 'Oshi No Ko',        type: 'anime', year: 2023, poster: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx163132-yOwNAbsE7KG1.jpg' },
+          ].map((m, i) => (
+            <MediaCard.Search
+              key={m.title}
+              data={{
+                titleEn: m.title, titleRomaji: m.title, titleTh: null,
+                posterUrl: m.poster,
+                tileColorIndex: i + 2,
+                mediaType: m.type,
+                seasonYear: m.year,
+              }}
+              onAdd={() => alert(`Add: ${m.title}`)}
+            />
+          ))}
+        </div>
+      </Section>
+
+      {/* ProviderBadge + StatusPill */}
+      <Section title="Media sub-components">
+        <Row label="ProviderBadge">
+          <ProviderBadge name="Crunchyroll" color="#F47521" />
+          <ProviderBadge name="Netflix" color="#E50914" />
+          <ProviderBadge name="Bilibili" color="#00A1D6" />
+        </Row>
+        <Row label="StatusPill">
+          {(['watching', 'plan_to_watch', 'on_hold', 'completed', 'dropped'] as WatchStatus[]).map(s => (
+            <StatusPill key={s} status={s} />
+          ))}
+        </Row>
       </Section>
 
       {/* Skeleton */}
