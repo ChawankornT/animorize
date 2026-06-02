@@ -10,7 +10,7 @@
 
 ```
 instructions_version: 2026-05-30-v2
-decisions_version: 2026-06-02-v1
+decisions_version: 2026-06-02-v2
 schema_version: 2026-05-27-v2
 claude_md_version: 2026-06-02-v1
 ```
@@ -18,7 +18,7 @@ claude_md_version: 2026-06-02-v1
 ## Current Phase
 
 - **Active:** Phase 3 — User Library & Dashboard
-- **Status:** Part 2c committed on `feature/phase3-part2c-library-dashboard` — pending PR to develop
+- **Status:** Part 2c merged to develop (PR #18) ✅ + Prettier + Header pushed — Phase 3 Features complete
 
 ## Phase 3 Progress
 
@@ -62,7 +62,7 @@ claude_md_version: 2026-06-02-v1
 - [x] Tailwind v4 canonical class cleanup (arbitrary → canonical ทั้ง project)
 - [x] `.claude/rules/ui.md` — design bundle storage convention (`.design-bundle/` at root)
 
-### Features — Part 2c (committed — pending PR)
+### Features — Part 2c (merged to develop — PR #18 ✅)
 
 - [x] `components/ui/Tabs.tsx` — DS component, tablist + count badges, optional `onChange` (server/client compatible)
 - [x] `components/ui/Empty.tsx` — DS component, icon + title + body + action slot
@@ -77,6 +77,12 @@ claude_md_version: 2026-06-02-v1
 - [x] CLAUDE.md — Dashboard business rule reworded
 - [x] `isDashboardItem` JSDoc updated (comment only, no logic change)
 - [x] 5 unit tests for `librarySort` — 116 tests total, lint ✅ typecheck ✅ build ✅
+
+### Post-2c commits (on develop ✅)
+
+- [x] Prettier 3.8 setup — `.prettierrc.json` (double quotes, trailing commas, 100 char width), `eslint-config-prettier`, lint-staged integration, `npm run format` / `format:check` scripts, formatted entire codebase
+- [x] Header — admin nav link with `internal` badge (query `profiles.role`), renamed "Dashboard" → "Library"
+- [x] DECISIONS.md — Phase 5 roadmap items (admin card shortcut, media search, extraLarge poster, filter/sort, motion); Phase 6 (admin pagination)
 
 ## Phase 2 Progress
 
@@ -120,13 +126,13 @@ claude_md_version: 2026-06-02-v1
 
 ## Recent Changes (last 5)
 
-| วันที่     | เปลี่ยนอะไร                                                                                                                                      | เปลี่ยนในไฟล์ไหน                                                                                                                  |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-06-02 | feat(phase3): Part 2c — Library/Dashboard page, Tabs+Empty DS, librarySort, DashboardEmpty, image quality 90, DECISIONS+CLAUDE reword             | components/media/ (LibraryView, DashboardEmpty), components/ui/ (Tabs, Empty), app/(main)/dashboard/ (page, loading, error), lib/utils/librarySort, constants/userMedia, DECISIONS.md, CLAUDE.md |
-| 2026-06-01 | feat(phase3): Part 2b — Search + Add-to-library modal + TanStack Query (search) + sanitize helper + franchise backport                            | components/media/ (SearchView, AddToLibraryModal), components/providers/QueryProvider, app/(main)/search/, app/actions/userMedia.ts, domain/usecases/UpdateLibraryProvider, lib/supabase/sanitizeSearchTerm, repositories/ (interface+impl search) |
-| 2026-06-01 | feat(phase3): Part 2a — MediaCard (2 variants) + FavoriteButton (optimistic) + SetFavorite usecase + actions + Icon/ProviderBadge/StatusPill      | components/media/ (4 files), components/ui/Icon.tsx, constants/userMedia.ts, domain/usecases/SetFavorite.ts, app/actions/userMedia.ts, hooks/useToast.ts |
-| 2026-05-31 | docs: DECISIONS.md เพิ่ม "User-facing AniList Import — Deferred (post-Phase 7)" — ไอเดีย request queue + ต้องเคาะตอนเริ่ม                        | DECISIONS.md                                                                                                                      |
-| 2026-05-31 | chore(rules): branch protection loud + UI design workflow gating (PR #15 → develop) — CI guard check-branch-target + build job สำหรับ release PR | .claude/rules/git.md, .claude/rules/ui.md (ใหม่), CLAUDE.md, DECISIONS.md, ci.yml, PULL_REQUEST_TEMPLATE.md (ใหม่)                |
+| วันที่     | เปลี่ยนอะไร                                                                                                                                    | เปลี่ยนในไฟล์ไหน                                                                                                                                                                                                                                   |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-02 | feat: admin nav in Header + Prettier setup + roadmap Phase 5/6 items                                                                           | components/layout/Header.tsx, .prettierrc.json, .prettierignore, eslint.config.mjs, package.json, DECISIONS.md, src/\*_/_ (format)                                                                                                                 |
+| 2026-06-02 | feat(phase3): Part 2c — Library/Dashboard page (PR #18), Tabs+Empty DS, librarySort, DashboardEmpty, image quality 90, DECISIONS+CLAUDE reword | components/media/ (LibraryView, DashboardEmpty), components/ui/ (Tabs, Empty), app/(main)/dashboard/ (page, loading, error), lib/utils/librarySort, constants/userMedia, DECISIONS.md, CLAUDE.md                                                   |
+| 2026-06-01 | feat(phase3): Part 2b — Search + Add-to-library modal + TanStack Query (search) + sanitize helper + franchise backport                         | components/media/ (SearchView, AddToLibraryModal), components/providers/QueryProvider, app/(main)/search/, app/actions/userMedia.ts, domain/usecases/UpdateLibraryProvider, lib/supabase/sanitizeSearchTerm, repositories/ (interface+impl search) |
+| 2026-06-01 | feat(phase3): Part 2a — MediaCard (2 variants) + FavoriteButton (optimistic) + SetFavorite usecase + actions + Icon/ProviderBadge/StatusPill   | components/media/ (4 files), components/ui/Icon.tsx, constants/userMedia.ts, domain/usecases/SetFavorite.ts, app/actions/userMedia.ts, hooks/useToast.ts                                                                                           |
+| 2026-05-31 | docs: DECISIONS.md เพิ่ม "User-facing AniList Import — Deferred (post-Phase 7)" — ไอเดีย request queue + ต้องเคาะตอนเริ่ม                      | DECISIONS.md                                                                                                                                                                                                                                       |
 
 ## Blockers
 
@@ -174,7 +180,7 @@ claude_md_version: 2026-06-02-v1
 - **MediaCard.Search** — `onAdd` undefined → แสดง "In library" + check icon แทนปุ่ม Add
 - **@tanstack/react-query** — `^5.100.14` install แล้วก่อนหน้า; DECISIONS.md Package Change Log updated
 
-### Phase 3 Part 2c (committed — pending PR)
+### Phase 3 Part 2c (merged to develop — PR #18 ✅)
 
 - **Dashboard page** — `app/(main)/dashboard/page.tsx`: Server Component, `listUserLibrary('all')` → full library (ไม่ filter); counts pre-computed server-side
 - **Decision: `/dashboard` = full library** — `'all'` ไม่ใช่ `'dashboard'` filter เพราะ items ที่เพิ่ง add = `plan_to_watch` + ไม่ fav → ไม่โผล่ที่ไหนถ้า filter; "watching OR favorite" = section highlight + sort priority เท่านั้น — ดู DECISIONS.md
@@ -190,10 +196,22 @@ claude_md_version: 2026-06-02-v1
 
 ### Git state (สำคัญ)
 
-- **develop** — มี Foundation (PR #14) + rules (PR #15) + Part 2a (PR #16) + Part 2b (PR #17) ✅
-- **feature/phase3-part2c-library-dashboard** — committed, pending push + PR to develop
+- **develop** — มี Foundation (PR #14) + rules (PR #15) + Part 2a (PR #16) + Part 2b (PR #17) + Part 2c (PR #18) + Prettier + Header ✅ pushed
 - **main** — ยังเป็น reverted state (PR #13 Revert) — update เมื่อปิด phase เท่านั้น
 - Design bundle ล่าสุด (verified 2026-06-02): `https://api.anthropic.com/v1/design/h/5D8CVsBqRlaHcpRuEicJrw`
+
+### Prettier (session 2026-06-02)
+
+- **Setup**: `.prettierrc.json` (double quotes, trailing commas, 100 char width, `arrowParens: "avoid"`), `eslint-config-prettier`, lint-staged runs `prettier --write` before `eslint --fix`
+- **Scripts**: `npm run format` (write) / `npm run format:check` (CI-ready check)
+- **Entire codebase formatted** — all `src/**/*.{ts,tsx}` consistent
+
+### Header admin link (session 2026-06-02)
+
+- Admin users see **"Admin"** nav link with `internal` badge → `/admin`
+- Header queries `profiles.role` to determine admin status
+- "Dashboard" renamed to **"Library"** to match page title
+- DECISIONS.md updated — Phase 5 roadmap: admin card shortcut, media search, extraLarge poster, filter/sort, motion; Phase 6: admin pagination
 
 ### ข้อมูล Admin (Phase 2 stable)
 
@@ -206,4 +224,4 @@ claude_md_version: 2026-06-02-v1
 - Google OAuth ยังไม่ทำ — Email/Password เท่านั้น
 - ⚠️ **PROJECT_INSTRUCTIONS.md เปลี่ยน** (เพิ่ม Phase 7) — Chat ต้อง re-upload (instructions_version → 2026-05-30-v2)
 - ⚠️ **CLAUDE.md เปลี่ยน** (Dashboard business rule reworded) — claude_md_version → 2026-06-02-v1
-- ⚠️ **DECISIONS.md เปลี่ยน** (เพิ่ม `/dashboard` = full library decision + composite sort spec) — decisions_version → 2026-06-02-v1
+- ⚠️ **DECISIONS.md เปลี่ยน** (เพิ่ม `/dashboard` decision + Phase 5/6 roadmap items) — decisions_version → 2026-06-02-v2
