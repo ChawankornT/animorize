@@ -1,4 +1,5 @@
 # ANIMORIZE — DECISIONS.md
+
 > บันทึกเหตุผลการตัดสินใจทุกอย่างในโปรเจค
 > อัปเดตทุกครั้งที่มีการเปลี่ยน tech, approach, หรือ scope
 > อัปเดตล่าสุด: 2026-05-31
@@ -8,56 +9,72 @@
 ## Tech Stack Decisions
 
 ### Database + Auth: Supabase (แทน Firebase)
+
 **ปฏิเสธ:** Firebase Auth + Firestore
 **เหตุผล:**
+
 - Supabase Auth ทำงานร่วมกับ Row Level Security ได้โดยตรงผ่าน `auth.uid()`
 - ถ้าใช้ Firebase Auth กับ Supabase DB ต้องทำ custom JWT bridge เพิ่ม
 - PostgreSQL รองรับ relational data ได้ดีกว่า Firestore สำหรับ schema นี้
 - ลด external dependency (ตัดการพึ่งพา Firebase ออกทั้งหมด)
 
 ### State Management: Zustand (ไม่ใช้ Context API)
+
 **ปฏิเสธ:** Redux, Context API
 **เหตุผล:**
+
 - เลือกอย่างเดียวเพื่อให้ codebase consistent
 - Zustand เบากว่า Redux, boilerplate น้อยกว่า
 - Context API เหมาะกับ static values ไม่เหมาะกับ state ที่เปลี่ยนบ่อย
 
 ### Server State: TanStack Query v5 (แทน SWR)
+
 **ปฏิเสธ:** SWR
 **เหตุผล:**
+
 - Devtools ดีกว่า ช่วย debug cache ได้ชัดเจน
 - Cache invalidation และ optimistic updates ยืดหยุ่นกว่า
 - Mutation API สอดคล้องกับ Server Actions ได้ดีกว่า
 
 ### Data Import: AniList (แทน MAL)
+
 **ปฏิเสธ:** MyAnimeList API
 **เหตุผล:**
+
 - AniList GraphQL API ฟรี ไม่ต้องขอ Client ID
 - Rate limit ผ่อนปรนกว่า MAL
 - MAL API ต้องขอ approval และ header authentication ทุก request
 
 ### ข้อมูล Import เก็บใน DB ของเรา (ไม่ call API ซ้ำ)
+
 **เหตุผล:**
+
 - ทำงานได้แม้ AniList ล่มหรือ rate limit
 - Admin แก้ไข/เพิ่มเติมข้อมูลได้โดยไม่ถูก overwrite
 - ลด latency ของ user
 
 ### Testing: Vitest (แทน Jest)
+
 **ปฏิเสธ:** Jest
 **เหตุผล:**
+
 - เข้ากับ Next.js 16 และ ES modules ได้โดยไม่ต้องตั้งค่าเพิ่ม
 - เร็วกว่า Jest อย่างเห็นได้ชัดใน watch mode
 
 ### Package Manager: npm (แทน pnpm)
+
 **ปฏิเสธ:** pnpm, yarn
 **เหตุผล:**
+
 - คุ้นเคยมากกว่า ลดความซับซ้อนสำหรับ solo project
 - Next.js 16 default ใช้ npm
 - ไม่มี monorepo ที่ต้องการ pnpm workspace
 
 ### Logging: console.error MVP → Pino ภายหลัง
+
 **ปฏิเสธ:** Pino/Winston ตอน MVP
 **เหตุผล:**
+
 - MVP ไม่ต้องการ structured logging
 - Next.js จัดการ server log ให้อยู่แล้ว
 - console.error เฉพาะ error จริงๆ ใน Server Actions
@@ -65,7 +82,9 @@
 - ทบทวนเมื่อ: deploy production + ต้องการ error tracking → เพิ่ม Pino + Sentry
 
 ### Git Hooks: Husky + lint-staged
+
 **เหตุผล:**
+
 - pre-commit: lint + typecheck เฉพาะ staged files — กัน commit code เสีย
 - ไม่ใส่ pre-push test เพราะจะช้าตอน push
 
@@ -74,14 +93,17 @@
 ## Architecture Decisions
 
 ### Clean Architecture (แทน 3-Layer)
+
 **ปฏิเสธ:** 3-Layer (UI → Hook → Service)
 **เหตุผล:**
+
 - ฝึกฝน Clean Architecture ให้คุ้นเคย
 - Dependency rule ชัดเจน: domain ไม่รู้จัก framework/DB
 - เปลี่ยน Supabase เป็น DB อื่นแก้แค่ repository implementation
 - Testable: test usecases ด้วย mock repository ไม่ต้องต่อ DB จริง
 
 **Layer structure:**
+
 ```
 Domain        → entities/ + usecases/      (pure TS, ไม่ import Supabase/Next.js)
 Repository    → interfaces/ + supabase/    (DB access ผ่าน interface)
@@ -90,33 +112,42 @@ UI            → app/ + components/         (render เท่านั้น)
 ```
 
 **Dependency rule:** ชั้นในห้าม import ชั้นนอก
+
 - domain/ ห้าม import จาก repositories/, hooks/, components/, app/, lib/supabase/
 - repositories/ import ได้เฉพาะ domain/entities/ (สำหรับ return types)
 - hooks/ import domain/ + repositories/
 - UI import hooks/ + domain/entities/ (สำหรับ types)
 
 ### Supabase 2 Projects แยก dev/prod
+
 **เหตุผล:**
+
 - Schema migration พังใน dev ไม่กระทบ production
 - Test data ไม่ปนกับ real data
 - Environment variables แยกกันชัดเจน
 
 ### Server Actions สำหรับ Mutations ทั้งหมด
+
 **เหตุผล:**
+
 - Type-safe end-to-end โดยไม่ต้องเขียน API route แยก
 - Validation ทำได้ใน server ก่อนถึง DB
 - ลด boilerplate
 
 ### Docker / Kubernetes: ยังไม่ทำ
+
 **เหตุผล:**
+
 - Vercel จัดการ infrastructure ให้ทั้งหมด
 - Over-engineering สำหรับ MVP
 - ทบทวนเมื่อ: scale เกิน Vercel, ต้องการ custom backend, หรือ self-host
 
 ### Branch protection — `main` off-limits mid-phase (incident-driven)
+
 > บันทึก 2026-05-31 — เพิ่มหลังเกิดเหตุ PR หลุดเข้า `main` ทั้งที่กฎระบุไว้
 
 **กฎ:**
+
 - ระหว่าง phase: `feature/*` / `fix/*` → PR เข้า `develop` เท่านั้น
 - `main` update เฉพาะ release PR `develop` → `main` ที่เจ้าของอนุมัติเองตอนปิด phase
 - ยกเว้น: เจ้าของเปิด PR เอง และเป็น `develop` → `main` เท่านั้น — ห้ามข้าม branch
@@ -125,15 +156,18 @@ UI            → app/ + components/         (render เท่านั้น)
 **เหตุผล:** เคยมี PR หลุดเข้า `main` โดยตรงทั้งที่กฎระบุชัด — กฎที่พึ่งวินัยเพียงอย่างเดียวพัง ต้องให้เครื่องบังคับ (CI guard) ควบคู่กัน
 
 ### UI work gated on Claude Design handoff
+
 > บันทึก 2026-05-31
 
 **กฎ:**
+
 - ก่อน implement UI component/screen ใดๆ: ต้อง fetch Claude Design handoff bundle ล่าสุดก่อน
 - verify ว่ามี screen/component ที่เกี่ยวข้องใน bundle — ถ้าไม่มี → สั่ง design ก่อน implement
 - `BRAND.md` = source of truth ของ token/spec ทุกอย่าง
 - ห้ามประดิษฐ์ UI เอง — recreate จาก spec เท่านั้น
 
 **เหตุผล:**
+
 - ป้องกัน UI drift จาก design system (เกิดเมื่อ implement โดยไม่มี spec)
 - export ใหม่ = ลิงก์ใหม่เสมอ → ต้องยืนยัน URL กับเจ้าของก่อนใช้ ไม่ cache ลิงก์เก่า
 - ลด rework (ทำซ้ำหลัง design เปลี่ยน)
@@ -141,11 +175,14 @@ UI            → app/ + components/         (render เท่านั้น)
 ---
 
 ## Pre-Phase 3 Foundation Decisions
+
 > บันทึก 2026-05-30 — เคาะก่อนเริ่ม Phase 3 เพื่อให้โค้ด Phase 3 เกิดมาสะอาด
 
 ### Client Data Layer: Server Actions + useOptimistic (ไม่ wire TanStack Query ล่วงหน้า)
+
 **ปฏิเสธ:** wire TanStack Query ตั้งแต่ต้น Phase 3
 **เหตุผล:**
+
 - Architecture เป็น Server Components (อ่าน) + Server Actions (เขียน) อยู่แล้ว → TanStack Query ส่วนใหญ่ซ้ำซ้อน
 - `useOptimistic` ครอบ optimistic UX ได้ตรงๆ โดยไม่ต้องเพิ่ม abstraction
 - Candidate เดียวที่ TanStack Query จะ justify ได้ตอนนี้คือ search autocomplete (dedup, stale-while-revalidate) — adopt เฉพาะตอนสร้าง search จริง ไม่ wire ล่วงหน้า
@@ -154,12 +191,15 @@ UI            → app/ + components/         (render เท่านั้น)
 > **Update 2026-06-01 (Part 2b):** adopted สำหรับ search autocomplete ตามแผน — scoped ที่ `(main)/search/layout.tsx` เท่านั้น; mutation อื่นยังเป็น Server Actions + useOptimistic
 
 ### Validation Single Source of Truth
+
 **กฎ:**
+
 - Zod = ตรวจรูปแบบ/ความครบของ input ที่ขอบ Server Action (parse untrusted input → typed)
 - Domain entities (`validateMedia`, `validateFranchise` ฯลฯ) = business invariant ที่เป็น canonical
 - ห้าม business rule เดียวกัน implement ซ้ำทั้ง 2 ที่ — ถ้าทับซ้อนให้ domain เป็น canonical
 
 **Overlap ที่ยอมรับ (trivial):**
+
 - `franchiseSchema.refine(at-least-one-title)` + `validateFranchise` ทั้งคู่เช็ค at-least-one-title
 - `mediaSchema.refine(at-least-one-title)` + `validateMedia` เช่นกัน
 - `providerFields` Zod slug/color regex + `validateProvider` เช่นกัน
@@ -167,7 +207,9 @@ UI            → app/ + components/         (render เท่านั้น)
 - ถ้า rule เปลี่ยน → แก้ domain ก่อนเสมอ แล้วค่อย sync Zod message
 
 ### Testing Policy (MVP)
+
 **กฎ:**
+
 - ไม่ตั้ง coverage % gate — CI รัน test ทุก PR แต่ไม่ fail บน threshold
 - usecase และ mapper ใหม่ทุกตัวต้องมาพร้อม unit test (pure, mock repository, ไม่ต่อ DB)
 - Mock repository harness อยู่ที่ `src/__tests__/utils/mockRepositories.ts` — Phase 3+ reuse ได้
@@ -175,19 +217,24 @@ UI            → app/ + components/         (render เท่านั้น)
 - RTL/component test = defer (ROI ต่ำสำหรับ solo, ทบทวน Phase 5)
 
 ### Dependency Rule Enforcement: ESLint no-restricted-imports
+
 **ปฏิเสธ:** `eslint-plugin-boundaries` / วินัยมนุษย์เพียงอย่างเดียว
 **เหตุผล:**
+
 - กฎ architecture ที่พึ่งวินัยมนุษย์จะถูกละเมิดเงียบ → ให้เครื่องบังคับแทนการ review ด้วยตา
 - `no-restricted-imports` เป็น built-in ไม่ต้องเพิ่ม dependency
 - ปฏิเสธ `eslint-plugin-boundaries` เพราะเพิ่ม dependency โดยไม่จำเป็นสำหรับกฎระดับนี้
 
 **กฎที่บังคับ (ดู `eslint.config.mjs`):**
-- `src/domain/**` — ห้าม import: react, next, @supabase/*, @/lib/supabase/*, @/repositories/supabase/* (implementations), @/hooks/*, @/components/*, @/app/*, @/stores/*
-- `src/repositories/**` — ห้าม import: react, next, @/hooks/*, @/components/*, @/app/*, @/stores/*
+
+- `src/domain/**` — ห้าม import: react, next, @supabase/_, @/lib/supabase/_, @/repositories/supabase/_ (implementations), @/hooks/_, @/components/_, @/app/_, @/stores/\*
+- `src/repositories/**` — ห้าม import: react, next, @/hooks/_, @/components/_, @/app/_, @/stores/_
 - **อนุญาต:** `@/repositories/interfaces/*` ใน domain (dependency inversion — usecase import interface type ได้)
 
 ### RLS Pattern สำหรับ User-owned Tables (เตรียม Phase 3/4 — ยังไม่ implement)
+
 **กฎ:**
+
 - `user_media` / `watchlogs` = per-user data ตัวแรกของโปรเจกต์
 - Policy ครบ 4 operation: `auth.uid() = user_id` สำหรับ SELECT/INSERT/UPDATE/DELETE
 - เขียน RLS ตั้งแต่ไฟล์ schema แรก ห้าม migrate table แล้วค่อย add policy ทีหลัง
@@ -197,7 +244,9 @@ UI            → app/ + components/         (render เท่านั้น)
 **เหตุผล:** จุดที่ prod หลุดบ่อยคือ client ผิดตัว (service-role bypass) ไม่ใช่ policy ผิด
 
 ### Atomic +1 Episode ผ่าน Postgres RPC (Phase 4) — Documented Exception
+
 **กฎ:**
+
 - Phase 4: increment episode + insert watchlog + auto-complete (`current = total → status='completed'`) รวมใน Postgres function (RPC) เดียว เรียกผ่าน repository
 - usecase `IncrementEpisode` ยัง orchestrate (เรียก repo method ที่ wrap RPC) แต่ atomic step อยู่ DB
 - นี่คือ **ข้อยกเว้นที่ตั้งใจของกฎ "business logic ใน domain/usecases เท่านั้น"**
@@ -206,7 +255,9 @@ UI            → app/ + components/         (render เท่านั้น)
 **ปฏิเสธ:** ยอม non-atomic + unique constraint กัน watchlog ซ้ำ
 
 ### Optimistic UI Pattern: useOptimistic + Server Action
+
 **กฎ:**
+
 - ตั้งมาตรฐานด้วย favorite toggle (Phase 3 งานแรก — stakes ต่ำสุด)
 - Pattern: `useOptimistic` + Server Action ที่ return `{ success, message, errors? }`
 - action fail → rollback optimistic state + toast error
@@ -217,66 +268,87 @@ UI            → app/ + components/         (render เท่านั้น)
 ## Data Model Decisions
 
 ### Title Display Order: English > Romaji > Thai (เปลี่ยนจาก Thai-first)
+
 **ปฏิเสธ:** Thai > English > Romaji (เดิม)
 **เหตุผล:**
+
 - Admin panel ใช้งานกับชื่อ English เป็นหลัก — ค้นหา/จดจำง่ายกว่า
 - Breadcrumb, heading, dropdown ที่แสดง Thai-first อ่านยากเมื่อ media มีแต่ชื่อ Romaji
 - `getDisplayTitle()` ใน `Media.ts` และ `Franchise.ts` ทั้งคู่ใช้ order เดียวกัน
 - User-facing pages (Phase 3+) ใช้ getDisplayTitle() ตัวเดียวกับ admin (EN-first) — ยืนยัน 2026-05-29 ว่าไม่แบ่งภาษา ไม่เพิ่ม per-language variant
 
 ### `src/constants/admin.ts` — shared display constants สำหรับ admin
+
 **เหตุผล:**
+
 - `MEDIA_TYPE_LABELS`, `MEDIA_STATUS_VARIANT`, `SEASON_LABELS`, `TILE_COLORS` ถูกใช้ซ้ำใน 3 ไฟล์
 - รวมไว้ที่เดียวเพื่อให้ Phase อื่นที่ต้องการ admin display constants ดึงใช้ได้โดยไม่ต้องนิยามซ้ำ
 - วางใน `constants/` (ไม่ใช่ `domain/`) เพราะเป็น UI display mapping ไม่ใช่ business logic
 
 ### Franchise → Media (แยก 2 ระดับ)
+
 **เหตุผล:**
+
 - Kimetsu no Yaiba มีหลาย season, movie, OVA ภายใต้ franchise เดียว
 - ค้นหาจาก franchise แล้ว drill down ไปยัง season ที่ต้องการได้
 - รองรับการจัดกลุ่มใน Franchise page
 
 ### Movie/Special = 1 Episode เสมอ
+
 **เหตุผล:**
+
 - Movie ไม่มี episode counter ที่มีความหมาย
 - UX ง่ายกว่า — แค่ toggle "Watched" / "Not watched"
 - total_episodes = 1 ทำให้ใช้ logic เดิมได้โดยไม่ต้องแยก code path
 
 ### OVA ใช้ Episode Tracking ปกติ
+
 **เหตุผล:**
+
 - บาง OVA มีมากกว่า 1 ตอน (เช่น Hellsing Ultimate มี 10 ตอน)
 - ไม่ควรสมมติว่า OVA = 1 ตอนเสมอ
 
 ### แยก `anime` กับ `series`
+
 **เหตุผล:**
+
 - Anime = animated (ญี่ปุ่นเป็นหลัก)
 - Series = live action
 - ต่างกันในการจัดกลุ่ม, filter, และ import source (AniList รองรับ anime เป็นหลัก)
 - ตัด `live_action` ออก เพราะ `series` ครอบคลุมอยู่แล้ว
 
 ### Auto-sync 2 ระดับ (System + Per-media)
+
 **เหตุผล:**
+
 - System level: ปิด sync ทั้งหมดได้ทีเดียวตอน maintenance
 - Per-media: เรื่องที่ฉายจบแล้ว (finished) ปิด sync ได้ ไม่เปลือง API calls
 - Sync เฉพาะ `airing_status = 'ongoing'` เพื่อประหยัด quota
 
 ### Sync Fields ที่ไม่ Override
+
 **Fields ที่ auto-sync ไม่แตะ:** `title_th`, `synopsis`, `poster_url`
 **เหตุผล:**
+
 - Admin อาจแก้ไขชื่อภาษาไทยเองหรือเพิ่ม synopsis ไทย
 - การ sync ไม่ควร overwrite งานที่ admin ทำไว้
 
 ### Supabase pg_cron Keep-alive
+
 **เหตุผล:**
+
 - Supabase Free tier จะ pause project หลัง inactive 7 วัน
 - pg_cron `SELECT 1` ทุก 3 วัน ทำงานได้ในระดับ DB ไม่ต้อง external service
 - keep-alive เป็น pg_cron `SELECT 1` standalone (applied แล้ว Phase 1) — คนละกลไกกับ auto-sync: auto-sync เรียก AniList external API จึงรันผ่าน Vercel Cron/Edge Function (ดู Phase 6) ไม่ใช่ pg_cron เดียวกัน แต่ daily sync ที่ touch DB ก็ช่วย keep-alive ไปในตัว
 
 ### Provider URL Resolution
+
 ```
 URL ที่ใช้จริง = user.custom_url ?? admin.base_url
 ```
+
 **เหตุผล:**
+
 - Admin ตั้ง base_url กลางไว้ก่อน (เช่น bilibili.com/anime/kimetsu)
 - User ที่ดูจาก URL เฉพาะ (เช่น episode ที่ bookmarked) ใส่ custom URL ได้
 
@@ -285,6 +357,7 @@ URL ที่ใช้จริง = user.custom_url ?? admin.base_url
 ## Sync Strategy Detail
 
 ### Import Flow
+
 ```
 1. Admin ใส่ AniList ID ใน Admin Panel
 2. Server Action call AniList GraphQL (server side เท่านั้น)
@@ -294,24 +367,40 @@ URL ที่ใช้จริง = user.custom_url ?? admin.base_url
 ```
 
 ### AniList GraphQL Query
+
 ```graphql
 query ($id: Int) {
   Media(id: $id, type: ANIME) {
-    title { romaji english native }
-    coverImage { large }
+    title {
+      romaji
+      english
+      native
+    }
+    coverImage {
+      large
+    }
     description
     genres
     episodes
     season
     seasonYear
-    startDate { year month day }
-    endDate { year month day }
+    startDate {
+      year
+      month
+      day
+    }
+    endDate {
+      year
+      month
+      day
+    }
     status
   }
 }
 ```
 
 ### Failure Handling
+
 ```
 ไม่ update ข้อมูลถ้า call ไม่ผ่าน
 บันทึก sync_logs.error_message
@@ -320,6 +409,7 @@ Admin กด Retry ได้ทีละรายการ
 ```
 
 ### Fields Mapping (AniList → DB)
+
 ```
 title.romaji     → title_romaji
 title.english    → title_en
@@ -340,17 +430,22 @@ genres           → genres[]
 ## Future Considerations (ยังไม่ทำใน MVP)
 
 ### Calendar Feature
+
 มี 2 แบบที่วางไว้:
+
 - Airing Calendar — แสดงวันออกอากาศของแต่ละ media
 - User Viewing Calendar — user วางแผนว่าจะดูวันไหน
-Schema ปัจจุบันรองรับได้ด้วย `air_date_start` และ `season_quarter`
+  Schema ปัจจุบันรองรับได้ด้วย `air_date_start` และ `season_quarter`
 
 ### Episodes Table
+
 รองรับในอนาคตสำหรับ episode-level metadata (ชื่อตอน, thumbnail, aired date)
 ตอนนี้ track แค่ episode_number เพียงพอสำหรับ MVP
 
 ### Backend แยก (Custom API)
+
 ถ้าวันนึงต้องการ:
+
 - Public API สำหรับ third-party
 - Self-host หรือเปลี่ยน DB
 - Performance tuning เกินที่ Supabase รองรับ
@@ -358,10 +453,12 @@ Schema ปัจจุบันรองรับได้ด้วย `air_date
 แนวทาง: เพิ่ม repository implementation ใหม่ — domain layer ไม่ต้องแตะ
 
 ### Animation/Live Action Movie แยก
+
 ปัจจุบันใช้ `movie` รวม animated + live action
 ถ้าอนาคตต้องการแยก ค่อยเพิ่ม `animated_movie` ใน enum
 
 ### Logging + Error Tracking
+
 - เพิ่ม Pino สำหรับ structured logging
 - เพิ่ม Sentry สำหรับ error tracking บน production
 - ทบทวนเมื่อ deploy production จริง
@@ -371,6 +468,7 @@ Schema ปัจจุบันรองรับได้ด้วย `air_date
 ## MVP Roadmap (รายละเอียด)
 
 ### Phase 1 — Foundation & Auth
+
 - Supabase project setup (dev + prod แยกกัน)
 - Schema migration ทั้งหมด + RLS policies
 - pg_cron keep-alive (ป้องกัน free tier pause)
@@ -383,6 +481,7 @@ Schema ปัจจุบันรองรับได้ด้วย `air_date
 - Husky + lint-staged setup
 
 ### Phase 2 — Admin Panel + Import
+
 - Provider CRUD (ชื่อ, สี, logo, URL)
 - Franchise CRUD
 - Media CRUD (manual)
@@ -394,11 +493,13 @@ Schema ปัจจุบันรองรับได้ด้วย `air_date
 ### Phase 3 — User Library & Dashboard
 
 #### Foundation (domain → repo ก่อน UI ตาม Clean Architecture)
+
 - UserMedia entity (+ Create/Update inputs + business rules) ใน domain/entities/
 - IUserMediaRepository interface + SupabaseUserMediaRepository + factory
 - usecases: AddToLibrary, ToggleFavorite, RemoveFromLibrary, ListUserLibrary
 
 #### Features
+
 - Search — match ข้าม title_th / title_en / title_romaji + autocomplete (display ผ่าน getDisplayTitle = EN-first)
 - เพิ่ม media เข้า library จาก search result
 - เลือก Provider + audio + custom URL (custom_url ?? base_url)
@@ -407,15 +508,18 @@ Schema ปัจจุบันรองรับได้ด้วย `air_date
 - MediaCard: render poster จริง (next/image — AniList host config มาแล้วจาก PR #6 poster fix) + fallback color tile เมื่อไม่มี poster + Provider badge (swatch ตาม BRAND 10.4/10.5)
 
 #### Decision (เคาะตอนเริ่ม Phase 3)
+
 - Client data layer: TanStack Query (server state user_media) + useOptimistic/Server Actions สำหรับ favorite toggle — หรือเริ่ม Server Actions + useOptimistic ก่อนแล้วค่อยเพิ่ม TanStack Query (stack ล็อกไว้แต่ยังไม่เคยใช้) → เคาะก่อนสร้าง hook แรก
 
 ### Phase 4 — Progress Tracking + Watchlog
 
 #### Foundation
+
 - WatchLog entity + IWatchLogRepository + SupabaseWatchLogRepository + factory
 - usecases: IncrementEpisode, ToggleWatched — business rule อยู่ใน usecase ไม่ใช่ UI
 
 #### Features
+
 - +1 Episode (EpisodeTracker → useEpisodeTracker → IncrementEpisode) + optimistic update
 - auto status update เมื่อ current = total → 'completed' (อยู่ใน IncrementEpisode)
 - movie/special: toggle Watched (total_episodes = 1)
@@ -423,14 +527,21 @@ Schema ปัจจุบันรองรับได้ด้วย `air_date
 - History page: รายการ watchlog ของ user
 
 ### Phase 5 — UX Polish
+
 - Audit loading.tsx (skeleton) + error.tsx ครบทุก route group (convention บังคับตั้งแต่ต้น — Phase 5 = ตรวจ/เก็บตก)
 - Error states + retry (client) + toast
 - Empty states + illustrations + action button
 - Dark mode toggle (เพิ่ม dark tokens ใน tokens.css ถ้ายังไม่มี)
 - Responsive (mobile hamburger menu)
 - Accessibility: WCAG 2.1 AA, keyboard navigation
+- Admin shortcut บน MediaCard → `/admin/media/[id]` (admin role only)
+- Admin media list search (ใช้ `sanitizeSearchTerm` ที่มีอยู่)
+- AniList `coverImage.extraLarge` แทน `large` — poster resolution ดีขึ้น
+- Library filter/sort/search popover (design พร้อมใน handoff)
+- Motion/animation wrapper — page transition, card enter, list stagger
 
 ### Phase 6 — Extended Features
+
 - Franchise page (รวมทุก season/movie/OVA ของ franchise)
 - Category page: user browse media ของเรา กรองตาม ปี / ฤดูกาล / media_type
   (คนละเรื่องกับ Phase 7 discovery ซึ่ง browse AniList)
@@ -438,8 +549,10 @@ Schema ปัจจุบันรองรับได้ด้วย `air_date
   ⚠️ pg_cron เพียว ๆ เรียก AniList ไม่ได้ (เป็น SQL) → ต้องใช้ Vercel Cron → API route หรือ Supabase Edge Function + pg_net — เคาะ mechanism ตอนเริ่ม
 - Basic stats (ดูไปกี่ตอน กี่เรื่อง)
 - (manual "Sync now" — done แล้วใน PR #6 (merged) ไม่ต้องทำซ้ำ)
+- Admin pagination — media list + franchise + sync logs
 
 ### Phase 7 — Discovery & Bulk Import (admin-side) [planned]
+
 - Discovery forward-only: default ซีซั่นปัจจุบัน + กำลังจะมา (AniList Page query)
 - ย้อนหลัง = manual filter (season + year)
 - 7a: live discovery + select-import (ยังไม่มี table — diff กับ media สด)
@@ -455,9 +568,11 @@ Schema ปัจจุบันรองรับได้ด้วย `air_date
 **ลำดับ:** admin-side ไม่ block Phase 3-6 → ทำหลัง Phase 3 ได้
 
 ### ปัญหาที่แก้
+
 - import ได้ทีละเรื่อง + admin ต้องรู้ AniList ID เอง → ไม่รู้ว่าซีซั่นข้างหน้ามีอะไรเข้า
 
 ### Scope ที่ทำ
+
 - Discovery = forward-only — default ซีซั่นปัจจุบัน + กำลังจะมา (RELEASING / NOT_YET_RELEASED)
 - ย้อนหลัง = manual filter (season + year) เท่านั้น ไม่ดึงย้อนอัตโนมัติ
 - Notification: เจอเรื่องใหม่ → ขึ้นจำนวน (candidates status='new') ไม่ import เอง
@@ -466,10 +581,12 @@ Schema ปัจจุบันรองรับได้ด้วย `air_date
 - หน่วย import = ซีซั่น — ไม่ทำ full-catalog dump ผ่านเว็บ
 
 ### Scope ที่ไม่ทำ (ตั้งใจ)
+
 - ❌ Full-catalog dump (หมื่นเรื่อง) ผ่าน Server Action — เกิน serverless timeout + ขัด curate model
 - ❌ ดึงย้อนหลังอัตโนมัติ
 
 ### Data model — candidates เก็บ LEAN (เคาะ 2026-05-30)
+
 - เก็บแค่ field สำหรับ "แสดง list + อ้างอิงตอน import":
   anilist_id (unique), title_romaji, title_en, poster_url, media_type,
   season_quarter, season_year, airing_status, status (new|dismissed|imported), discovered_at
@@ -479,11 +596,13 @@ Schema ปัจจุบันรองรับได้ด้วย `air_date
   (candidates ไม่เป็น source of truth ซ้อนกับ media, ไม่ drift จาก schema)
 
 ### Schema — DEFER (เคาะ 2026-05-30)
+
 - import_candidates table ยังไม่ migrate ตอนนี้ → สร้างตอนเริ่ม 7b
 - เริ่มที่ 7a (live discovery, ไม่มี table) ก่อน
 - ตอนทำ 7b: เพิ่ม schema file ใหม่ + regenerate types/database.ts (auto-gen — ห้ามแก้มือ) + RLS (admin-only)
 
 ### กฎที่ต้อง preserve / แก้
+
 - ✅ Preview ก่อน save ยังอยู่ — admin เลือกเอง = preview
 - ✅ ห้าม auto-save (สร้าง media อัตโนมัติ) ยังอยู่ — cache candidates ≠ save
 - 🔧 .claude/rules/admin.md:
@@ -493,6 +612,7 @@ Schema ปัจจุบันรองรับได้ด้วย `air_date
 - sync_log ต่อเรื่องตอน import — 1 เรื่อง fail ไม่ล้มทั้ง batch
 
 ### Architecture (Clean Architecture เดิม)
+
 - lib/anilist/ — Page query (browse by season/year/status) + list mapper
 - domain/entities/ — ImportCandidate (7b)
 - domain/usecases/ — DiscoverUpcoming, BulkImportSelected, DismissCandidate (7b)
@@ -501,24 +621,28 @@ Schema ปัจจุบันรองรับได้ด้วย `air_date
 - rate limit: sleep ระหว่าง request, เคารพ ~30-90 req/min (Page ดึงทีละ ~50 ประหยัด quota)
 
 ### ⚠️ ต้อง confirm ตอนเริ่ม
+
 1. notification ขึ้นที่ไหน — admin dashboard "Needs attention" inbox (มีอยู่แล้ว) เพิ่ม section?
 2. cron mechanism (7c) ใช้ตัวเดียวกับ auto-sync Phase 6
 
 ---
 
 ## User-facing AniList Import — Deferred (post-Phase 7)
+
 > บันทึก 2026-05-31
 
 **สถานะ:** ยังไม่ทำ — Phase 3 user เพิ่มเรื่องจาก catalog (search) เท่านั้น
 **ทบทวนเมื่อ:** จบ Phase 7 (discovery/candidates พร้อม)
 
 ### ไอเดียที่ลอยไว้
+
 - user ส่ง "request" เรื่องที่อยากได้ (อาจมาจาก AniList list ของตัวเอง) → เข้า queue
 - admin review/approve → import เข้า catalog → ค่อย add เข้า library ของ user
 - ต่อกับ Phase 7 candidates ได้ (request ที่ match anilist_id เดิม = dedup; ที่ยังไม่มีใน catalog = candidate ใหม่)
 - รักษา boundary เดิม: ยิง AniList = ฝั่ง server/admin เท่านั้น ห้าม client
 
 ### ⚠️ ต้องเคาะตอนเริ่ม
+
 - schema ของ request queue
 - จุดที่ admin เห็น (inbox "Needs attention"?)
 - ความสัมพันธ์กับ import_candidates ของ Phase 7
@@ -526,9 +650,11 @@ Schema ปัจจุบันรองรับได้ด้วย `air_date
 ---
 
 ## Phase 3 Foundation Decisions
+
 > บันทึก 2026-05-31 — เคาะระหว่างสร้าง UserMedia entity + repository
 
 ### URL Resolution Model — 3 ชั้น (เคาะ 2026-05-31)
+
 ```
 providers.base_url       — หน้าแรกของ provider (e.g. bilibili.com)
 media_providers.base_url — ลิงก์เรื่องนี้บน provider (admin-managed; อาจมาจาก AniList import)
@@ -536,6 +662,7 @@ user_media.custom_url    — user override (e.g. ชี้ไป /play หรื
 
 Effective URL = custom_url ?? media_providers.base_url
 ```
+
 **keyed by `(media_id, provider_id, audio)` unique** → sub/dub แยกลิงก์ได้ในเรื่องเดียวกัน
 
 **ปฏิเสธ:** ใช้ `providers.base_url` โดยตรง — เป็น provider homepage ไม่ใช่ลิงก์เรื่อง
@@ -545,6 +672,7 @@ Effective URL = custom_url ?? media_providers.base_url
 **Implementation:** `getEffectiveUrl(customUrl, baseUrl)` ใน `domain/entities/UserMedia.ts`; `baseUrl` ดึงจาก nested JOIN `media.media_providers.base_url` match `(provider_id, audio)` ใน `toUserMediaWithMedia` mapper
 
 ### `/dashboard` = full library (tab All) — Dashboard rule = highlight + sort ไม่ใช่ page filter
+
 > บันทึก 2026-06-02 — ปลดล็อกตอนเริ่ม Phase 3 Library/Dashboard (หลัง design Library view)
 
 **เดิม (business rule):** "Dashboard filter: status='watching' OR is_favorite=true"
@@ -572,15 +700,16 @@ Bundle (first load) <  200KB
 ---
 
 ## Package Change Log
+
 > บันทึกทุกครั้งที่ install package ใหม่
 
-| วันที่ | Package | Version | เหตุผล |
-|--------|---------|---------|--------|
-| 2025-05 | next | 16.0.5 | Framework หลัก |
-| 2025-05 | react, react-dom | 19.2.0 | React runtime |
-| 2025-05 | typescript | ^5 | Type safety |
-| 2025-05 | tailwindcss, @tailwindcss/postcss | ^4 | Styling |
-| 2025-05 | eslint, eslint-config-next | ^9 / 16.0.5 | Linting |
-| 2026-05 | tsc-files | ^1.1.4 | Type-check staged files only ใน lint-staged (ไม่ต้อง run tsc ทั้ง project ทุก commit) |
-| 2026-05-30 | lucide-react | ^1.17.0 | Icon library สำหรับ UI (Phase 3+: MediaCard, Provider badge, nav) — tree-shakeable, ไม่มี runtime dependency |
-| 2026-06-01 | @tanstack/react-query | ^5.100.14 | Server state เฉพาะ search autocomplete (dedup + stale-while-revalidate); adopt ตามที่ §"Client Data Layer" predict ไว้ — ยังไม่ wire ที่อื่น |
+| วันที่     | Package                           | Version     | เหตุผล                                                                                                                                       |
+| ---------- | --------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2025-05    | next                              | 16.0.5      | Framework หลัก                                                                                                                               |
+| 2025-05    | react, react-dom                  | 19.2.0      | React runtime                                                                                                                                |
+| 2025-05    | typescript                        | ^5          | Type safety                                                                                                                                  |
+| 2025-05    | tailwindcss, @tailwindcss/postcss | ^4          | Styling                                                                                                                                      |
+| 2025-05    | eslint, eslint-config-next        | ^9 / 16.0.5 | Linting                                                                                                                                      |
+| 2026-05    | tsc-files                         | ^1.1.4      | Type-check staged files only ใน lint-staged (ไม่ต้อง run tsc ทั้ง project ทุก commit)                                                        |
+| 2026-05-30 | lucide-react                      | ^1.17.0     | Icon library สำหรับ UI (Phase 3+: MediaCard, Provider badge, nav) — tree-shakeable, ไม่มี runtime dependency                                 |
+| 2026-06-01 | @tanstack/react-query             | ^5.100.14   | Server state เฉพาะ search autocomplete (dedup + stale-while-revalidate); adopt ตามที่ §"Client Data Layer" predict ไว้ — ยังไม่ wire ที่อื่น |
