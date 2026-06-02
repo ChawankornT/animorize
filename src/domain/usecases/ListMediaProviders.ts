@@ -1,5 +1,5 @@
-import type { IMediaProviderRepository } from '@/repositories/interfaces/IMediaProviderRepository';
-import type { MediaProvider } from '@/domain/entities/MediaProvider';
+import type { IMediaProviderRepository } from "@/repositories/interfaces/IMediaProviderRepository";
+import type { MediaProvider } from "@/domain/entities/MediaProvider";
 
 /**
  * Returns all provider assignments for a given media entry.

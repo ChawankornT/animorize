@@ -1,6 +1,6 @@
-import type { IMediaRepository } from '@/repositories/interfaces/IMediaRepository';
-import type { ISyncLogRepository } from '@/repositories/interfaces/ISyncLogRepository';
-import type { CreateMediaInput, Media } from '@/domain/entities/Media';
+import type { IMediaRepository } from "@/repositories/interfaces/IMediaRepository";
+import type { ISyncLogRepository } from "@/repositories/interfaces/ISyncLogRepository";
+import type { CreateMediaInput, Media } from "@/domain/entities/Media";
 
 /**
  * Imports a new media entry from AniList pre-mapped data.
@@ -30,13 +30,13 @@ export async function importMedia(
   const media = await mediaRepo.create(input);
 
   try {
-    await syncLogRepo.create({ mediaId: media.id, result: 'success' });
+    await syncLogRepo.create({ mediaId: media.id, result: "success" });
   } catch (logErr) {
     try {
       await syncLogRepo.create({
         mediaId: media.id,
-        result: 'failed',
-        errorMessage: logErr instanceof Error ? logErr.message : 'Failed to write success log',
+        result: "failed",
+        errorMessage: logErr instanceof Error ? logErr.message : "Failed to write success log",
       });
     } catch {
       // best-effort

@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { ProviderForm } from '@/components/admin/ProviderForm';
+import Link from "next/link";
+import { ProviderForm } from "@/components/admin/ProviderForm";
 
 export default function NewProviderPage() {
   return (
@@ -9,7 +9,10 @@ export default function NewProviderPage() {
           Admin
         </Link>
         <span className="text-tertiary">›</span>
-        <Link href="/admin/providers" className="hover:text-primary transition-colors duration-fast">
+        <Link
+          href="/admin/providers"
+          className="hover:text-primary transition-colors duration-fast"
+        >
           Providers
         </Link>
         <span className="text-tertiary">›</span>

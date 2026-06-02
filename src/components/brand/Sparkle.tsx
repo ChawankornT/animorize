@@ -6,9 +6,8 @@ interface SparkleProps {
 }
 
 export function Sparkle({ className, style, size }: SparkleProps) {
-  const sizeStyle: React.CSSProperties = size !== undefined
-    ? { width: size, height: size * 1.6 }
-    : {};
+  const sizeStyle: React.CSSProperties =
+    size !== undefined ? { width: size, height: size * 1.6 } : {};
   return (
     <svg
       viewBox="0 0 100 160"

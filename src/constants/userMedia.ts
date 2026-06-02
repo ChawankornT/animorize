@@ -1,11 +1,11 @@
-import type { WatchStatus } from '@/domain/entities/UserMedia';
+import type { WatchStatus } from "@/domain/entities/UserMedia";
 
 export const STATUS_LABEL: Record<WatchStatus, string> = {
-  watching:      'Watching',
-  plan_to_watch: 'Plan to watch',
-  on_hold:       'On hold',
-  completed:     'Completed',
-  dropped:       'Dropped',
+  watching: "Watching",
+  plan_to_watch: "Plan to watch",
+  on_hold: "On hold",
+  completed: "Completed",
+  dropped: "Dropped",
 };
 
 export const STATUS_PRIORITY: Record<WatchStatus, number> = {

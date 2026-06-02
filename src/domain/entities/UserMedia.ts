@@ -1,5 +1,5 @@
-import type { AudioType, WatchStatus } from '@/types/database';
-import { getDisplayTitle } from '@/domain/entities/title';
+import type { AudioType, WatchStatus } from "@/types/database";
+import { getDisplayTitle } from "@/domain/entities/title";
 
 export type { AudioType, WatchStatus };
 
@@ -57,7 +57,10 @@ export { getDisplayTitle };
  * @param customUrl - user_media.custom_url
  * @param baseUrl   - media_providers.base_url (keyed by provider + audio)
  */
-export function getEffectiveUrl(customUrl: string | null | undefined, baseUrl: string | null | undefined): string | null {
+export function getEffectiveUrl(
+  customUrl: string | null | undefined,
+  baseUrl: string | null | undefined,
+): string | null {
   return customUrl ?? baseUrl ?? null;
 }
 
@@ -65,6 +68,6 @@ export function getEffectiveUrl(customUrl: string | null | undefined, baseUrl: s
  * Returns true if this item qualifies as a highlight (watching OR favorite).
  * Used by `listUserLibrary('dashboard')` filter — note: `/dashboard` page uses 'all' + sections instead.
  */
-export function isDashboardItem(userMedia: Pick<UserMedia, 'status' | 'isFavorite'>): boolean {
-  return userMedia.status === 'watching' || userMedia.isFavorite;
+export function isDashboardItem(userMedia: Pick<UserMedia, "status" | "isFavorite">): boolean {
+  return userMedia.status === "watching" || userMedia.isFavorite;
 }

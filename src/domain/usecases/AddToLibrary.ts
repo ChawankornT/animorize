@@ -1,5 +1,5 @@
-import type { IUserMediaRepository } from '@/repositories/interfaces/IUserMediaRepository';
-import type { UserMedia, AddToLibraryInput } from '@/domain/entities/UserMedia';
+import type { IUserMediaRepository } from "@/repositories/interfaces/IUserMediaRepository";
+import type { UserMedia, AddToLibraryInput } from "@/domain/entities/UserMedia";
 
 /**
  * Adds a media entry to the user's library.
@@ -15,7 +15,7 @@ export async function addToLibrary(
 ): Promise<UserMedia> {
   const existing = await repository.findByUserAndMedia(input.userId, input.mediaId);
   if (existing) {
-    throw new Error('This media is already in your library');
+    throw new Error("This media is already in your library");
   }
   return repository.add(input);
 }

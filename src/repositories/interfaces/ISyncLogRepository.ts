@@ -1,4 +1,4 @@
-import type { SyncLog, CreateSyncLogInput } from '@/domain/entities/SyncLog';
+import type { SyncLog, CreateSyncLogInput } from "@/domain/entities/SyncLog";
 
 export interface ISyncLogRepository {
   findAll(options?: { mediaId?: string; limit?: number }): Promise<SyncLog[]>;

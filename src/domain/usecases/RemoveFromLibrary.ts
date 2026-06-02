@@ -1,4 +1,4 @@
-import type { IUserMediaRepository } from '@/repositories/interfaces/IUserMediaRepository';
+import type { IUserMediaRepository } from "@/repositories/interfaces/IUserMediaRepository";
 
 /**
  * Removes a media entry from the user's library.

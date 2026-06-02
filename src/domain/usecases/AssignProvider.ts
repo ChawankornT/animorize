@@ -1,5 +1,5 @@
-import type { IMediaProviderRepository } from '@/repositories/interfaces/IMediaProviderRepository';
-import type { MediaProvider, CreateMediaProviderInput } from '@/domain/entities/MediaProvider';
+import type { IMediaProviderRepository } from "@/repositories/interfaces/IMediaProviderRepository";
+import type { MediaProvider, CreateMediaProviderInput } from "@/domain/entities/MediaProvider";
 
 /**
  * Assigns a provider to a media entry.

@@ -1,4 +1,10 @@
-import type { UserMedia, UserMediaWithMedia, AddToLibraryInput, AudioType, WatchStatus } from '@/domain/entities/UserMedia';
+import type {
+  UserMedia,
+  UserMediaWithMedia,
+  AddToLibraryInput,
+  AudioType,
+  WatchStatus,
+} from "@/domain/entities/UserMedia";
 
 export interface UpdateProviderInput {
   providerId: string | null;

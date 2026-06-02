@@ -1,5 +1,5 @@
-import type { UserMediaWithMedia } from '@/domain/entities/UserMedia';
-import { STATUS_PRIORITY } from '@/constants/userMedia';
+import type { UserMediaWithMedia } from "@/domain/entities/UserMedia";
+import { STATUS_PRIORITY } from "@/constants/userMedia";
 
 export function librarySort(a: UserMediaWithMedia, b: UserMediaWithMedia): number {
   const pa = STATUS_PRIORITY[a.status] ?? 99;

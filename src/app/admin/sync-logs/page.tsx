@@ -1,17 +1,17 @@
-import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
-import { createSyncLogRepository } from '@/repositories';
-import { listSyncLogs } from '@/domain/usecases/ListSyncLogs';
-import { Badge } from '@/components/ui/Badge';
-import { RetrySyncButton } from '@/components/admin/RetrySyncButton';
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import { createSyncLogRepository } from "@/repositories";
+import { listSyncLogs } from "@/domain/usecases/ListSyncLogs";
+import { Badge } from "@/components/ui/Badge";
+import { RetrySyncButton } from "@/components/admin/RetrySyncButton";
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+  return new Date(dateStr).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
@@ -30,10 +30,10 @@ export default async function SyncLogsPage() {
 
       {logs.length === 0 ? (
         <div className="py-16 text-center text-secondary text-sm border-[0.5px] border-default rounded-card">
-          No sync logs yet.{' '}
+          No sync logs yet.{" "}
           <Link href="/admin/import" className="text-primary underline-offset-2 hover:underline">
             Import media from AniList
-          </Link>{' '}
+          </Link>{" "}
           to create the first log.
         </div>
       ) : (
@@ -57,24 +57,24 @@ export default async function SyncLogsPage() {
               </tr>
             </thead>
             <tbody className="divide-y-[0.5px] divide-default">
-              {logs.map((log) => (
+              {logs.map(log => (
                 <tr key={log.id} className="hover:bg-surface transition-colors duration-fast">
                   <td className="px-4 py-3 font-medium text-primary">
                     {log.mediaTitle || log.mediaId}
                   </td>
                   <td className="px-4 py-3">
-                    <Badge variant={log.result === 'success' ? 'success' : 'error'} dot>
+                    <Badge variant={log.result === "success" ? "success" : "error"} dot>
                       {log.result}
                     </Badge>
                   </td>
                   <td className="px-4 py-3 text-secondary text-xs max-w-xs truncate">
-                    {log.errorMessage ?? '—'}
+                    {log.errorMessage ?? "—"}
                   </td>
                   <td className="px-4 py-3 text-secondary text-xs whitespace-nowrap">
                     {formatDate(log.syncedAt)}
                   </td>
                   <td className="px-4 py-3 text-right">
-                    {log.result === 'failed' && (
+                    {log.result === "failed" && (
                       <RetrySyncButton
                         mediaId={log.mediaId}
                         mediaTitle={log.mediaTitle ?? log.mediaId}

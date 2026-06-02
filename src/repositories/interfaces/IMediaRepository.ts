@@ -1,4 +1,10 @@
-import type { Media, CreateMediaInput, UpdateMediaInput, MediaType, AiringStatus } from '@/domain/entities/Media';
+import type {
+  Media,
+  CreateMediaInput,
+  UpdateMediaInput,
+  MediaType,
+  AiringStatus,
+} from "@/domain/entities/Media";
 
 export interface IMediaRepository {
   findAll(options?: {

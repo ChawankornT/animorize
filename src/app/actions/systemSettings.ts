@@ -1,10 +1,10 @@
-'use server';
+"use server";
 
-import { revalidatePath } from 'next/cache';
-import { z } from 'zod/v4';
-import { createClient } from '@/lib/supabase/server';
-import { createSystemSettingsRepository } from '@/repositories';
-import { updateSystemSettings } from '@/domain/usecases/UpdateSystemSettings';
+import { revalidatePath } from "next/cache";
+import { z } from "zod/v4";
+import { createClient } from "@/lib/supabase/server";
+import { createSystemSettingsRepository } from "@/repositories";
+import { updateSystemSettings } from "@/domain/usecases/UpdateSystemSettings";
 
 export type SystemSettingsState = {
   message?: string;
@@ -20,21 +20,21 @@ export async function updateSystemSettingsAction(
   formData: FormData,
 ): Promise<SystemSettingsState> {
   const parsed = settingsSchema.safeParse({
-    autoSyncEnabled: formData.get('autoSyncEnabled'),
+    autoSyncEnabled: formData.get("autoSyncEnabled"),
   });
 
   if (!parsed.success) {
-    return { message: 'Invalid settings.' };
+    return { message: "Invalid settings." };
   }
 
   try {
     const supabase = await createClient();
     const repo = createSystemSettingsRepository(supabase);
     await updateSystemSettings(repo, { autoSyncEnabled: parsed.data.autoSyncEnabled });
-    revalidatePath('/admin/settings');
-    return { success: true, message: 'Settings saved.' };
+    revalidatePath("/admin/settings");
+    return { success: true, message: "Settings saved." };
   } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Failed to save settings';
+    const msg = err instanceof Error ? err.message : "Failed to save settings";
     return { message: msg };
   }
 }

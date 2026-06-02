@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useActionState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { DeleteConfirmModal } from './DeleteConfirmModal';
-import { removeProviderAction, type RemoveProviderState } from '@/app/actions/mediaProvider';
+import { useState, useActionState } from "react";
+import { Button } from "@/components/ui/Button";
+import { DeleteConfirmModal } from "./DeleteConfirmModal";
+import { removeProviderAction, type RemoveProviderState } from "@/app/actions/mediaProvider";
 
 interface Props {
   id: string;
@@ -21,7 +21,7 @@ export function RemoveProviderButton({ id, mediaId, providerName }: Props) {
   );
 
   function actionWithMediaId(formData: FormData) {
-    formData.set('mediaId', mediaId);
+    formData.set("mediaId", mediaId);
     wrappedAction(formData);
   }
 

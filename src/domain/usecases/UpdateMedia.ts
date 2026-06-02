@@ -1,5 +1,5 @@
-import type { IMediaRepository } from '@/repositories/interfaces/IMediaRepository';
-import { validateMedia, type UpdateMediaInput, type Media } from '@/domain/entities/Media';
+import type { IMediaRepository } from "@/repositories/interfaces/IMediaRepository";
+import { validateMedia, type UpdateMediaInput, type Media } from "@/domain/entities/Media";
 
 /**
  * Updates an existing media entry.
@@ -22,7 +22,7 @@ export async function updateMedia(
 
   const effectiveType = input.mediaType ?? existing.mediaType;
   const normalizedInput: UpdateMediaInput =
-    effectiveType === 'movie' || effectiveType === 'special'
+    effectiveType === "movie" || effectiveType === "special"
       ? { ...input, totalEpisodes: 1 }
       : input;
 

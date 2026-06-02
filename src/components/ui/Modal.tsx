@@ -12,14 +12,7 @@ interface ModalProps {
   className?: string;
 }
 
-export function Modal({
-  open,
-  onClose,
-  title,
-  children,
-  actions,
-  className,
-}: ModalProps) {
+export function Modal({ open, onClose, title, children, actions, className }: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -55,17 +48,9 @@ export function Modal({
       )}
     >
       <div className="p-6 text-left">
-        {title && (
-          <h2 className="text-xl font-medium tracking-tight text-primary mb-3">
-            {title}
-          </h2>
-        )}
+        {title && <h2 className="text-xl font-medium tracking-tight text-primary mb-3">{title}</h2>}
         <div className="text-sm text-secondary leading-[1.6]">{children}</div>
-        {actions && (
-          <div className="flex items-center justify-end gap-2 mt-4">
-            {actions}
-          </div>
-        )}
+        {actions && <div className="flex items-center justify-end gap-2 mt-4">{actions}</div>}
       </div>
     </dialog>
   );

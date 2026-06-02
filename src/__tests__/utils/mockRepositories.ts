@@ -1,20 +1,20 @@
-import { vi } from 'vitest';
-import type { IMediaRepository } from '@/repositories/interfaces/IMediaRepository';
-import type { ISyncLogRepository } from '@/repositories/interfaces/ISyncLogRepository';
-import type { IUserMediaRepository } from '@/repositories/interfaces/IUserMediaRepository';
-import type { Media, CreateMediaInput, UpdateMediaInput } from '@/domain/entities/Media';
-import type { SyncLog, CreateSyncLogInput } from '@/domain/entities/SyncLog';
-import type { UserMedia, UserMediaWithMedia } from '@/domain/entities/UserMedia';
+import { vi } from "vitest";
+import type { IMediaRepository } from "@/repositories/interfaces/IMediaRepository";
+import type { ISyncLogRepository } from "@/repositories/interfaces/ISyncLogRepository";
+import type { IUserMediaRepository } from "@/repositories/interfaces/IUserMediaRepository";
+import type { Media, CreateMediaInput, UpdateMediaInput } from "@/domain/entities/Media";
+import type { SyncLog, CreateSyncLogInput } from "@/domain/entities/SyncLog";
+import type { UserMedia, UserMediaWithMedia } from "@/domain/entities/UserMedia";
 
 /** Stub Media for use in mock repos. Override individual fields as needed. */
 export function makeMedia(overrides: Partial<Media> = {}): Media {
   return {
-    id: 'media-1',
+    id: "media-1",
     franchiseId: null,
     anilistId: null,
-    mediaType: 'anime',
+    mediaType: "anime",
     titleTh: null,
-    titleEn: 'Test Media',
+    titleEn: "Test Media",
     titleRomaji: null,
     synopsis: null,
     posterUrl: null,
@@ -24,11 +24,11 @@ export function makeMedia(overrides: Partial<Media> = {}): Media {
     seasonYear: null,
     airDateStart: null,
     airDateEnd: null,
-    airingStatus: 'ongoing',
+    airingStatus: "ongoing",
     autoSync: true,
     sortOrder: 0,
-    createdAt: '2026-01-01T00:00:00Z',
-    updatedAt: '2026-01-01T00:00:00Z',
+    createdAt: "2026-01-01T00:00:00Z",
+    updatedAt: "2026-01-01T00:00:00Z",
     ...overrides,
   };
 }
@@ -36,11 +36,11 @@ export function makeMedia(overrides: Partial<Media> = {}): Media {
 /** Stub SyncLog for use in mock repos. */
 export function makeSyncLog(overrides: Partial<SyncLog> = {}): SyncLog {
   return {
-    id: 'log-1',
-    mediaId: 'media-1',
-    result: 'success',
+    id: "log-1",
+    mediaId: "media-1",
+    result: "success",
     errorMessage: null,
-    syncedAt: '2026-01-01T00:00:00Z',
+    syncedAt: "2026-01-01T00:00:00Z",
     ...overrides,
   };
 }
@@ -55,12 +55,16 @@ export function createMockMediaRepository(defaults: { media?: Media } = {}): IMe
     findAll: vi.fn().mockResolvedValue([media]),
     findById: vi.fn().mockResolvedValue(media),
     findByAnilistId: vi.fn().mockResolvedValue(null),
-    create: vi.fn().mockImplementation(async (data: CreateMediaInput) =>
-      makeMedia({ ...data, id: 'media-new' }),
-    ),
-    update: vi.fn().mockImplementation(async (_id: string, data: UpdateMediaInput) =>
-      makeMedia({ ...media, ...data }),
-    ),
+    create: vi
+      .fn()
+      .mockImplementation(async (data: CreateMediaInput) =>
+        makeMedia({ ...data, id: "media-new" }),
+      ),
+    update: vi
+      .fn()
+      .mockImplementation(async (_id: string, data: UpdateMediaInput) =>
+        makeMedia({ ...media, ...data }),
+      ),
     delete: vi.fn().mockResolvedValue(undefined),
   };
 }
@@ -71,42 +75,46 @@ export function createMockMediaRepository(defaults: { media?: Media } = {}): IMe
 export function createMockSyncLogRepository(): ISyncLogRepository {
   return {
     findAll: vi.fn().mockResolvedValue([]),
-    create: vi.fn().mockImplementation(async (data: CreateSyncLogInput) =>
-      makeSyncLog({ ...data, id: 'log-new' }),
-    ),
+    create: vi
+      .fn()
+      .mockImplementation(async (data: CreateSyncLogInput) =>
+        makeSyncLog({ ...data, id: "log-new" }),
+      ),
   };
 }
 
 /** Stub UserMedia for use in mock repos. Override individual fields as needed. */
 export function makeUserMedia(overrides: Partial<UserMedia> = {}): UserMedia {
   return {
-    id: 'um-1',
-    userId: 'user-1',
-    mediaId: 'media-1',
+    id: "um-1",
+    userId: "user-1",
+    mediaId: "media-1",
     providerId: null,
-    audio: 'sub',
-    status: 'plan_to_watch',
+    audio: "sub",
+    status: "plan_to_watch",
     currentEpisode: 0,
     isFavorite: false,
     customUrl: null,
     startedAt: null,
     completedAt: null,
-    createdAt: '2026-01-01T00:00:00Z',
-    updatedAt: '2026-01-01T00:00:00Z',
+    createdAt: "2026-01-01T00:00:00Z",
+    updatedAt: "2026-01-01T00:00:00Z",
     ...overrides,
   };
 }
 
 /** Stub UserMediaWithMedia for use in mock repos. */
-export function makeUserMediaWithMedia(overrides: Partial<UserMediaWithMedia> = {}): UserMediaWithMedia {
+export function makeUserMediaWithMedia(
+  overrides: Partial<UserMediaWithMedia> = {},
+): UserMediaWithMedia {
   return {
     ...makeUserMedia(),
     titleTh: null,
-    titleEn: 'Test Media',
+    titleEn: "Test Media",
     titleRomaji: null,
     posterUrl: null,
     totalEpisodes: 12,
-    mediaType: 'anime',
+    mediaType: "anime",
     providerName: null,
     providerColor: null,
     baseUrl: null,
@@ -127,12 +135,16 @@ export function createMockUserMediaRepository(
     add: vi.fn().mockResolvedValue(userMedia),
     findByUserId: vi.fn().mockResolvedValue([withMedia]),
     findByUserAndMedia: vi.fn().mockResolvedValue(null),
-    updateFavorite: vi.fn().mockImplementation(async (_id: string, isFavorite: boolean) =>
-      makeUserMedia({ ...userMedia, isFavorite }),
-    ),
-    updateStatus: vi.fn().mockImplementation(async (_id: string, status: UserMedia['status']) =>
-      makeUserMedia({ ...userMedia, status }),
-    ),
+    updateFavorite: vi
+      .fn()
+      .mockImplementation(async (_id: string, isFavorite: boolean) =>
+        makeUserMedia({ ...userMedia, isFavorite }),
+      ),
+    updateStatus: vi
+      .fn()
+      .mockImplementation(async (_id: string, status: UserMedia["status"]) =>
+        makeUserMedia({ ...userMedia, status }),
+      ),
     updateProvider: vi.fn().mockResolvedValue(userMedia),
     remove: vi.fn().mockResolvedValue(undefined),
   };

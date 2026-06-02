@@ -1,4 +1,4 @@
-import type { IMediaRepository } from '@/repositories/interfaces/IMediaRepository';
+import type { IMediaRepository } from "@/repositories/interfaces/IMediaRepository";
 
 /**
  * Deletes a media entry by ID.
@@ -6,9 +6,6 @@ import type { IMediaRepository } from '@/repositories/interfaces/IMediaRepositor
  * @param repository - Media repository implementation
  * @param id - Media UUID to delete
  */
-export async function deleteMedia(
-  repository: IMediaRepository,
-  id: string,
-): Promise<void> {
+export async function deleteMedia(repository: IMediaRepository, id: string): Promise<void> {
   return repository.delete(id);
 }

@@ -1,8 +1,8 @@
-import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
-import { logoutAction } from '@/app/(auth)/actions';
-import { Button, buttonVariants } from '@/components/ui/Button';
-import { Wordmark } from '@/components/brand/Wordmark';
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import { logoutAction } from "@/app/(auth)/actions";
+import { Button, buttonVariants } from "@/components/ui/Button";
+import { Wordmark } from "@/components/brand/Wordmark";
 
 export async function Header() {
   const supabase = await createClient();
@@ -13,7 +13,7 @@ export async function Header() {
   return (
     <header className="h-14 bg-page border-b-[0.5px] border-default px-6 flex items-center">
       <div className="flex w-full items-center justify-between">
-        <Link href={user ? '/dashboard' : '/'} className="shrink-0">
+        <Link href={user ? "/dashboard" : "/"} className="shrink-0">
           <Wordmark />
         </Link>
 
@@ -48,10 +48,10 @@ export async function Header() {
             </>
           ) : (
             <>
-              <Link href="/login" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+              <Link href="/login" className={buttonVariants({ variant: "ghost", size: "sm" })}>
                 Log in
               </Link>
-              <Link href="/signup" className={buttonVariants({ variant: 'primary', size: 'sm' })}>
+              <Link href="/signup" className={buttonVariants({ variant: "primary", size: "sm" })}>
                 Sign up
               </Link>
             </>

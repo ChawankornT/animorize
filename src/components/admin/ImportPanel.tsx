@@ -1,32 +1,32 @@
-'use client';
+"use client";
 
-import { useActionState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
-import { Select } from '@/components/ui/Select';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
-import { getDisplayTitle } from '@/domain/entities/Franchise';
-import type { Franchise } from '@/domain/entities/Franchise';
+import { useActionState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
+import { Select } from "@/components/ui/Select";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { getDisplayTitle } from "@/domain/entities/Franchise";
+import type { Franchise } from "@/domain/entities/Franchise";
 import {
   fetchAnilistPreviewAction,
   saveImportAction,
   type AnilistPreviewState,
   type SaveImportState,
-} from '@/app/actions/anilist';
-import { SEASON_LABELS, TILE_COLORS } from '@/constants/admin';
+} from "@/app/actions/anilist";
+import { SEASON_LABELS, TILE_COLORS } from "@/constants/admin";
 
 type ImportPanelProps = {
   franchises: Franchise[];
 };
 
 export function ImportPanel({ franchises }: ImportPanelProps) {
-  const [previewState, previewAction, previewPending] = useActionState<AnilistPreviewState, FormData>(
-    fetchAnilistPreviewAction,
-    {},
-  );
+  const [previewState, previewAction, previewPending] = useActionState<
+    AnilistPreviewState,
+    FormData
+  >(fetchAnilistPreviewAction, {});
   const [saveState, saveAction, savePending] = useActionState<SaveImportState, FormData>(
     saveImportAction,
     {},
@@ -38,7 +38,13 @@ export function ImportPanel({ franchises }: ImportPanelProps) {
       <div className="max-w-md border-[0.5px] border-default rounded-card p-6 flex flex-col gap-3">
         <div className="flex items-center gap-2.5">
           {/* Check-circle icon */}
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="shrink-0 text-success">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            className="shrink-0 text-success"
+          >
             <circle cx="10" cy="10" r="9.25" stroke="currentColor" strokeWidth="1.5" />
             <path
               d="M6.5 10l2.5 2.5 5-5"
@@ -66,12 +72,7 @@ export function ImportPanel({ franchises }: ImportPanelProps) {
           >
             Assign providers →
           </Link>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => window.location.reload()}
-          >
+          <Button type="button" variant="ghost" size="sm" onClick={() => window.location.reload()}>
             Import another
           </Button>
         </div>
@@ -95,16 +96,16 @@ export function ImportPanel({ franchises }: ImportPanelProps) {
 
         {/* Hidden round-trip fields */}
         <input type="hidden" name="anilistId" value={d.anilistId} />
-        <input type="hidden" name="titleRomaji" value={d.titleRomaji ?? ''} />
-        <input type="hidden" name="titleEn" value={d.titleEn ?? ''} />
-        <input type="hidden" name="posterUrl" value={d.posterUrl ?? ''} />
-        <input type="hidden" name="totalEpisodes" value={d.totalEpisodes ?? ''} />
-        <input type="hidden" name="airingStatus" value={d.airingStatus ?? 'upcoming'} />
-        <input type="hidden" name="genres" value={(d.genres ?? []).join(', ')} />
-        <input type="hidden" name="seasonQuarter" value={d.seasonQuarter ?? ''} />
-        <input type="hidden" name="seasonYear" value={d.seasonYear ?? ''} />
-        <input type="hidden" name="airDateStart" value={d.airDateStart ?? ''} />
-        <input type="hidden" name="airDateEnd" value={d.airDateEnd ?? ''} />
+        <input type="hidden" name="titleRomaji" value={d.titleRomaji ?? ""} />
+        <input type="hidden" name="titleEn" value={d.titleEn ?? ""} />
+        <input type="hidden" name="posterUrl" value={d.posterUrl ?? ""} />
+        <input type="hidden" name="totalEpisodes" value={d.totalEpisodes ?? ""} />
+        <input type="hidden" name="airingStatus" value={d.airingStatus ?? "upcoming"} />
+        <input type="hidden" name="genres" value={(d.genres ?? []).join(", ")} />
+        <input type="hidden" name="seasonQuarter" value={d.seasonQuarter ?? ""} />
+        <input type="hidden" name="seasonYear" value={d.seasonYear ?? ""} />
+        <input type="hidden" name="airDateStart" value={d.airDateStart ?? ""} />
+        <input type="hidden" name="airDateEnd" value={d.airDateEnd ?? ""} />
         <input type="hidden" name="mediaType" value={d.mediaType} />
 
         {/* Preview card */}
@@ -119,7 +120,7 @@ export function ImportPanel({ franchises }: ImportPanelProps) {
               {d.posterUrl && (
                 <Image
                   src={d.posterUrl}
-                  alt={d.titleEn ?? d.titleRomaji ?? ''}
+                  alt={d.titleEn ?? d.titleRomaji ?? ""}
                   fill
                   className="object-cover"
                   sizes="84px"
@@ -143,11 +144,11 @@ export function ImportPanel({ franchises }: ImportPanelProps) {
                 <Badge>{d.mediaType}</Badge>
                 <Badge
                   variant={
-                    d.airingStatus === 'ongoing'
-                      ? 'success'
-                      : d.airingStatus === 'upcoming'
-                        ? 'warning'
-                        : 'default'
+                    d.airingStatus === "ongoing"
+                      ? "success"
+                      : d.airingStatus === "upcoming"
+                        ? "warning"
+                        : "default"
                   }
                   dot
                 >
@@ -161,7 +162,7 @@ export function ImportPanel({ franchises }: ImportPanelProps) {
                 )}
               </div>
               {(d.genres ?? []).length > 0 && (
-                <p className="text-xs text-tertiary">{(d.genres ?? []).join(' · ')}</p>
+                <p className="text-xs text-tertiary">{(d.genres ?? []).join(" · ")}</p>
               )}
               {d.synopsis && (
                 <p className="text-sm text-secondary leading-relaxed line-clamp-3 mt-1">
@@ -187,7 +188,7 @@ export function ImportPanel({ franchises }: ImportPanelProps) {
               />
               <Select label="Franchise" name="franchiseId" defaultValue="">
                 <option value="">None (standalone)</option>
-                {franchises.map((f) => (
+                {franchises.map(f => (
                   <option key={f.id} value={f.id}>
                     {getDisplayTitle(f)}
                   </option>
@@ -198,7 +199,7 @@ export function ImportPanel({ franchises }: ImportPanelProps) {
             <Textarea
               label="Synopsis"
               name="synopsis"
-              defaultValue={d.synopsis ?? ''}
+              defaultValue={d.synopsis ?? ""}
               rows={4}
               hint="Pre-filled from AniList — edit as needed"
             />
@@ -213,9 +214,7 @@ export function ImportPanel({ franchises }: ImportPanelProps) {
               />
               <div>
                 <span className="text-sm font-medium text-primary">Auto-sync</span>
-                <p className="text-xs text-secondary mt-0.5">
-                  Sync this title with AniList daily
-                </p>
+                <p className="text-xs text-secondary mt-0.5">Sync this title with AniList daily</p>
               </div>
             </label>
           </div>
@@ -223,7 +222,7 @@ export function ImportPanel({ franchises }: ImportPanelProps) {
           {/* Action bar */}
           <div className="flex items-center gap-3 px-5 py-4 border-t-[0.5px] border-default">
             <Button type="submit" disabled={savePending}>
-              {savePending ? 'Saving…' : 'Import'}
+              {savePending ? "Saving…" : "Import"}
             </Button>
             <Button
               type="button"
@@ -270,7 +269,7 @@ export function ImportPanel({ franchises }: ImportPanelProps) {
             />
           </div>
           <Button type="submit" disabled={previewPending}>
-            {previewPending ? 'Fetching…' : 'Fetch'}
+            {previewPending ? "Fetching…" : "Fetch"}
           </Button>
         </div>
 

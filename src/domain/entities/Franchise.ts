@@ -1,4 +1,4 @@
-export { getDisplayTitle } from '@/domain/entities/title';
+export { getDisplayTitle } from "@/domain/entities/title";
 
 export interface Franchise {
   id: string;
@@ -33,7 +33,6 @@ export function validateFranchise(data: {
   titleRomaji?: string | null;
 }): void {
   if (!data.titleTh && !data.titleEn && !data.titleRomaji) {
-    throw new Error('Franchise must have at least one title (titleTh, titleEn, or titleRomaji)');
+    throw new Error("Franchise must have at least one title (titleTh, titleEn, or titleRomaji)");
   }
 }
-

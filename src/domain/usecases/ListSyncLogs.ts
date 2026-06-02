@@ -1,5 +1,5 @@
-import type { ISyncLogRepository } from '@/repositories/interfaces/ISyncLogRepository';
-import type { SyncLog } from '@/domain/entities/SyncLog';
+import type { ISyncLogRepository } from "@/repositories/interfaces/ISyncLogRepository";
+import type { SyncLog } from "@/domain/entities/SyncLog";
 
 /**
  * Returns sync log entries, ordered by most recent first.

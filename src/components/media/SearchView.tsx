@@ -51,7 +51,7 @@ export function SearchView({ libraryMediaIds }: SearchViewProps) {
   }, []);
 
   const handleAdded = useCallback((mediaId: string) => {
-    setAddedIds((prev) => new Set(prev).add(mediaId));
+    setAddedIds(prev => new Set(prev).add(mediaId));
     setModalMedia(null);
   }, []);
 
@@ -81,7 +81,7 @@ export function SearchView({ libraryMediaIds }: SearchViewProps) {
             <input
               type="text"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={e => setQuery(e.target.value)}
               placeholder="frieren, kimetsu, jujutsu…"
               className="flex-1 bg-transparent text-lg font-medium tracking-[-0.01em] text-primary placeholder:text-tertiary outline-none"
             />
@@ -107,9 +107,7 @@ export function SearchView({ libraryMediaIds }: SearchViewProps) {
               ) : (
                 <>
                   <b>{results.length}</b> matches for{" "}
-                  <span className="text-primary font-medium">
-                    &ldquo;{debouncedQuery}&rdquo;
-                  </span>
+                  <span className="text-primary font-medium">&ldquo;{debouncedQuery}&rdquo;</span>
                 </>
               )}
             </span>
@@ -117,7 +115,7 @@ export function SearchView({ libraryMediaIds }: SearchViewProps) {
 
           {showResults && (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {results.map((media) => {
+              {results.map(media => {
                 const inLibrary = librarySet.has(media.id);
                 return (
                   <MediaCard.Search
@@ -139,9 +137,7 @@ export function SearchView({ libraryMediaIds }: SearchViewProps) {
 
           {hasQuery && !isFetching && results.length === 0 && (
             <div className="text-center py-16">
-              <p className="text-md text-secondary">
-                No results found. Try a different title.
-              </p>
+              <p className="text-md text-secondary">No results found. Try a different title.</p>
             </div>
           )}
         </div>

@@ -1,23 +1,20 @@
-'use client';
+"use client";
 
-import { useActionState } from 'react';
-import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
-import { Button } from '@/components/ui/Button';
-import type { Franchise } from '@/domain/entities/Franchise';
+import { useActionState } from "react";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
+import { Button } from "@/components/ui/Button";
+import type { Franchise } from "@/domain/entities/Franchise";
 import {
   createFranchiseAction,
   updateFranchiseAction,
   type FranchiseActionState,
-} from '@/app/actions/franchise';
+} from "@/app/actions/franchise";
 
 export function FranchiseForm({ franchise }: { franchise?: Franchise }) {
   const isEdit = !!franchise;
   const action = isEdit ? updateFranchiseAction : createFranchiseAction;
-  const [state, formAction, pending] = useActionState<FranchiseActionState, FormData>(
-    action,
-    {},
-  );
+  const [state, formAction, pending] = useActionState<FranchiseActionState, FormData>(action, {});
 
   return (
     <form action={formAction} className="space-y-5 max-w-lg">
@@ -32,7 +29,7 @@ export function FranchiseForm({ franchise }: { franchise?: Franchise }) {
       <Input
         label="Title (Thai)"
         name="titleTh"
-        defaultValue={franchise?.titleTh ?? ''}
+        defaultValue={franchise?.titleTh ?? ""}
         error={state.errors?.titleTh?.[0]}
         placeholder="e.g. คิเมสึ โนะ ยาอิบะ"
         autoComplete="off"
@@ -41,7 +38,7 @@ export function FranchiseForm({ franchise }: { franchise?: Franchise }) {
       <Input
         label="Title (English)"
         name="titleEn"
-        defaultValue={franchise?.titleEn ?? ''}
+        defaultValue={franchise?.titleEn ?? ""}
         error={state.errors?.titleEn?.[0]}
         placeholder="e.g. Demon Slayer"
         autoComplete="off"
@@ -50,7 +47,7 @@ export function FranchiseForm({ franchise }: { franchise?: Franchise }) {
       <Input
         label="Title (Romaji)"
         name="titleRomaji"
-        defaultValue={franchise?.titleRomaji ?? ''}
+        defaultValue={franchise?.titleRomaji ?? ""}
         error={state.errors?.titleRomaji?.[0]}
         placeholder="e.g. Kimetsu no Yaiba"
         autoComplete="off"
@@ -59,7 +56,7 @@ export function FranchiseForm({ franchise }: { franchise?: Franchise }) {
       <Input
         label="Poster URL"
         name="posterUrl"
-        defaultValue={franchise?.posterUrl ?? ''}
+        defaultValue={franchise?.posterUrl ?? ""}
         error={state.errors?.posterUrl?.[0]}
         placeholder="https://example.com/poster.jpg"
         hint="Optional"
@@ -69,7 +66,7 @@ export function FranchiseForm({ franchise }: { franchise?: Franchise }) {
       <Textarea
         label="Synopsis"
         name="synopsis"
-        defaultValue={franchise?.synopsis ?? ''}
+        defaultValue={franchise?.synopsis ?? ""}
         error={state.errors?.synopsis?.[0]}
         placeholder="Brief description…"
         hint="Optional"
@@ -80,11 +77,11 @@ export function FranchiseForm({ franchise }: { franchise?: Franchise }) {
         <Button type="submit" disabled={pending}>
           {pending
             ? isEdit
-              ? 'Saving…'
-              : 'Creating…'
+              ? "Saving…"
+              : "Creating…"
             : isEdit
-              ? 'Save changes'
-              : 'Create franchise'}
+              ? "Save changes"
+              : "Create franchise"}
         </Button>
         <a
           href="/admin/franchises"

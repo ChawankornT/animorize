@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useOptimistic, useTransition } from 'react';
-import { createPortal } from 'react-dom';
-import { motion, useReducedMotion } from 'motion/react';
-import { Star } from 'lucide-react';
-import { Icon } from '@/components/ui/Icon';
-import { Sparkle } from '@/components/brand/Sparkle';
-import { Toast } from '@/components/ui/Toast';
-import { useToast } from '@/hooks/useToast';
-import { toggleFavoriteAction } from '@/app/actions/userMedia';
+import { useOptimistic, useTransition } from "react";
+import { createPortal } from "react-dom";
+import { motion, useReducedMotion } from "motion/react";
+import { Star } from "lucide-react";
+import { Icon } from "@/components/ui/Icon";
+import { Sparkle } from "@/components/brand/Sparkle";
+import { Toast } from "@/components/ui/Toast";
+import { useToast } from "@/hooks/useToast";
+import { toggleFavoriteAction } from "@/app/actions/userMedia";
 
 interface FavoriteButtonProps {
   userMediaId: string;
@@ -27,7 +27,7 @@ export function FavoriteButton({ userMediaId, isFavorite }: FavoriteButtonProps)
       setOptimisticFav(next);
       const result = await toggleFavoriteAction(userMediaId, next);
       if (!result.success) {
-        show(result.message, 'error');
+        show(result.message, "error");
       }
     });
   }
@@ -54,12 +54,12 @@ export function FavoriteButton({ userMediaId, isFavorite }: FavoriteButtonProps)
   return (
     <>
       <button
-        aria-label={optimisticFav ? 'Remove from favorites' : 'Add to favorites'}
+        aria-label={optimisticFav ? "Remove from favorites" : "Add to favorites"}
         aria-pressed={optimisticFav}
         disabled={isPending}
         onClick={handleToggle}
         className="flex items-center justify-center w-full h-full disabled:cursor-not-allowed"
-        style={{ color: '#fff' }}
+        style={{ color: "#fff" }}
       >
         {optimisticFav ? (
           <motion.span
@@ -75,23 +75,24 @@ export function FavoriteButton({ userMediaId, isFavorite }: FavoriteButtonProps)
         )}
       </button>
 
-      {toasts.length > 0 && createPortal(
-        <div
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] flex flex-col gap-2 pointer-events-none"
-          aria-live="polite"
-        >
-          {toasts.map(t => (
-            <Toast
-              key={t.id}
-              variant={t.variant}
-              title={t.title}
-              onClose={() => dismiss(t.id)}
-              className="pointer-events-auto"
-            />
-          ))}
-        </div>,
-        document.body,
-      )}
+      {toasts.length > 0 &&
+        createPortal(
+          <div
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] flex flex-col gap-2 pointer-events-none"
+            aria-live="polite"
+          >
+            {toasts.map(t => (
+              <Toast
+                key={t.id}
+                variant={t.variant}
+                title={t.title}
+                onClose={() => dismiss(t.id)}
+                className="pointer-events-auto"
+              />
+            ))}
+          </div>,
+          document.body,
+        )}
     </>
   );
 }

@@ -1,12 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useActionState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { DeleteConfirmModal } from './DeleteConfirmModal';
-import {
-  deleteProviderAction,
-  type DeleteActionState,
-} from '@/app/actions/provider';
+import { useState, useActionState } from "react";
+import { Button } from "@/components/ui/Button";
+import { DeleteConfirmModal } from "./DeleteConfirmModal";
+import { deleteProviderAction, type DeleteActionState } from "@/app/actions/provider";
 
 export function ProviderDeleteButton({ id, name }: { id: string; name: string }) {
   const [open, setOpen] = useState(false);
@@ -14,10 +11,7 @@ export function ProviderDeleteButton({ id, name }: { id: string; name: string })
     prevState: DeleteActionState,
     formData: FormData,
   ) => Promise<DeleteActionState>;
-  const [state, action, pending] = useActionState<DeleteActionState, FormData>(
-    boundAction,
-    {},
-  );
+  const [state, action, pending] = useActionState<DeleteActionState, FormData>(boundAction, {});
 
   return (
     <>

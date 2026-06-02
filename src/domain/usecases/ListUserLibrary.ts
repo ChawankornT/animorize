@@ -1,6 +1,6 @@
-import type { IUserMediaRepository } from '@/repositories/interfaces/IUserMediaRepository';
-import type { UserMediaWithMedia } from '@/domain/entities/UserMedia';
-import { isDashboardItem } from '@/domain/entities/UserMedia';
+import type { IUserMediaRepository } from "@/repositories/interfaces/IUserMediaRepository";
+import type { UserMediaWithMedia } from "@/domain/entities/UserMedia";
+import { isDashboardItem } from "@/domain/entities/UserMedia";
 
 /**
  * Lists all media in the user's library.
@@ -11,10 +11,10 @@ import { isDashboardItem } from '@/domain/entities/UserMedia';
 export async function listUserLibrary(
   repository: IUserMediaRepository,
   userId: string,
-  filter: 'all' | 'dashboard' = 'all',
+  filter: "all" | "dashboard" = "all",
 ): Promise<UserMediaWithMedia[]> {
   const all = await repository.findByUserId(userId);
-  if (filter === 'dashboard') {
+  if (filter === "dashboard") {
     return all.filter(isDashboardItem);
   }
   return all;

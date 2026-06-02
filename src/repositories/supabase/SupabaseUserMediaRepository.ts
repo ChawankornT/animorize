@@ -1,21 +1,29 @@
-import type { SupabaseDb } from '@/lib/supabase/types';
-import type { IUserMediaRepository, UpdateProviderInput } from '@/repositories/interfaces/IUserMediaRepository';
-import type { UserMedia, UserMediaWithMedia, AddToLibraryInput, WatchStatus } from '@/domain/entities/UserMedia';
+import type { SupabaseDb } from "@/lib/supabase/types";
+import type {
+  IUserMediaRepository,
+  UpdateProviderInput,
+} from "@/repositories/interfaces/IUserMediaRepository";
+import type {
+  UserMedia,
+  UserMediaWithMedia,
+  AddToLibraryInput,
+  WatchStatus,
+} from "@/domain/entities/UserMedia";
 import {
   toUserMedia,
   toUserMediaWithMedia,
   fromAddToLibraryInput,
-} from '@/repositories/supabase/mappers';
+} from "@/repositories/supabase/mappers";
 
 const USER_MEDIA_WITH_MEDIA_SELECT =
-  '*, media(title_th, title_en, title_romaji, poster_url, total_episodes, media_type, media_providers(provider_id, audio, base_url)), providers(name, color)' as const;
+  "*, media(title_th, title_en, title_romaji, poster_url, total_episodes, media_type, media_providers(provider_id, audio, base_url)), providers(name, color)" as const;
 
 export class SupabaseUserMediaRepository implements IUserMediaRepository {
   constructor(private readonly supabase: SupabaseDb) {}
 
   async add(input: AddToLibraryInput): Promise<UserMedia> {
     const { data, error } = await this.supabase
-      .from('user_media')
+      .from("user_media")
       .insert(fromAddToLibraryInput(input))
       .select()
       .single();
@@ -26,26 +34,26 @@ export class SupabaseUserMediaRepository implements IUserMediaRepository {
 
   async findByUserId(userId: string): Promise<UserMediaWithMedia[]> {
     const { data, error } = await this.supabase
-      .from('user_media')
+      .from("user_media")
       .select(USER_MEDIA_WITH_MEDIA_SELECT)
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
 
     if (error) throw new Error(`Failed to list user library: ${error.message}`);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (data ?? []).map((row) => toUserMediaWithMedia(row as any));
+    return (data ?? []).map(row => toUserMediaWithMedia(row as any));
   }
 
   async findByUserAndMedia(userId: string, mediaId: string): Promise<UserMedia | null> {
     const { data, error } = await this.supabase
-      .from('user_media')
+      .from("user_media")
       .select()
-      .eq('user_id', userId)
-      .eq('media_id', mediaId)
+      .eq("user_id", userId)
+      .eq("media_id", mediaId)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') return null;
+      if (error.code === "PGRST116") return null;
       throw new Error(`Failed to find user media: ${error.message}`);
     }
     return toUserMedia(data);
@@ -53,14 +61,14 @@ export class SupabaseUserMediaRepository implements IUserMediaRepository {
 
   async updateFavorite(id: string, isFavorite: boolean): Promise<UserMedia> {
     const { data, error } = await this.supabase
-      .from('user_media')
+      .from("user_media")
       .update({ is_favorite: isFavorite })
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') throw new Error(`User media not found: ${id}`);
+      if (error.code === "PGRST116") throw new Error(`User media not found: ${id}`);
       throw new Error(`Failed to update favorite: ${error.message}`);
     }
     return toUserMedia(data);
@@ -68,14 +76,14 @@ export class SupabaseUserMediaRepository implements IUserMediaRepository {
 
   async updateStatus(id: string, status: WatchStatus): Promise<UserMedia> {
     const { data, error } = await this.supabase
-      .from('user_media')
+      .from("user_media")
       .update({ status })
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') throw new Error(`User media not found: ${id}`);
+      if (error.code === "PGRST116") throw new Error(`User media not found: ${id}`);
       throw new Error(`Failed to update status: ${error.message}`);
     }
     return toUserMedia(data);
@@ -83,28 +91,25 @@ export class SupabaseUserMediaRepository implements IUserMediaRepository {
 
   async updateProvider(id: string, input: UpdateProviderInput): Promise<UserMedia> {
     const { data, error } = await this.supabase
-      .from('user_media')
+      .from("user_media")
       .update({
         provider_id: input.providerId,
         audio: input.audio,
         custom_url: input.customUrl,
       })
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') throw new Error(`User media not found: ${id}`);
+      if (error.code === "PGRST116") throw new Error(`User media not found: ${id}`);
       throw new Error(`Failed to update provider: ${error.message}`);
     }
     return toUserMedia(data);
   }
 
   async remove(id: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('user_media')
-      .delete()
-      .eq('id', id);
+    const { error } = await this.supabase.from("user_media").delete().eq("id", id);
 
     if (error) throw new Error(`Failed to remove from library: ${error.message}`);
   }

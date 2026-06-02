@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { cn } from '@/lib/utils/cn';
+import { cn } from "@/lib/utils/cn";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -8,15 +8,8 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
-export function Input({
-  label,
-  hint,
-  error,
-  className,
-  id,
-  ...props
-}: InputProps) {
-  const inputId = id ?? (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
+export function Input({ label, hint, error, className, id, ...props }: InputProps) {
+  const inputId = id ?? (label ? label.toLowerCase().replace(/\s+/g, "-") : undefined);
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -28,13 +21,13 @@ export function Input({
       <input
         id={inputId}
         className={cn(
-          'h-9 px-3 bg-page text-md text-primary rounded-input',
-          'border-[0.5px] border-default placeholder:text-tertiary',
-          'transition-colors duration-fast ease-out',
-          'hover:border-strong',
-          'focus:border-primary focus:outline-none',
-          error && 'border-error hover:border-error focus:border-error',
-          'disabled:opacity-50 disabled:pointer-events-none',
+          "h-9 px-3 bg-page text-md text-primary rounded-input",
+          "border-[0.5px] border-default placeholder:text-tertiary",
+          "transition-colors duration-fast ease-out",
+          "hover:border-strong",
+          "focus:border-primary focus:outline-none",
+          error && "border-error hover:border-error focus:border-error",
+          "disabled:opacity-50 disabled:pointer-events-none",
           className,
         )}
         aria-invalid={error ? true : undefined}

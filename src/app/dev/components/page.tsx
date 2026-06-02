@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
-import { Select } from '@/components/ui/Select';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { Modal } from '@/components/ui/Modal';
-import { Toast } from '@/components/ui/Toast';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { MediaCard } from '@/components/media/MediaCard';
-import { ProviderBadge } from '@/components/media/ProviderBadge';
-import { StatusPill } from '@/components/media/MediaCard';
-import type { WatchStatus } from '@/domain/entities/UserMedia';
+import { useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
+import { Select } from "@/components/ui/Select";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Modal } from "@/components/ui/Modal";
+import { Toast } from "@/components/ui/Toast";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { MediaCard } from "@/components/media/MediaCard";
+import { ProviderBadge } from "@/components/media/ProviderBadge";
+import { StatusPill } from "@/components/media/MediaCard";
+import type { WatchStatus } from "@/domain/entities/UserMedia";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -30,9 +30,7 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   return (
     <div className="space-y-2">
       <p className="text-xs font-medium text-tertiary">{label}</p>
-      <div className="flex flex-wrap items-center gap-3">
-        {children}
-      </div>
+      <div className="flex flex-wrap items-center gap-3">{children}</div>
     </div>
   );
 }
@@ -56,22 +54,46 @@ export default function ComponentsPage() {
           <Button disabled>Disabled</Button>
         </Row>
         <Row label="Secondary">
-          <Button variant="secondary" size="sm">Small</Button>
-          <Button variant="secondary" size="md">Medium</Button>
-          <Button variant="secondary" size="lg">Large</Button>
-          <Button variant="secondary" disabled>Disabled</Button>
+          <Button variant="secondary" size="sm">
+            Small
+          </Button>
+          <Button variant="secondary" size="md">
+            Medium
+          </Button>
+          <Button variant="secondary" size="lg">
+            Large
+          </Button>
+          <Button variant="secondary" disabled>
+            Disabled
+          </Button>
         </Row>
         <Row label="Ghost">
-          <Button variant="ghost" size="sm">Small</Button>
-          <Button variant="ghost" size="md">Medium</Button>
-          <Button variant="ghost" size="lg">Large</Button>
-          <Button variant="ghost" disabled>Disabled</Button>
+          <Button variant="ghost" size="sm">
+            Small
+          </Button>
+          <Button variant="ghost" size="md">
+            Medium
+          </Button>
+          <Button variant="ghost" size="lg">
+            Large
+          </Button>
+          <Button variant="ghost" disabled>
+            Disabled
+          </Button>
         </Row>
         <Row label="Destructive">
-          <Button variant="destructive" size="sm">Remove</Button>
-          <Button variant="destructive" size="md">Delete</Button>
-          <Button variant="destructive" size="lg">Remove all</Button>
-          <Button variant="destructive" disabled>Disabled</Button>
+          <Button variant="destructive" size="sm">
+            Remove
+          </Button>
+          <Button variant="destructive" size="md">
+            Delete
+          </Button>
+          <Button variant="destructive" size="lg">
+            Remove all
+          </Button>
+          <Button variant="destructive" disabled>
+            Disabled
+          </Button>
         </Row>
       </Section>
 
@@ -125,7 +147,9 @@ export default function ComponentsPage() {
             <Card.Body>This is the default card variant with page background.</Card.Body>
             <Card.Actions>
               <Button size="sm">Action</Button>
-              <Button variant="ghost" size="sm">Cancel</Button>
+              <Button variant="ghost" size="sm">
+                Cancel
+              </Button>
             </Card.Actions>
           </Card>
           <Card variant="surface">
@@ -158,10 +182,18 @@ export default function ComponentsPage() {
         </Row>
         <Row label="With dot">
           <Badge dot>Default</Badge>
-          <Badge variant="success" dot>Airing</Badge>
-          <Badge variant="warning" dot>Pending</Badge>
-          <Badge variant="error" dot>Failed</Badge>
-          <Badge variant="info" dot>Syncing</Badge>
+          <Badge variant="success" dot>
+            Airing
+          </Badge>
+          <Badge variant="warning" dot>
+            Pending
+          </Badge>
+          <Badge variant="error" dot>
+            Failed
+          </Badge>
+          <Badge variant="info" dot>
+            Syncing
+          </Badge>
         </Row>
       </Section>
 
@@ -176,50 +208,82 @@ export default function ComponentsPage() {
           title="Remove from library"
           actions={
             <>
-              <Button variant="secondary" size="sm" onClick={() => setModalOpen(false)}>Cancel</Button>
-              <Button variant="destructive" size="sm" onClick={() => setModalOpen(false)}>Remove</Button>
+              <Button variant="secondary" size="sm" onClick={() => setModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => setModalOpen(false)}>
+                Remove
+              </Button>
             </>
           }
         >
-          <p>Are you sure you want to remove this title from your library? Your watch progress will be lost.</p>
+          <p>
+            Are you sure you want to remove this title from your library? Your watch progress will
+            be lost.
+          </p>
         </Modal>
       </Section>
 
       {/* Toast */}
       <Section title="Toast">
         <div className="space-y-3">
-          <Toast variant="success" title="Episode recorded" description="Kimetsu no Yaiba S4 — episode 7 of 11" onClose={() => {}} />
-          <Toast variant="warning" title="Sync delayed" description="AniList rate limit reached, retrying in 60s" onClose={() => {}} />
-          <Toast variant="error" title="Import failed" description="Could not fetch data from AniList" onClose={() => {}} />
-          <Toast variant="info" title="Sync complete" description="3 titles updated" onClose={() => {}} />
+          <Toast
+            variant="success"
+            title="Episode recorded"
+            description="Kimetsu no Yaiba S4 — episode 7 of 11"
+            onClose={() => {}}
+          />
+          <Toast
+            variant="warning"
+            title="Sync delayed"
+            description="AniList rate limit reached, retrying in 60s"
+            onClose={() => {}}
+          />
+          <Toast
+            variant="error"
+            title="Import failed"
+            description="Could not fetch data from AniList"
+            onClose={() => {}}
+          />
+          <Toast
+            variant="info"
+            title="Sync complete"
+            description="3 titles updated"
+            onClose={() => {}}
+          />
         </div>
       </Section>
 
       {/* MediaCard — Library variant */}
       <Section title="MediaCard — Library">
         <div className="grid grid-cols-4 gap-3">
-          {([
-            { status: 'watching',      label: 'Watching',      ep: 7,  total: 11, fav: true  },
-            { status: 'plan_to_watch', label: 'Plan to watch', ep: 0,  total: 12, fav: false },
-            { status: 'on_hold',       label: 'On hold',       ep: 3,  total: 24, fav: false },
-            { status: 'completed',     label: 'Completed',     ep: 24, total: 24, fav: false },
-            { status: 'dropped',       label: 'Dropped',       ep: 2,  total: 13, fav: false },
-            { status: 'watching',      label: 'With poster',   ep: 4,  total: 26, fav: true  },
-          ] as const).map(({ status, label, ep, total, fav }, i) => (
+          {(
+            [
+              { status: "watching", label: "Watching", ep: 7, total: 11, fav: true },
+              { status: "plan_to_watch", label: "Plan to watch", ep: 0, total: 12, fav: false },
+              { status: "on_hold", label: "On hold", ep: 3, total: 24, fav: false },
+              { status: "completed", label: "Completed", ep: 24, total: 24, fav: false },
+              { status: "dropped", label: "Dropped", ep: 2, total: 13, fav: false },
+              { status: "watching", label: "With poster", ep: 4, total: 26, fav: true },
+            ] as const
+          ).map(({ status, label, ep, total, fav }, i) => (
             <div key={label} className="flex flex-col gap-1">
               <MediaCard.Library
                 data={{
-                  titleEn: 'Sousou no Frieren',
-                  titleRomaji: 'Sousou no Frieren',
+                  titleEn: "Sousou no Frieren",
+                  titleRomaji: "Sousou no Frieren",
                   titleTh: null,
-                  posterUrl: i === 5 ? 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx154587-hWgxGCCzHDAd.jpg' : null,
+                  posterUrl:
+                    i === 5
+                      ? "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx154587-hWgxGCCzHDAd.jpg"
+                      : null,
                   tileColorIndex: i,
                   status: status as WatchStatus,
                   currentEpisode: ep,
                   totalEpisodes: total,
                   isFavorite: fav,
-                  providerName: 'Crunchyroll',
-                  providerColor: '#F47521',
+                  providerName: "Crunchyroll",
+                  providerColor: "#F47521",
                 }}
                 showStatus
               />
@@ -233,14 +297,22 @@ export default function ComponentsPage() {
       <Section title="MediaCard — Search">
         <div className="grid grid-cols-4 gap-3">
           {[
-            { title: 'Sousou no Frieren', type: 'anime', year: 2023, poster: null },
-            { title: 'Bocchi the Rock!',  type: 'anime', year: 2022, poster: null },
-            { title: 'Oshi No Ko',        type: 'anime', year: 2023, poster: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx163132-yOwNAbsE7KG1.jpg' },
+            { title: "Sousou no Frieren", type: "anime", year: 2023, poster: null },
+            { title: "Bocchi the Rock!", type: "anime", year: 2022, poster: null },
+            {
+              title: "Oshi No Ko",
+              type: "anime",
+              year: 2023,
+              poster:
+                "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx163132-yOwNAbsE7KG1.jpg",
+            },
           ].map((m, i) => (
             <MediaCard.Search
               key={m.title}
               data={{
-                titleEn: m.title, titleRomaji: m.title, titleTh: null,
+                titleEn: m.title,
+                titleRomaji: m.title,
+                titleTh: null,
                 posterUrl: m.poster,
                 tileColorIndex: i + 2,
                 mediaType: m.type,
@@ -260,9 +332,11 @@ export default function ComponentsPage() {
           <ProviderBadge name="Bilibili" color="#00A1D6" />
         </Row>
         <Row label="StatusPill">
-          {(['watching', 'plan_to_watch', 'on_hold', 'completed', 'dropped'] as WatchStatus[]).map(s => (
-            <StatusPill key={s} status={s} />
-          ))}
+          {(["watching", "plan_to_watch", "on_hold", "completed", "dropped"] as WatchStatus[]).map(
+            s => (
+              <StatusPill key={s} status={s} />
+            ),
+          )}
         </Row>
       </Section>
 

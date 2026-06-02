@@ -1,4 +1,8 @@
-import type { Provider, CreateProviderInput, UpdateProviderInput } from '@/domain/entities/Provider';
+import type {
+  Provider,
+  CreateProviderInput,
+  UpdateProviderInput,
+} from "@/domain/entities/Provider";
 
 export interface IProviderRepository {
   findAll(): Promise<Provider[]>;

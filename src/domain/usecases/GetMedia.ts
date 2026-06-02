@@ -1,5 +1,5 @@
-import type { IMediaRepository } from '@/repositories/interfaces/IMediaRepository';
-import type { Media } from '@/domain/entities/Media';
+import type { IMediaRepository } from "@/repositories/interfaces/IMediaRepository";
+import type { Media } from "@/domain/entities/Media";
 
 /**
  * Retrieves a single media entry by ID.
@@ -7,9 +7,6 @@ import type { Media } from '@/domain/entities/Media';
  * @param id - Media UUID
  * @returns Media entity or null if not found
  */
-export async function getMedia(
-  repository: IMediaRepository,
-  id: string,
-): Promise<Media | null> {
+export async function getMedia(repository: IMediaRepository, id: string): Promise<Media | null> {
   return repository.findById(id);
 }

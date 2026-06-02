@@ -1,19 +1,27 @@
-import type { Database } from '@/types/database';
-import type { Provider, CreateProviderInput, UpdateProviderInput } from '@/domain/entities/Provider';
-import type { Franchise, CreateFranchiseInput, UpdateFranchiseInput } from '@/domain/entities/Franchise';
-import type { Media, CreateMediaInput, UpdateMediaInput } from '@/domain/entities/Media';
-import type { MediaProvider, CreateMediaProviderInput } from '@/domain/entities/MediaProvider';
-import type { SyncLog, CreateSyncLogInput } from '@/domain/entities/SyncLog';
-import type { SystemSettings } from '@/domain/entities/SystemSettings';
-import type { UserMedia, UserMediaWithMedia, AddToLibraryInput } from '@/domain/entities/UserMedia';
+import type { Database } from "@/types/database";
+import type {
+  Provider,
+  CreateProviderInput,
+  UpdateProviderInput,
+} from "@/domain/entities/Provider";
+import type {
+  Franchise,
+  CreateFranchiseInput,
+  UpdateFranchiseInput,
+} from "@/domain/entities/Franchise";
+import type { Media, CreateMediaInput, UpdateMediaInput } from "@/domain/entities/Media";
+import type { MediaProvider, CreateMediaProviderInput } from "@/domain/entities/MediaProvider";
+import type { SyncLog, CreateSyncLogInput } from "@/domain/entities/SyncLog";
+import type { SystemSettings } from "@/domain/entities/SystemSettings";
+import type { UserMedia, UserMediaWithMedia, AddToLibraryInput } from "@/domain/entities/UserMedia";
 
-type ProviderRow = Database['public']['Tables']['providers']['Row'];
-type FranchiseRow = Database['public']['Tables']['franchises']['Row'];
-type MediaRow = Database['public']['Tables']['media']['Row'];
-type MediaProviderRow = Database['public']['Tables']['media_providers']['Row'];
-type SyncLogRow = Database['public']['Tables']['sync_logs']['Row'];
-type SystemSettingsRow = Database['public']['Tables']['system_settings']['Row'];
-type UserMediaRow = Database['public']['Tables']['user_media']['Row'];
+type ProviderRow = Database["public"]["Tables"]["providers"]["Row"];
+type FranchiseRow = Database["public"]["Tables"]["franchises"]["Row"];
+type MediaRow = Database["public"]["Tables"]["media"]["Row"];
+type MediaProviderRow = Database["public"]["Tables"]["media_providers"]["Row"];
+type SyncLogRow = Database["public"]["Tables"]["sync_logs"]["Row"];
+type SystemSettingsRow = Database["public"]["Tables"]["system_settings"]["Row"];
+type UserMediaRow = Database["public"]["Tables"]["user_media"]["Row"];
 
 type MediaProviderRowWithJoin = MediaProviderRow & {
   providers?: { name: string; color: string } | null;
@@ -84,8 +92,8 @@ export function toMediaProvider(row: MediaProviderRowWithJoin): MediaProvider {
     audio: row.audio,
     baseUrl: row.base_url,
     createdAt: row.created_at,
-    providerName: row.providers?.name ?? '',
-    providerColor: row.providers?.color ?? '#000000',
+    providerName: row.providers?.name ?? "",
+    providerColor: row.providers?.color ?? "#000000",
   };
 }
 
@@ -113,7 +121,7 @@ export function toSystemSettings(row: SystemSettingsRow): SystemSettings {
 
 export function fromCreateProviderInput(
   input: CreateProviderInput,
-): Database['public']['Tables']['providers']['Insert'] {
+): Database["public"]["Tables"]["providers"]["Insert"] {
   return {
     name: input.name,
     slug: input.slug,
@@ -125,8 +133,8 @@ export function fromCreateProviderInput(
 
 export function fromUpdateProviderInput(
   input: UpdateProviderInput,
-): Database['public']['Tables']['providers']['Update'] {
-  const result: Database['public']['Tables']['providers']['Update'] = {};
+): Database["public"]["Tables"]["providers"]["Update"] {
+  const result: Database["public"]["Tables"]["providers"]["Update"] = {};
   if (input.name !== undefined) result.name = input.name;
   if (input.slug !== undefined) result.slug = input.slug;
   if (input.color !== undefined) result.color = input.color;
@@ -137,7 +145,7 @@ export function fromUpdateProviderInput(
 
 export function fromCreateFranchiseInput(
   input: CreateFranchiseInput,
-): Database['public']['Tables']['franchises']['Insert'] {
+): Database["public"]["Tables"]["franchises"]["Insert"] {
   return {
     title_th: input.titleTh ?? null,
     title_en: input.titleEn ?? null,
@@ -149,8 +157,8 @@ export function fromCreateFranchiseInput(
 
 export function fromUpdateFranchiseInput(
   input: UpdateFranchiseInput,
-): Database['public']['Tables']['franchises']['Update'] {
-  const result: Database['public']['Tables']['franchises']['Update'] = {};
+): Database["public"]["Tables"]["franchises"]["Update"] {
+  const result: Database["public"]["Tables"]["franchises"]["Update"] = {};
   if (input.titleTh !== undefined) result.title_th = input.titleTh;
   if (input.titleEn !== undefined) result.title_en = input.titleEn;
   if (input.titleRomaji !== undefined) result.title_romaji = input.titleRomaji;
@@ -161,7 +169,7 @@ export function fromUpdateFranchiseInput(
 
 export function fromCreateMediaInput(
   input: CreateMediaInput,
-): Database['public']['Tables']['media']['Insert'] {
+): Database["public"]["Tables"]["media"]["Insert"] {
   return {
     franchise_id: input.franchiseId ?? null,
     anilist_id: input.anilistId ?? null,
@@ -177,7 +185,7 @@ export function fromCreateMediaInput(
     season_year: input.seasonYear ?? null,
     air_date_start: input.airDateStart ?? null,
     air_date_end: input.airDateEnd ?? null,
-    airing_status: input.airingStatus ?? 'upcoming',
+    airing_status: input.airingStatus ?? "upcoming",
     auto_sync: input.autoSync ?? true,
     sort_order: input.sortOrder ?? 0,
   };
@@ -185,8 +193,8 @@ export function fromCreateMediaInput(
 
 export function fromUpdateMediaInput(
   input: UpdateMediaInput,
-): Database['public']['Tables']['media']['Update'] {
-  const result: Database['public']['Tables']['media']['Update'] = {};
+): Database["public"]["Tables"]["media"]["Update"] {
+  const result: Database["public"]["Tables"]["media"]["Update"] = {};
   if (input.franchiseId !== undefined) result.franchise_id = input.franchiseId;
   if (input.anilistId !== undefined) result.anilist_id = input.anilistId;
   if (input.mediaType !== undefined) result.media_type = input.mediaType;
@@ -209,7 +217,7 @@ export function fromUpdateMediaInput(
 
 export function fromCreateMediaProviderInput(
   input: CreateMediaProviderInput,
-): Database['public']['Tables']['media_providers']['Insert'] {
+): Database["public"]["Tables"]["media_providers"]["Insert"] {
   return {
     media_id: input.mediaId,
     provider_id: input.providerId,
@@ -220,7 +228,7 @@ export function fromCreateMediaProviderInput(
 
 export function fromCreateSyncLogInput(
   input: CreateSyncLogInput,
-): Database['public']['Tables']['sync_logs']['Insert'] {
+): Database["public"]["Tables"]["sync_logs"]["Insert"] {
   return {
     media_id: input.mediaId,
     result: input.result,
@@ -268,9 +276,7 @@ export function toUserMedia(row: UserMediaRow): UserMedia {
 export function toUserMediaWithMedia(row: UserMediaRowWithJoin): UserMediaWithMedia {
   const mediaProviders = row.media?.media_providers ?? [];
   const providerEntry = row.provider_id
-    ? mediaProviders.find(
-        (mp) => mp.provider_id === row.provider_id && mp.audio === row.audio,
-      )
+    ? mediaProviders.find(mp => mp.provider_id === row.provider_id && mp.audio === row.audio)
     : undefined;
 
   return {
@@ -280,7 +286,7 @@ export function toUserMediaWithMedia(row: UserMediaRowWithJoin): UserMediaWithMe
     titleRomaji: row.media?.title_romaji ?? null,
     posterUrl: row.media?.poster_url ?? null,
     totalEpisodes: row.media?.total_episodes ?? 0,
-    mediaType: row.media?.media_type ?? '',
+    mediaType: row.media?.media_type ?? "",
     providerName: row.providers?.name ?? null,
     providerColor: row.providers?.color ?? null,
     baseUrl: providerEntry?.base_url ?? null,
@@ -289,13 +295,13 @@ export function toUserMediaWithMedia(row: UserMediaRowWithJoin): UserMediaWithMe
 
 export function fromAddToLibraryInput(
   input: AddToLibraryInput,
-): Database['public']['Tables']['user_media']['Insert'] {
+): Database["public"]["Tables"]["user_media"]["Insert"] {
   return {
     user_id: input.userId,
     media_id: input.mediaId,
     provider_id: input.providerId ?? null,
-    audio: input.audio ?? 'sub',
-    status: input.status ?? 'plan_to_watch',
+    audio: input.audio ?? "sub",
+    status: input.status ?? "plan_to_watch",
     current_episode: 0,
     is_favorite: false,
     custom_url: input.customUrl ?? null,

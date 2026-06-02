@@ -9,10 +9,7 @@ import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 import { useToast } from "@/hooks/useToast";
-import {
-  getAddToLibraryDataAction,
-  addToLibraryAction,
-} from "@/app/actions/userMedia";
+import { getAddToLibraryDataAction, addToLibraryAction } from "@/app/actions/userMedia";
 import { getDisplayTitle } from "@/domain/entities/Media";
 import { TILE_COLORS } from "@/constants/admin";
 import type { Media } from "@/domain/entities/Media";
@@ -32,16 +29,10 @@ interface AddToLibraryModalProps {
   onAdded: (mediaId: string) => void;
 }
 
-export function AddToLibraryModal({
-  media,
-  onClose,
-  onAdded,
-}: AddToLibraryModalProps) {
+export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModalProps) {
   const [allProviders, setAllProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedProviderId, setSelectedProviderId] = useState<string | null>(
-    null,
-  );
+  const [selectedProviderId, setSelectedProviderId] = useState<string | null>(null);
   const [selectedAudio, setSelectedAudio] = useState<AudioType>("sub");
   const [customUrl, setCustomUrl] = useState("");
   const [urlError, setUrlError] = useState<string | null>(null);
@@ -122,7 +113,7 @@ export function AddToLibraryModal({
             "border-[0.5px] border-default p-6",
             "flex flex-col gap-4",
           )}
-          onClick={(e) => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
         >
           {/* Header: poster swatch + titles — design: .atl-head */}
           <div className="flex gap-3 items-start pb-3 border-b-[0.5px] border-default">
@@ -131,10 +122,7 @@ export function AddToLibraryModal({
               style={
                 !media.posterUrl
                   ? {
-                      background:
-                        TILE_COLORS[
-                          media.id.charCodeAt(0) % TILE_COLORS.length
-                        ],
+                      background: TILE_COLORS[media.id.charCodeAt(0) % TILE_COLORS.length],
                     }
                   : undefined
               }
@@ -158,9 +146,7 @@ export function AddToLibraryModal({
                 {media.mediaType} · {media.seasonYear ?? "—"}
               </div>
               {media.titleTh && (
-                <div className="text-xs text-tertiary leading-snug">
-                  {media.titleTh}
-                </div>
+                <div className="text-xs text-tertiary leading-snug">{media.titleTh}</div>
               )}
             </div>
           </div>
@@ -169,9 +155,7 @@ export function AddToLibraryModal({
           <div className="flex flex-col gap-4">
             {/* Provider — design: Field > Select */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-secondary">
-                Provider
-              </label>
+              <label className="text-sm font-medium text-secondary">Provider</label>
               {loading ? (
                 <div className="h-9 rounded-input bg-surface animate-pulse" />
               ) : allProviders.length === 0 ? (
@@ -179,9 +163,7 @@ export function AddToLibraryModal({
               ) : (
                 <select
                   value={selectedProviderId ?? ""}
-                  onChange={(e) =>
-                    setSelectedProviderId(e.target.value || null)
-                  }
+                  onChange={e => setSelectedProviderId(e.target.value || null)}
                   disabled={disabled}
                   className={cn(
                     "h-9 px-3 bg-page text-md rounded-input appearance-none",
@@ -194,10 +176,8 @@ export function AddToLibraryModal({
                     "bg-[url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")]",
                   )}
                 >
-                  {!selectedProviderId && (
-                    <option value="">Select a provider</option>
-                  )}
-                  {allProviders.map((p) => (
+                  {!selectedProviderId && <option value="">Select a provider</option>}
+                  {allProviders.map(p => (
                     <option key={p.id} value={p.id}>
                       {p.name}
                     </option>
@@ -208,9 +188,7 @@ export function AddToLibraryModal({
 
             {/* Audio — design: AudioSegmented, always show both sub/dub */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-secondary">
-                Audio
-              </label>
+              <label className="text-sm font-medium text-secondary">Audio</label>
               <div className="flex border-[0.5px] border-default rounded-input overflow-hidden bg-page">
                 {AUDIO_OPTIONS.map((audio, i) => {
                   const isOn = selectedAudio === audio;
@@ -235,9 +213,7 @@ export function AddToLibraryModal({
                       <span
                         className={cn(
                           "inline-flex items-center h-5 px-2 rounded-pill text-xs font-medium border-[0.5px]",
-                          isOn
-                            ? "border-transparent"
-                            : "border-default bg-page text-secondary",
+                          isOn ? "border-transparent" : "border-default bg-page text-secondary",
                         )}
                         style={
                           isOn
@@ -259,24 +235,21 @@ export function AddToLibraryModal({
 
             {/* Custom URL — design: Field > TextInput + hint/error */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-secondary">
-                Custom URL
-              </label>
+              <label className="text-sm font-medium text-secondary">Custom URL</label>
               <div
                 className={cn(
                   "flex items-center gap-2 h-9 px-3 bg-page rounded-input",
                   "border-[0.5px] border-default",
                   "transition-colors duration-fast ease-out",
                   "hover:border-strong focus-within:border-primary",
-                  urlError &&
-                    "border-error hover:border-error focus-within:border-error",
+                  urlError && "border-error hover:border-error focus-within:border-error",
                   disabled && "opacity-50 pointer-events-none",
                 )}
               >
                 <input
                   type="text"
                   value={customUrl}
-                  onChange={(e) => {
+                  onChange={e => {
                     setCustomUrl(e.target.value);
                     if (urlError) setUrlError(null);
                   }}
@@ -302,20 +275,10 @@ export function AddToLibraryModal({
 
           {/* Actions — design: .modal-actions, justify-end, gap space-2, mt space-2 */}
           <div className="flex items-center justify-end gap-2 mt-2">
-            <Button
-              variant="secondary"
-              size="md"
-              disabled={disabled}
-              onClick={onClose}
-            >
+            <Button variant="secondary" size="md" disabled={disabled} onClick={onClose}>
               Cancel
             </Button>
-            <Button
-              variant="primary"
-              size="md"
-              disabled={disabled}
-              onClick={handleSubmit}
-            >
+            <Button variant="primary" size="md" disabled={disabled} onClick={handleSubmit}>
               {submitting ? (
                 <>
                   <span className="inline-block w-3.5 h-3.5 border-[1.5px] border-current border-r-transparent rounded-full animate-spin shrink-0" />
@@ -334,7 +297,7 @@ export function AddToLibraryModal({
         toasts.length > 0 &&
         createPortal(
           <div className="fixed bottom-6 right-6 z-60 flex flex-col gap-2">
-            {toasts.map((t) => (
+            {toasts.map(t => (
               <Toast
                 key={t.id}
                 variant={t.variant}

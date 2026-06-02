@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { FranchiseForm } from '@/components/admin/FranchiseForm';
+import Link from "next/link";
+import { FranchiseForm } from "@/components/admin/FranchiseForm";
 
 export default function NewFranchisePage() {
   return (
@@ -9,7 +9,10 @@ export default function NewFranchisePage() {
           Admin
         </Link>
         <span className="text-tertiary">›</span>
-        <Link href="/admin/franchises" className="hover:text-primary transition-colors duration-fast">
+        <Link
+          href="/admin/franchises"
+          className="hover:text-primary transition-colors duration-fast"
+        >
           Franchises
         </Link>
         <span className="text-tertiary">›</span>

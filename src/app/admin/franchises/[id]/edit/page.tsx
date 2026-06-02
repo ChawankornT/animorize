@@ -1,16 +1,12 @@
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import { createFranchiseRepository } from '@/repositories';
-import { getFranchise } from '@/domain/usecases/GetFranchise';
-import { getDisplayTitle } from '@/domain/entities/Franchise';
-import { FranchiseForm } from '@/components/admin/FranchiseForm';
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { createFranchiseRepository } from "@/repositories";
+import { getFranchise } from "@/domain/usecases/GetFranchise";
+import { getDisplayTitle } from "@/domain/entities/Franchise";
+import { FranchiseForm } from "@/components/admin/FranchiseForm";
 
-export default async function EditFranchisePage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function EditFranchisePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
   const repo = createFranchiseRepository(supabase);
@@ -27,7 +23,10 @@ export default async function EditFranchisePage({
           Admin
         </Link>
         <span className="text-tertiary">›</span>
-        <Link href="/admin/franchises" className="hover:text-primary transition-colors duration-fast">
+        <Link
+          href="/admin/franchises"
+          className="hover:text-primary transition-colors duration-fast"
+        >
           Franchises
         </Link>
         <span className="text-tertiary">›</span>
@@ -37,9 +36,7 @@ export default async function EditFranchisePage({
       </nav>
 
       <div>
-        <h1 className="text-2xl font-medium text-primary tracking-tight">
-          Edit {displayTitle}
-        </h1>
+        <h1 className="text-2xl font-medium text-primary tracking-tight">Edit {displayTitle}</h1>
       </div>
 
       <FranchiseForm franchise={franchise} />

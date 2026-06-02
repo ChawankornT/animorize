@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Plus } from 'lucide-react';
-import { buttonVariants } from '@/components/ui/button-variants';
-import { Icon } from '@/components/ui/Icon';
-import { Tabs } from '@/components/ui/Tabs';
-import { MediaCard, type LibraryCardData } from '@/components/media/MediaCard';
-import { FavoriteButton } from '@/components/media/FavoriteButton';
-import { Sparkle } from '@/components/brand/Sparkle';
-import { TILE_COLORS } from '@/constants/admin';
-import { librarySort } from '@/lib/utils/librarySort';
-import type { UserMediaWithMedia } from '@/domain/entities/UserMedia';
+import { useState } from "react";
+import Link from "next/link";
+import { Plus } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button-variants";
+import { Icon } from "@/components/ui/Icon";
+import { Tabs } from "@/components/ui/Tabs";
+import { MediaCard, type LibraryCardData } from "@/components/media/MediaCard";
+import { FavoriteButton } from "@/components/media/FavoriteButton";
+import { Sparkle } from "@/components/brand/Sparkle";
+import { TILE_COLORS } from "@/constants/admin";
+import { librarySort } from "@/lib/utils/librarySort";
+import type { UserMediaWithMedia } from "@/domain/entities/UserMedia";
 
 interface LibraryViewProps {
   items: UserMediaWithMedia[];
@@ -37,45 +37,31 @@ function toCardData(item: UserMediaWithMedia): LibraryCardData {
 }
 
 function LibraryGrid({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="grid grid-cols-4 gap-3">
-      {children}
-    </div>
-  );
+  return <div className="grid grid-cols-4 gap-3">{children}</div>;
 }
 
-function renderCard(
-  item: UserMediaWithMedia,
-  showStatus: boolean,
-) {
+function renderCard(item: UserMediaWithMedia, showStatus: boolean) {
   return (
     <MediaCard.Library
       key={item.id}
       data={toCardData(item)}
       showStatus={showStatus}
-      favoriteSlot={
-        <FavoriteButton userMediaId={item.id} isFavorite={item.isFavorite} />
-      }
+      favoriteSlot={<FavoriteButton userMediaId={item.id} isFavorite={item.isFavorite} />}
     />
   );
 }
 
-export function LibraryView({
-  items,
-  allCount,
-  watchingCount,
-  favoritesCount,
-}: LibraryViewProps) {
-  const [tab, setTab] = useState('all');
+export function LibraryView({ items, allCount, watchingCount, favoritesCount }: LibraryViewProps) {
+  const [tab, setTab] = useState("all");
   const sorted = [...items].sort(librarySort);
 
-  const watching = sorted.filter(i => i.status === 'watching');
-  const favNonWatching = sorted.filter(i => i.isFavorite && i.status !== 'watching');
+  const watching = sorted.filter(i => i.status === "watching");
+  const favNonWatching = sorted.filter(i => i.isFavorite && i.status !== "watching");
 
   const tabItems = [
-    { value: 'all', label: 'All', count: allCount },
-    { value: 'watching', label: 'Watching', count: watchingCount },
-    { value: 'favorites', label: 'Favorites', count: favoritesCount },
+    { value: "all", label: "All", count: allCount },
+    { value: "watching", label: "Watching", count: watchingCount },
+    { value: "favorites", label: "Favorites", count: favoritesCount },
   ];
 
   return (
@@ -83,9 +69,7 @@ export function LibraryView({
       {/* Page header */}
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-medium tracking-tight leading-none mb-1.5">
-            Library
-          </h1>
+          <h1 className="text-4xl font-medium tracking-tight leading-none mb-1.5">Library</h1>
           <p className="text-sm text-tertiary">
             {watchingCount} watching · {favoritesCount} favorites · {allCount} total
           </p>
@@ -93,7 +77,7 @@ export function LibraryView({
         <div className="flex items-center gap-2">
           <Link
             href="/search"
-            className={buttonVariants({ variant: 'primary', size: 'md' }) + ' gap-2'}
+            className={buttonVariants({ variant: "primary", size: "md" }) + " gap-2"}
           >
             <Icon as={Plus} size={16} />
             Add media
@@ -104,7 +88,7 @@ export function LibraryView({
       <Tabs items={tabItems} value={tab} onChange={setTab} />
 
       {/* Tab content */}
-      {tab === 'all' && (
+      {tab === "all" && (
         <AllView
           sorted={sorted}
           watching={watching}
@@ -113,13 +97,11 @@ export function LibraryView({
         />
       )}
 
-      {tab === 'watching' && (
-        <LibraryGrid>
-          {watching.map(item => renderCard(item, false))}
-        </LibraryGrid>
+      {tab === "watching" && (
+        <LibraryGrid>{watching.map(item => renderCard(item, false))}</LibraryGrid>
       )}
 
-      {tab === 'favorites' && (
+      {tab === "favorites" && (
         <LibraryGrid>
           {sorted.filter(i => i.isFavorite).map(item => renderCard(item, true))}
         </LibraryGrid>
@@ -145,14 +127,10 @@ function AllView({
       {watching.length > 0 && (
         <section className="flex flex-col gap-3">
           <div className="flex items-baseline justify-between">
-            <h2 className="text-xl font-medium tracking-[-0.01em]">
-              Currently watching
-            </h2>
+            <h2 className="text-xl font-medium tracking-[-0.01em]">Currently watching</h2>
             <span className="text-xs text-tertiary">Sorted by last watched</span>
           </div>
-          <LibraryGrid>
-            {watching.map(item => renderCard(item, false))}
-          </LibraryGrid>
+          <LibraryGrid>{watching.map(item => renderCard(item, false))}</LibraryGrid>
         </section>
       )}
 
@@ -164,13 +142,9 @@ function AllView({
               <Sparkle size={14} />
               Favorites
             </h2>
-            <span className="text-xs text-tertiary">
-              {favNonWatching.length} titles
-            </span>
+            <span className="text-xs text-tertiary">{favNonWatching.length} titles</span>
           </div>
-          <LibraryGrid>
-            {favNonWatching.map(item => renderCard(item, true))}
-          </LibraryGrid>
+          <LibraryGrid>{favNonWatching.map(item => renderCard(item, true))}</LibraryGrid>
         </section>
       )}
 
@@ -180,9 +154,7 @@ function AllView({
           <h2 className="text-xl font-medium tracking-[-0.01em]">All titles</h2>
           <span className="text-xs text-tertiary">{allCount} titles</span>
         </div>
-        <LibraryGrid>
-          {sorted.map(item => renderCard(item, true))}
-        </LibraryGrid>
+        <LibraryGrid>{sorted.map(item => renderCard(item, true))}</LibraryGrid>
       </section>
     </div>
   );

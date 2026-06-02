@@ -1,4 +1,4 @@
-import type { SyncResult } from '@/types/database';
+import type { SyncResult } from "@/types/database";
 
 export type { SyncResult };
 

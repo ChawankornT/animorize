@@ -1,9 +1,9 @@
-import type { IMediaRepository } from '@/repositories/interfaces/IMediaRepository';
-import type { ISyncLogRepository } from '@/repositories/interfaces/ISyncLogRepository';
-import type { UpdateMediaInput, Media } from '@/domain/entities/Media';
+import type { IMediaRepository } from "@/repositories/interfaces/IMediaRepository";
+import type { ISyncLogRepository } from "@/repositories/interfaces/ISyncLogRepository";
+import type { UpdateMediaInput, Media } from "@/domain/entities/Media";
 
 /** Fields admin-managed — never overwritten by sync. */
-const PROTECTED: (keyof UpdateMediaInput)[] = ['titleTh', 'synopsis', 'posterUrl'];
+const PROTECTED: (keyof UpdateMediaInput)[] = ["titleTh", "synopsis", "posterUrl"];
 
 /**
  * Retries sync for a media entry using pre-mapped AniList data.
@@ -34,14 +34,14 @@ export async function retrySync(
     }
 
     const media = await mediaRepo.update(mediaId, safeInput);
-    await syncLogRepo.create({ mediaId, result: 'success' });
+    await syncLogRepo.create({ mediaId, result: "success" });
     return media;
   } catch (err) {
     try {
       await syncLogRepo.create({
         mediaId,
-        result: 'failed',
-        errorMessage: err instanceof Error ? err.message : 'Sync failed',
+        result: "failed",
+        errorMessage: err instanceof Error ? err.message : "Sync failed",
       });
     } catch {
       // best-effort

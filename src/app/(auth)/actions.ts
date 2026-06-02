@@ -1,30 +1,27 @@
-'use server';
+"use server";
 
-import { redirect } from 'next/navigation';
-import { z } from 'zod/v4';
-import { createClient } from '@/lib/supabase/server';
+import { redirect } from "next/navigation";
+import { z } from "zod/v4";
+import { createClient } from "@/lib/supabase/server";
 
 const loginSchema = z.object({
-  email: z.email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
+  email: z.email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
 });
 
 const signupSchema = z.object({
-  email: z.email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  email: z.email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 export type AuthResult = {
   error?: string;
 };
 
-export async function loginAction(
-  _prev: AuthResult,
-  formData: FormData,
-): Promise<AuthResult> {
+export async function loginAction(_prev: AuthResult, formData: FormData): Promise<AuthResult> {
   const parsed = loginSchema.safeParse({
-    email: formData.get('email'),
-    password: formData.get('password'),
+    email: formData.get("email"),
+    password: formData.get("password"),
   });
 
   if (!parsed.success) {
@@ -42,16 +39,13 @@ export async function loginAction(
     return { error: error.message };
   }
 
-  redirect('/dashboard');
+  redirect("/dashboard");
 }
 
-export async function signupAction(
-  _prev: AuthResult,
-  formData: FormData,
-): Promise<AuthResult> {
+export async function signupAction(_prev: AuthResult, formData: FormData): Promise<AuthResult> {
   const parsed = signupSchema.safeParse({
-    email: formData.get('email'),
-    password: formData.get('password'),
+    email: formData.get("email"),
+    password: formData.get("password"),
   });
 
   if (!parsed.success) {
@@ -69,11 +63,11 @@ export async function signupAction(
     return { error: error.message };
   }
 
-  redirect('/dashboard');
+  redirect("/dashboard");
 }
 
 export async function logoutAction(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect('/login');
+  redirect("/login");
 }

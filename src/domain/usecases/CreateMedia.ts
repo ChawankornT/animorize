@@ -1,5 +1,5 @@
-import type { IMediaRepository } from '@/repositories/interfaces/IMediaRepository';
-import { validateMedia, type CreateMediaInput, type Media } from '@/domain/entities/Media';
+import type { IMediaRepository } from "@/repositories/interfaces/IMediaRepository";
+import { validateMedia, type CreateMediaInput, type Media } from "@/domain/entities/Media";
 
 /**
  * Creates a new media entry.
@@ -16,7 +16,7 @@ export async function createMedia(
   input: CreateMediaInput,
 ): Promise<Media> {
   const normalizedInput: CreateMediaInput =
-    input.mediaType === 'movie' || input.mediaType === 'special'
+    input.mediaType === "movie" || input.mediaType === "special"
       ? { ...input, totalEpisodes: 1 }
       : input;
 

@@ -100,11 +100,7 @@ interface LibraryCardProps {
   favoriteSlot?: React.ReactNode;
 }
 
-function LibraryCard({
-  data,
-  showStatus = false,
-  favoriteSlot,
-}: LibraryCardProps) {
+function LibraryCard({ data, showStatus = false, favoriteSlot }: LibraryCardProps) {
   const {
     titleTh,
     titleEn,
@@ -137,16 +133,10 @@ function LibraryCard({
         {favoriteSlot}
       </div>
 
-      <Poster
-        posterUrl={posterUrl}
-        titleEn={titleEn}
-        tileColorIndex={tileColorIndex}
-      />
+      <Poster posterUrl={posterUrl} titleEn={titleEn} tileColorIndex={tileColorIndex} />
 
       <div className="flex flex-col gap-1.5 px-3 pt-2.5 pb-3">
-        <span className="text-md font-medium truncate tracking-[-0.005em]">
-          {displayTitle}
-        </span>
+        <span className="text-md font-medium truncate tracking-[-0.005em]">{displayTitle}</span>
 
         <div className="flex items-center flex-wrap gap-2">
           {providerName && providerColor && (
@@ -155,16 +145,13 @@ function LibraryCard({
           {showStatus && <StatusPill status={status} />}
           {showEp && (
             <span className="text-[11px] text-tertiary tabular-nums whitespace-nowrap">
-              ep{" "}
-              <span className="text-primary font-medium">{currentEpisode}</span>{" "}
-              of {totalEpisodes}
+              ep <span className="text-primary font-medium">{currentEpisode}</span> of{" "}
+              {totalEpisodes}
             </span>
           )}
         </div>
 
-        {showProgress && (
-          <ProgressBar value={currentEpisode} total={totalEpisodes} />
-        )}
+        {showProgress && <ProgressBar value={currentEpisode} total={totalEpisodes} />}
       </div>
     </div>
   );
@@ -207,16 +194,10 @@ function SearchCard({ data, onAdd }: SearchCardProps) {
         "transition-colors duration-fast ease-out hover:border-strong",
       )}
     >
-      <Poster
-        posterUrl={posterUrl}
-        titleEn={titleEn}
-        tileColorIndex={tileColorIndex}
-      />
+      <Poster posterUrl={posterUrl} titleEn={titleEn} tileColorIndex={tileColorIndex} />
 
       <div className="flex flex-col gap-1.5 px-3 pt-2.5 pb-3">
-        <span className="text-md font-medium truncate tracking-[-0.005em]">
-          {displayTitle}
-        </span>
+        <span className="text-md font-medium truncate tracking-[-0.005em]">{displayTitle}</span>
 
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-tertiary">

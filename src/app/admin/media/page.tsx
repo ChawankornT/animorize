@@ -1,22 +1,22 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
-import { createMediaRepository } from '@/repositories';
-import { listMedia } from '@/domain/usecases/ListMedia';
-import { getDisplayTitle } from '@/domain/entities/Media';
-import type { MediaType, AiringStatus } from '@/domain/entities/Media';
-import { Badge } from '@/components/ui/Badge';
-import { buttonVariants } from '@/components/ui/button-variants';
-import { MediaDeleteButton } from '@/components/admin/MediaDeleteButton';
+import Image from "next/image";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import { createMediaRepository } from "@/repositories";
+import { listMedia } from "@/domain/usecases/ListMedia";
+import { getDisplayTitle } from "@/domain/entities/Media";
+import type { MediaType, AiringStatus } from "@/domain/entities/Media";
+import { Badge } from "@/components/ui/Badge";
+import { buttonVariants } from "@/components/ui/button-variants";
+import { MediaDeleteButton } from "@/components/admin/MediaDeleteButton";
 import {
   MEDIA_TYPE_LABELS,
   MEDIA_STATUS_VARIANT,
   SEASON_LABELS,
   TILE_COLORS,
-} from '@/constants/admin';
+} from "@/constants/admin";
 
-const VALID_TYPES: MediaType[] = ['anime', 'series', 'movie', 'ova', 'special'];
-const VALID_STATUSES: AiringStatus[] = ['ongoing', 'finished', 'upcoming'];
+const VALID_TYPES: MediaType[] = ["anime", "series", "movie", "ova", "special"];
+const VALID_STATUSES: AiringStatus[] = ["ongoing", "finished", "upcoming"];
 
 export default async function MediaPage({
   searchParams,
@@ -39,7 +39,7 @@ export default async function MediaPage({
           <h1 className="text-2xl font-medium text-primary tracking-tight">Media</h1>
           <p className="mt-1 text-sm text-secondary">{mediaList.length} entries</p>
         </div>
-        <Link href="/admin/import" className={buttonVariants({ size: 'sm' })}>
+        <Link href="/admin/import" className={buttonVariants({ size: "sm" })}>
           Import media
         </Link>
       </div>
@@ -50,11 +50,11 @@ export default async function MediaPage({
           <span className="font-mono text-[10px] text-tertiary">type</span>
           <select
             name="type"
-            defaultValue={type ?? ''}
+            defaultValue={type ?? ""}
             className="bg-transparent text-sm text-primary outline-none"
           >
             <option value="">All types</option>
-            {VALID_TYPES.map((t) => (
+            {VALID_TYPES.map(t => (
               <option key={t} value={t}>
                 {MEDIA_TYPE_LABELS[t]}
               </option>
@@ -65,7 +65,7 @@ export default async function MediaPage({
           <span className="font-mono text-[10px] text-tertiary">status</span>
           <select
             name="status"
-            defaultValue={status ?? ''}
+            defaultValue={status ?? ""}
             className="bg-transparent text-sm text-primary outline-none"
           >
             <option value="">All statuses</option>
@@ -86,7 +86,7 @@ export default async function MediaPage({
 
       {mediaList.length === 0 ? (
         <div className="py-16 text-center text-secondary text-sm border-[0.5px] border-default rounded-card">
-          No media found.{' '}
+          No media found.{" "}
           <Link href="/admin/import" className="text-primary underline-offset-2 hover:underline">
             Import from AniList.
           </Link>
@@ -119,7 +119,7 @@ export default async function MediaPage({
             </thead>
             <tbody className="divide-y-[0.5px] divide-default">
               {mediaList.map((m, i) => {
-                const primaryTitle = getDisplayTitle(m) || '—';
+                const primaryTitle = getDisplayTitle(m) || "—";
                 const secondaryTitle =
                   m.titleRomaji && m.titleRomaji !== primaryTitle ? m.titleRomaji : null;
                 const tertiaryTitle = m.titleTh || null;
@@ -132,10 +132,7 @@ export default async function MediaPage({
                       : null;
 
                 return (
-                  <tr
-                    key={m.id}
-                    className="hover:bg-surface transition-colors duration-fast"
-                  >
+                  <tr key={m.id} className="hover:bg-surface transition-colors duration-fast">
                     {/* Title cell — swatch + multi-line */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
@@ -177,14 +174,14 @@ export default async function MediaPage({
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-secondary font-mono text-xs">
-                      {m.totalEpisodes > 0 ? m.totalEpisodes : '—'}
+                      {m.totalEpisodes > 0 ? m.totalEpisodes : "—"}
                     </td>
-                    <td className="px-4 py-3 text-xs text-secondary">
-                      {seasonStr ?? '—'}
-                    </td>
+                    <td className="px-4 py-3 text-xs text-secondary">{seasonStr ?? "—"}</td>
                     <td className="px-4 py-3">
                       {m.autoSync ? (
-                        <Badge variant="info" dot>On</Badge>
+                        <Badge variant="info" dot>
+                          On
+                        </Badge>
                       ) : (
                         <Badge>Off</Badge>
                       )}
@@ -193,14 +190,11 @@ export default async function MediaPage({
                       <div className="flex items-center justify-end gap-2">
                         <Link
                           href={`/admin/media/${m.id}`}
-                          className={buttonVariants({ variant: 'secondary', size: 'sm' })}
+                          className={buttonVariants({ variant: "secondary", size: "sm" })}
                         >
                           View
                         </Link>
-                        <MediaDeleteButton
-                          id={m.id}
-                          title={primaryTitle}
-                        />
+                        <MediaDeleteButton id={m.id} title={primaryTitle} />
                       </div>
                     </td>
                   </tr>

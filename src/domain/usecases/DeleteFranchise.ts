@@ -1,4 +1,4 @@
-import type { IFranchiseRepository } from '@/repositories/interfaces/IFranchiseRepository';
+import type { IFranchiseRepository } from "@/repositories/interfaces/IFranchiseRepository";
 
 /**
  * Deletes a franchise by ID.
@@ -6,9 +6,6 @@ import type { IFranchiseRepository } from '@/repositories/interfaces/IFranchiseR
  * @param repository - Franchise repository implementation
  * @param id - Franchise UUID to delete
  */
-export async function deleteFranchise(
-  repository: IFranchiseRepository,
-  id: string,
-): Promise<void> {
+export async function deleteFranchise(repository: IFranchiseRepository, id: string): Promise<void> {
   return repository.delete(id);
 }

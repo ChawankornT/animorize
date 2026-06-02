@@ -1,5 +1,8 @@
-import type { IUserMediaRepository, UpdateProviderInput } from '@/repositories/interfaces/IUserMediaRepository';
-import type { UserMedia } from '@/domain/entities/UserMedia';
+import type {
+  IUserMediaRepository,
+  UpdateProviderInput,
+} from "@/repositories/interfaces/IUserMediaRepository";
+import type { UserMedia } from "@/domain/entities/UserMedia";
 
 /**
  * Updates the provider, audio, and custom URL for a user's library entry.
