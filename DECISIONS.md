@@ -544,6 +544,20 @@ Effective URL = custom_url ?? media_providers.base_url
 
 **Implementation:** `getEffectiveUrl(customUrl, baseUrl)` ใน `domain/entities/UserMedia.ts`; `baseUrl` ดึงจาก nested JOIN `media.media_providers.base_url` match `(provider_id, audio)` ใน `toUserMediaWithMedia` mapper
 
+### `/dashboard` = full library (tab All) — Dashboard rule = highlight + sort ไม่ใช่ page filter
+> บันทึก 2026-06-02 — ปลดล็อกตอนเริ่ม Phase 3 Library/Dashboard (หลัง design Library view)
+
+**เดิม (business rule):** "Dashboard filter: status='watching' OR is_favorite=true"
+**ปรับเป็น:** `/dashboard` fetch `listUserLibrary(userId, 'all')` = library ทั้งหมด; "watching OR favorite" = นิยามของ **section ที่ highlight** (Currently watching / Favorites) + **sort priority** ไม่ใช่ filter ของทั้งหน้า
+
+**เหตุผล:** ทางเข้า library เดียวคือ add ผ่าน search → ทุก item ที่เพิ่ง add = `plan_to_watch` (schema default) + ไม่ fav; ถ้า filter ทั้งหน้าด้วย watching∪favorite เป๊ะ → เรื่องที่เพิ่ง add ไม่โผล่ที่ไหนเลย + plan_to_watch ไม่มีบ้านจนกว่ามี category page (Phase 6); onboarding "Add your first title" วนกลับหน้าว่าง
+
+**Composite sort (locked):** (1) status `watching→plan_to_watch→on_hold→completed→dropped` (2) favorite tie-break ภายใน status (ไม่ override ทั้งหมด) (3) recency `updated_at` DESC. บนสุด = fav+watching. Favorites section = favorite ที่ status≠watching (ไม่ซ้ำ Currently watching); Favorites **tab** = ทุก favorite (รวม watching)
+
+**Counts:** page-head + Favorites tab = all-fav (`items.filter(isFavorite)`); Favorites section sub = fav-not-watching (คนละเลข ตั้งใจ)
+
+**Top-bar (Phase 3):** มีแค่ "Add media → /search"; Filter/Sort/Library-search popover defer → Phase 5 (design พร้อมใน handoff)
+
 ---
 
 ## Performance Targets

@@ -7,3 +7,11 @@ export const STATUS_LABEL: Record<WatchStatus, string> = {
   completed:     'Completed',
   dropped:       'Dropped',
 };
+
+export const STATUS_PRIORITY: Record<WatchStatus, number> = {
+  watching: 0,
+  plan_to_watch: 1,
+  on_hold: 2,
+  completed: 3,
+  dropped: 4,
+};

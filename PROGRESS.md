@@ -10,15 +10,15 @@
 
 ```
 instructions_version: 2026-05-30-v2
-decisions_version: 2026-06-01-v1
+decisions_version: 2026-06-02-v1
 schema_version: 2026-05-27-v2
-claude_md_version: 2026-05-31-v1
+claude_md_version: 2026-06-02-v1
 ```
 
 ## Current Phase
 
 - **Active:** Phase 3 — User Library & Dashboard
-- **Status:** Part 2b merged to develop (PR #17) — พร้อมเริ่ม Part 2c (Library/Dashboard)
+- **Status:** Part 2c committed on `feature/phase3-part2c-library-dashboard` — pending PR to develop
 
 ## Phase 3 Progress
 
@@ -62,9 +62,21 @@ claude_md_version: 2026-05-31-v1
 - [x] Tailwind v4 canonical class cleanup (arbitrary → canonical ทั้ง project)
 - [x] `.claude/rules/ui.md` — design bundle storage convention (`.design-bundle/` at root)
 
-### Features — Part 2c (ยังไม่เริ่ม)
+### Features — Part 2c (committed — pending PR)
 
-- [ ] Dashboard: full library (tab All) + sections (Currently watching / Favorites / All titles)
+- [x] `components/ui/Tabs.tsx` — DS component, tablist + count badges, optional `onChange` (server/client compatible)
+- [x] `components/ui/Empty.tsx` — DS component, icon + title + body + action slot
+- [x] `constants/userMedia.ts` — added `STATUS_PRIORITY` (watching=0 → dropped=4)
+- [x] `lib/utils/librarySort.ts` — composite sort: status priority → favorite tie-break → recency DESC
+- [x] `app/(main)/dashboard/page.tsx` — Server Component, `listUserLibrary('all')` + counts → LibraryView | DashboardEmpty
+- [x] `components/media/LibraryView.tsx` — `'use client'`, 3 tabs (All/Watching/Favorites), All = 3 sections (Currently watching / Favorites / All titles)
+- [x] `components/media/DashboardEmpty.tsx` — empty state "Your library is empty" + "Add your first title" → `/search`
+- [x] `app/(main)/dashboard/loading.tsx` + `error.tsx`
+- [x] `MediaCard.tsx` — poster `quality={90}` for sharper rendering
+- [x] DECISIONS.md — `/dashboard` = full library decision + composite sort spec
+- [x] CLAUDE.md — Dashboard business rule reworded
+- [x] `isDashboardItem` JSDoc updated (comment only, no logic change)
+- [x] 5 unit tests for `librarySort` — 116 tests total, lint ✅ typecheck ✅ build ✅
 
 ## Phase 2 Progress
 
@@ -110,11 +122,11 @@ claude_md_version: 2026-05-31-v1
 
 | วันที่     | เปลี่ยนอะไร                                                                                                                                      | เปลี่ยนในไฟล์ไหน                                                                                                                  |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-02 | feat(phase3): Part 2c — Library/Dashboard page, Tabs+Empty DS, librarySort, DashboardEmpty, image quality 90, DECISIONS+CLAUDE reword             | components/media/ (LibraryView, DashboardEmpty), components/ui/ (Tabs, Empty), app/(main)/dashboard/ (page, loading, error), lib/utils/librarySort, constants/userMedia, DECISIONS.md, CLAUDE.md |
 | 2026-06-01 | feat(phase3): Part 2b — Search + Add-to-library modal + TanStack Query (search) + sanitize helper + franchise backport                            | components/media/ (SearchView, AddToLibraryModal), components/providers/QueryProvider, app/(main)/search/, app/actions/userMedia.ts, domain/usecases/UpdateLibraryProvider, lib/supabase/sanitizeSearchTerm, repositories/ (interface+impl search) |
 | 2026-06-01 | feat(phase3): Part 2a — MediaCard (2 variants) + FavoriteButton (optimistic) + SetFavorite usecase + actions + Icon/ProviderBadge/StatusPill      | components/media/ (4 files), components/ui/Icon.tsx, constants/userMedia.ts, domain/usecases/SetFavorite.ts, app/actions/userMedia.ts, hooks/useToast.ts |
 | 2026-05-31 | docs: DECISIONS.md เพิ่ม "User-facing AniList Import — Deferred (post-Phase 7)" — ไอเดีย request queue + ต้องเคาะตอนเริ่ม                        | DECISIONS.md                                                                                                                      |
 | 2026-05-31 | chore(rules): branch protection loud + UI design workflow gating (PR #15 → develop) — CI guard check-branch-target + build job สำหรับ release PR | .claude/rules/git.md, .claude/rules/ui.md (ใหม่), CLAUDE.md, DECISIONS.md, ci.yml, PULL_REQUEST_TEMPLATE.md (ใหม่)                |
-| 2026-05-31 | feat(phase3): Phase 3 Foundation merged to develop (PR #14) — UserMedia entity, repo, 4 usecases, 98 tests                                       | domain/entities/UserMedia.ts, repositories/ (3 files), domain/usecases/ (4 files), src/**tests**/ (5 files), mappers.ts, index.ts |
 
 ## Blockers
 
@@ -162,11 +174,26 @@ claude_md_version: 2026-05-31-v1
 - **MediaCard.Search** — `onAdd` undefined → แสดง "In library" + check icon แทนปุ่ม Add
 - **@tanstack/react-query** — `^5.100.14` install แล้วก่อนหน้า; DECISIONS.md Package Change Log updated
 
+### Phase 3 Part 2c (committed — pending PR)
+
+- **Dashboard page** — `app/(main)/dashboard/page.tsx`: Server Component, `listUserLibrary('all')` → full library (ไม่ filter); counts pre-computed server-side
+- **Decision: `/dashboard` = full library** — `'all'` ไม่ใช่ `'dashboard'` filter เพราะ items ที่เพิ่ง add = `plan_to_watch` + ไม่ fav → ไม่โผล่ที่ไหนถ้า filter; "watching OR favorite" = section highlight + sort priority เท่านั้น — ดู DECISIONS.md
+- **LibraryView** — `'use client'`, 3 tabs (All/Watching/Favorites):
+  - All view = 3 sections: "Currently watching" (showStatus=false) / "Favorites" (status≠watching, sparkle icon, ซ่อนเมื่อว่าง) / "All titles" (showStatus=true)
+  - Favorites **tab** = ทุก favorite (รวม watching); Favorites **section** = favorite ที่ status≠watching → คนละ filter ตั้งใจ
+- **Composite sort (`librarySort`)**: (1) STATUS_PRIORITY (watching=0→dropped=4) (2) favorite tie-break ภายใน status (3) `updatedAt` DESC — sort `UserMediaWithMedia[]` ก่อน map เป็น `LibraryCardData` (ไม่มี `updatedAt`)
+- **`tileColorIndex`** — `item.mediaId.charCodeAt(0) % TILE_COLORS.length` (same pattern as AddToLibraryModal + admin)
+- **DS components**: `Tabs` (`onChange` optional — server compatible), `Empty` (icon + title + body + action)
+- **DashboardEmpty** — empty state, no AniList button, "Add your first title" → `/search`
+- **Image quality** — `quality={90}` on MediaCard poster (default 75 too blurry for small AniList images)
+- **Phase 5 backlog**: AniList `coverImage.extraLarge` instead of `large` for better poster resolution
+
 ### Git state (สำคัญ)
 
 - **develop** — มี Foundation (PR #14) + rules (PR #15) + Part 2a (PR #16) + Part 2b (PR #17) ✅
+- **feature/phase3-part2c-library-dashboard** — committed, pending push + PR to develop
 - **main** — ยังเป็น reverted state (PR #13 Revert) — update เมื่อปิด phase เท่านั้น
-- Design bundle ล่าสุด (verified 2026-06-01): `https://api.anthropic.com/v1/design/h/Kp6d3N-GioWAaNXPRJr12w`
+- Design bundle ล่าสุด (verified 2026-06-02): `https://api.anthropic.com/v1/design/h/5D8CVsBqRlaHcpRuEicJrw`
 
 ### ข้อมูล Admin (Phase 2 stable)
 
@@ -178,5 +205,5 @@ claude_md_version: 2026-05-31-v1
 
 - Google OAuth ยังไม่ทำ — Email/Password เท่านั้น
 - ⚠️ **PROJECT_INSTRUCTIONS.md เปลี่ยน** (เพิ่ม Phase 7) — Chat ต้อง re-upload (instructions_version → 2026-05-30-v2)
-- ⚠️ **CLAUDE.md เปลี่ยน** (เพิ่ม Git & Deploy + UI/Design workflow) — claude_md_version → 2026-05-31-v1
-- ⚠️ **DECISIONS.md เปลี่ยน** (เพิ่ม TanStack Query adoption update + Package Change Log) — decisions_version → 2026-06-01-v1
+- ⚠️ **CLAUDE.md เปลี่ยน** (Dashboard business rule reworded) — claude_md_version → 2026-06-02-v1
+- ⚠️ **DECISIONS.md เปลี่ยน** (เพิ่ม `/dashboard` = full library decision + composite sort spec) — decisions_version → 2026-06-02-v1

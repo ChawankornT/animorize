@@ -62,8 +62,8 @@ export function getEffectiveUrl(customUrl: string | null | undefined, baseUrl: s
 }
 
 /**
- * Returns true if this item should appear on the user's dashboard.
- * Dashboard rule: status='watching' OR is_favorite=true
+ * Returns true if this item qualifies as a highlight (watching OR favorite).
+ * Used by `listUserLibrary('dashboard')` filter — note: `/dashboard` page uses 'all' + sections instead.
  */
 export function isDashboardItem(userMedia: Pick<UserMedia, 'status' | 'isFavorite'>): boolean {
   return userMedia.status === 'watching' || userMedia.isFavorite;

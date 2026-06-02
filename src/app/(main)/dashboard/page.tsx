@@ -1,28 +1,38 @@
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { logoutAction } from '@/app/(auth)/actions';
-import { Button } from '@/components/ui/Button';
+import { createUserMediaRepository } from '@/repositories';
+import { listUserLibrary } from '@/domain/usecases/ListUserLibrary';
+import { DashboardEmpty } from '@/components/media/DashboardEmpty';
+import { LibraryView } from '@/components/media/LibraryView';
 
 export const metadata = {
-  title: 'Dashboard — Animorize',
+  title: 'Library — Animorize',
 };
 
 export default async function DashboardPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
+  const repo = createUserMediaRepository(supabase);
+  const items = await listUserLibrary(repo, user.id, 'all');
+
+  if (items.length === 0) {
+    return <DashboardEmpty />;
+  }
+
+  const watchingCount = items.filter(i => i.status === 'watching').length;
+  const favoritesCount = items.filter(i => i.isFavorite).length;
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="space-y-4 text-center">
-        <h1 className="text-2xl font-medium text-primary">Welcome back</h1>
-        <p className="text-sm text-secondary">{user?.email}</p>
-        <form action={logoutAction}>
-          <Button type="submit" variant="secondary" size="sm">
-            Log out
-          </Button>
-        </form>
-      </div>
-    </div>
+    <LibraryView
+      items={items}
+      allCount={items.length}
+      watchingCount={watchingCount}
+      favoritesCount={favoritesCount}
+    />
   );
 }
