@@ -66,6 +66,7 @@ function Poster({ posterUrl, titleEn, tileColorIndex }: PosterProps) {
           fill
           className="object-cover"
           sizes="(max-width: 768px) 50vw, 25vw"
+          quality={90}
         />
       )}
       <div className="absolute inset-x-0 bottom-0 h-[70%] bg-linear-to-t from-black/55 to-transparent pointer-events-none" />

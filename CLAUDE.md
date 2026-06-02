@@ -59,7 +59,7 @@ UseCases: `IncrementEpisode.ts` / Repos: `IMediaRepository.ts` / Actions: `updat
 - movie/special → total_episodes=1, toggle "Watched" / ova → episode tracking ปกติ
 - +1 Episode: current_episode++ → INSERT watchlog → ถ้า current=total → status='completed'
 - Title: title_en > title_romaji > title_th — impl เดียวที่ `domain/entities/title.ts#getDisplayTitle`, re-exported จาก Media + Franchise
-- Dashboard: status='watching' OR is_favorite=true
+- Dashboard (/dashboard) = full library (tab All); 'watching' OR favorite = highlight sections + sort priority ไม่ใช่ filter ของทั้งหน้า — ดู DECISIONS.md
 - Provider URL: custom_url ?? base_url
 - Auto-sync: system enabled AND media.auto_sync AND airing_status='ongoing'
 - Sync ไม่ overwrite: title_th, synopsis, poster_url
