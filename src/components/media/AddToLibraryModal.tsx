@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { AlertCircle } from "lucide-react";
@@ -41,21 +41,35 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
 
   useEffect(() => {
     let cancelled = false;
-    getAddToLibraryDataAction(media.id).then(
-      ({ allProviders: providers, mediaProviders: assigned }) => {
+    async function load() {
+      try {
+        const { allProviders: providers, mediaProviders: assigned } =
+          await getAddToLibraryDataAction(media.id);
         if (cancelled) return;
         setAllProviders(providers);
         if (assigned.length > 0) {
           setSelectedProviderId(assigned[0].providerId);
           setSelectedAudio(assigned[0].audio);
         }
-        setLoading(false);
-      },
-    );
+      } catch {
+        if (cancelled) return;
+        showToast("Failed to load providers", "error");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    load();
     return () => {
       cancelled = true;
     };
-  }, [media.id]);
+  }, [media.id, showToast]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    },
+    [onClose],
+  );
 
   const displayTitle = getDisplayTitle({
     titleEn: media.titleEn,
@@ -93,7 +107,7 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
     if (result.success) {
       onAdded(media.id);
     } else {
-      showToast("Couldn't add to library", "error");
+      showToast(result.message, "error");
     }
   }
 
@@ -102,12 +116,16 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
   return (
     <>
       {/* Backdrop — bg-overlay, no blur */}
+      { }
       <div
         className="fixed inset-0 z-50 bg-overlay flex items-center justify-center"
         onClick={onClose}
+        onKeyDown={handleKeyDown}
       >
         {/* Modal — design: .modal */}
         <div
+          role="dialog"
+          aria-modal="true"
           className={cn(
             "w-[min(420px,calc(100%-32px))] bg-page rounded-modal",
             "border-[0.5px] border-default p-6",
@@ -302,7 +320,7 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
                 key={t.id}
                 variant={t.variant}
                 title={t.title}
-                description="Already in your library."
+                description={t.description}
                 onClose={() => dismiss(t.id)}
               />
             ))}

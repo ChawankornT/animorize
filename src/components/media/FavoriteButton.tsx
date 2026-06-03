@@ -75,10 +75,11 @@ export function FavoriteButton({ userMediaId, isFavorite }: FavoriteButtonProps)
         )}
       </button>
 
-      {toasts.length > 0 &&
+      {typeof document !== "undefined" &&
+        toasts.length > 0 &&
         createPortal(
           <div
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] flex flex-col gap-2 pointer-events-none"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-90 flex flex-col gap-2 pointer-events-none"
             aria-live="polite"
           >
             {toasts.map(t => (

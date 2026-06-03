@@ -13,6 +13,7 @@ import {
   toUserMedia,
   toUserMediaWithMedia,
   fromAddToLibraryInput,
+  type UserMediaRowWithJoin,
 } from "@/repositories/supabase/mappers";
 
 const USER_MEDIA_WITH_MEDIA_SELECT =
@@ -40,8 +41,17 @@ export class SupabaseUserMediaRepository implements IUserMediaRepository {
       .order("created_at", { ascending: false });
 
     if (error) throw new Error(`Failed to list user library: ${error.message}`);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (data ?? []).map(row => toUserMediaWithMedia(row as any));
+    return (data ?? []).map(row => toUserMediaWithMedia(row as unknown as UserMediaRowWithJoin));
+  }
+
+  async findMediaIdsByUserId(userId: string): Promise<string[]> {
+    const { data, error } = await this.supabase
+      .from("user_media")
+      .select("media_id")
+      .eq("user_id", userId);
+
+    if (error) throw new Error(`Failed to list user media IDs: ${error.message}`);
+    return (data ?? []).map(row => row.media_id);
   }
 
   async findByUserAndMedia(userId: string, mediaId: string): Promise<UserMedia | null> {
@@ -109,8 +119,13 @@ export class SupabaseUserMediaRepository implements IUserMediaRepository {
   }
 
   async remove(id: string): Promise<void> {
-    const { error } = await this.supabase.from("user_media").delete().eq("id", id);
+    const { data, error } = await this.supabase
+      .from("user_media")
+      .delete()
+      .eq("id", id)
+      .select("id");
 
     if (error) throw new Error(`Failed to remove from library: ${error.message}`);
+    if (!data || data.length === 0) throw new Error(`User media not found: ${id}`);
   }
 }

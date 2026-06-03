@@ -238,7 +238,7 @@ export function fromCreateSyncLogInput(
 
 // ─── UserMedia mappers ────────────────────────────────────────────────────────
 
-type UserMediaRowWithJoin = UserMediaRow & {
+export type UserMediaRowWithJoin = UserMediaRow & {
   media?: {
     title_th: string | null;
     title_en: string | null;

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { addToLibrary } from "@/domain/usecases/AddToLibrary";
+import { addToLibrary, DuplicateLibraryEntryError } from "@/domain/usecases/AddToLibrary";
 import { createMockUserMediaRepository, makeUserMedia } from "@/__tests__/utils/mockRepositories";
 
 describe("addToLibrary", () => {
@@ -14,12 +14,12 @@ describe("addToLibrary", () => {
     expect(result.mediaId).toBe("media-1");
   });
 
-  it("throws when media is already in library", async () => {
+  it("throws DuplicateLibraryEntryError when media is already in library", async () => {
     const repo = createMockUserMediaRepository();
     repo.findByUserAndMedia = vi.fn().mockResolvedValue(makeUserMedia());
 
     await expect(addToLibrary(repo, { userId: "user-1", mediaId: "media-1" })).rejects.toThrow(
-      "already in your library",
+      DuplicateLibraryEntryError,
     );
 
     expect(repo.add).not.toHaveBeenCalled();

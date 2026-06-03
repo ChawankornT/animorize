@@ -134,6 +134,7 @@ export function createMockUserMediaRepository(
   return {
     add: vi.fn().mockResolvedValue(userMedia),
     findByUserId: vi.fn().mockResolvedValue([withMedia]),
+    findMediaIdsByUserId: vi.fn().mockResolvedValue([withMedia.mediaId]),
     findByUserAndMedia: vi.fn().mockResolvedValue(null),
     updateFavorite: vi
       .fn()

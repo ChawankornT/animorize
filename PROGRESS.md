@@ -84,6 +84,23 @@ claude_md_version: 2026-06-02-v1
 - [x] Header — admin nav link with `internal` badge (query `profiles.role`), renamed "Dashboard" → "Library"
 - [x] DECISIONS.md — Phase 5 roadmap items (admin card shortcut, media search, extraLarge poster, filter/sort, motion); Phase 6 (admin pagination)
 
+### Code review fixes (on develop — not yet pushed)
+
+- [x] `AddToLibraryModal` — hardcoded toast `"Already in your library."` for all errors → uses `result.message` (curated by action)
+- [x] `AddToLibraryModal` — no `.catch()` on data fetch → `try/catch/finally` with error toast + `setLoading(false)`
+- [x] `AddToLibraryModal` — no Escape key / focus trap → added `onKeyDown` Escape handler + `role="dialog"` + `aria-modal`
+- [x] `sanitizeSearchTerm` → empty string returned full catalog → repos now return `[]` when sanitized to empty; search `.limit(50)` added
+- [x] `search/page.tsx` — full JOIN for media IDs → new `findMediaIdsByUserId()` (flat `SELECT media_id`)
+- [x] `Header.tsx` — profiles query no error handling → added `error` check
+- [x] `SupabaseUserMediaRepository` — `as any` cast → exported `UserMediaRowWithJoin` type, cast to specific type
+- [x] `SupabaseUserMediaRepository.remove()` — silent success on 0 rows → added `.select("id")` + row count check
+- [x] `FavoriteButton` — missing `typeof document` guard → added guard consistent with AddToLibraryModal
+- [x] `LibraryView` — sort+filter on every render → wrapped in `useMemo`
+- [x] `DuplicateLibraryEntryError` typed error class in `AddToLibrary` usecase — `instanceof` check in action replaces string-sniffing
+- [x] `UserMediaActionResult` → discriminated union with `reason: "duplicate" | "unauthorized" | "invalid" | "error"`
+- [x] `useToast` — added `description` field support + `clearTimeout` cleanup on unmount via `timersRef`
+- [x] 116 tests pass — lint ✅ typecheck ✅
+
 ## Phase 2 Progress
 
 - [x] Phase 2 schema migration — schema/ folder (13 SQL files) + types/database.ts updated
@@ -128,6 +145,7 @@ claude_md_version: 2026-06-02-v1
 
 | วันที่     | เปลี่ยนอะไร                                                                                                                                    | เปลี่ยนในไฟล์ไหน                                                                                                                                                                                                                                   |
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-03 | fix: code review — 10 findings (toast, error handling, search safety, a11y, perf, typed errors, reason codes)                                  | AddToLibraryModal, FavoriteButton, LibraryView, Header, useToast, AddToLibrary usecase, userMedia actions, repos (UserMedia/Media/Franchise), mappers, search/page, IUserMediaRepository                                                           |
 | 2026-06-02 | feat: admin nav in Header + Prettier setup + roadmap Phase 5/6 items                                                                           | components/layout/Header.tsx, .prettierrc.json, .prettierignore, eslint.config.mjs, package.json, DECISIONS.md, src/\*_/_ (format)                                                                                                                 |
 | 2026-06-02 | feat(phase3): Part 2c — Library/Dashboard page (PR #18), Tabs+Empty DS, librarySort, DashboardEmpty, image quality 90, DECISIONS+CLAUDE reword | components/media/ (LibraryView, DashboardEmpty), components/ui/ (Tabs, Empty), app/(main)/dashboard/ (page, loading, error), lib/utils/librarySort, constants/userMedia, DECISIONS.md, CLAUDE.md                                                   |
 | 2026-06-01 | feat(phase3): Part 2b — Search + Add-to-library modal + TanStack Query (search) + sanitize helper + franchise backport                         | components/media/ (SearchView, AddToLibraryModal), components/providers/QueryProvider, app/(main)/search/, app/actions/userMedia.ts, domain/usecases/UpdateLibraryProvider, lib/supabase/sanitizeSearchTerm, repositories/ (interface+impl search) |
@@ -194,10 +212,22 @@ claude_md_version: 2026-06-02-v1
 - **Image quality** — `quality={90}` on MediaCard poster (default 75 too blurry for small AniList images)
 - **Phase 5 backlog**: AniList `coverImage.extraLarge` instead of `large` for better poster resolution
 
+### Code review fixes (session 2026-06-03)
+
+- **`DuplicateLibraryEntryError`** — typed error class ใน `AddToLibrary.ts` usecase; action ใช้ `instanceof` check แทน `.includes()` string-sniffing
+- **`UserMediaActionResult`** — discriminated union: `{ success: true; message } | { success: false; message; reason: "duplicate" | "unauthorized" | "invalid" | "error" }` — ทุก action error branch มี reason code, Phase 4 reuse ได้
+- **`IUserMediaRepository.findMediaIdsByUserId()`** — flat `SELECT media_id` query; `/search` page ใช้แทน full JOIN
+- **`SupabaseUserMediaRepository.remove()`** — `.select("id")` + row count check → throw ถ้า 0 rows
+- **`useToast`** — เพิ่ม `description?` field + `timersRef` cleanup on unmount (clearTimeout ทุก pending timer)
+- **`AddToLibraryModal`** — try/catch/finally (ไม่ใช่ .then/.catch) + Escape key + `role="dialog"` + `aria-modal` + dynamic toast description
+- **`sanitizeSearchTerm`** → empty string → repos return `[]` (ไม่ใช่ full catalog); search query มี `.limit(50)` (เฉพาะ search mode ไม่กระทบ admin list)
+- **`mappers.ts`** — exported `UserMediaRowWithJoin` type; repo cast `as unknown as UserMediaRowWithJoin` แทน `as any`
+
 ### Git state (สำคัญ)
 
 - **develop** — มี Foundation (PR #14) + rules (PR #15) + Part 2a (PR #16) + Part 2b (PR #17) + Part 2c (PR #18) + Prettier + Header ✅ pushed
 - **main** — ยังเป็น reverted state (PR #13 Revert) — update เมื่อปิด phase เท่านั้น
+- **uncommitted** — code review fixes (15 files) — ยังไม่ push
 - Design bundle ล่าสุด (verified 2026-06-02): `https://api.anthropic.com/v1/design/h/5D8CVsBqRlaHcpRuEicJrw`
 
 ### Prettier (session 2026-06-02)

@@ -15,6 +15,7 @@ export interface UpdateProviderInput {
 export interface IUserMediaRepository {
   add(input: AddToLibraryInput): Promise<UserMedia>;
   findByUserId(userId: string): Promise<UserMediaWithMedia[]>;
+  findMediaIdsByUserId(userId: string): Promise<string[]>;
   findByUserAndMedia(userId: string, mediaId: string): Promise<UserMedia | null>;
   updateFavorite(id: string, isFavorite: boolean): Promise<UserMedia>;
   updateStatus(id: string, status: WatchStatus): Promise<UserMedia>;

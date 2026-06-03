@@ -11,7 +11,7 @@ import {
 } from "@/repositories";
 import { setFavorite } from "@/domain/usecases/SetFavorite";
 import { removeFromLibrary } from "@/domain/usecases/RemoveFromLibrary";
-import { addToLibrary } from "@/domain/usecases/AddToLibrary";
+import { addToLibrary, DuplicateLibraryEntryError } from "@/domain/usecases/AddToLibrary";
 import { listMedia } from "@/domain/usecases/ListMedia";
 import { listMediaProviders } from "@/domain/usecases/ListMediaProviders";
 import { listProviders } from "@/domain/usecases/ListProviders";
@@ -20,10 +20,9 @@ import type { Media } from "@/domain/entities/Media";
 import type { MediaProvider } from "@/domain/entities/MediaProvider";
 import type { Provider } from "@/domain/entities/Provider";
 
-export type UserMediaActionResult = {
-  success: boolean;
-  message: string;
-};
+export type UserMediaActionResult =
+  | { success: true; message: string }
+  | { success: false; message: string; reason: "duplicate" | "unauthorized" | "invalid" | "error" };
 
 export async function toggleFavoriteAction(
   userMediaId: string,
@@ -33,7 +32,7 @@ export async function toggleFavoriteAction(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { success: false, message: "Unauthorized" };
+  if (!user) return { success: false, message: "Unauthorized", reason: "unauthorized" };
 
   try {
     const repo = createUserMediaRepository(supabase);
@@ -42,7 +41,7 @@ export async function toggleFavoriteAction(
     return { success: true, message: next ? "Added to favorites" : "Removed from favorites" };
   } catch (error) {
     console.error("[toggleFavoriteAction]", error);
-    return { success: false, message: "Failed to update favorite" };
+    return { success: false, message: "Failed to update favorite", reason: "error" };
   }
 }
 
@@ -51,7 +50,7 @@ export async function removeFromLibraryAction(userMediaId: string): Promise<User
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { success: false, message: "Unauthorized" };
+  if (!user) return { success: false, message: "Unauthorized", reason: "unauthorized" };
 
   try {
     const repo = createUserMediaRepository(supabase);
@@ -60,7 +59,7 @@ export async function removeFromLibraryAction(userMediaId: string): Promise<User
     return { success: true, message: "Removed from library" };
   } catch (error) {
     console.error("[removeFromLibraryAction]", error);
-    return { success: false, message: "Failed to remove from library" };
+    return { success: false, message: "Failed to remove from library", reason: "error" };
   }
 }
 
@@ -107,11 +106,11 @@ export async function addToLibraryAction(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { success: false, message: "Unauthorized" };
+  if (!user) return { success: false, message: "Unauthorized", reason: "unauthorized" };
 
   const parsed = addToLibrarySchema.safeParse(input);
   if (!parsed.success) {
-    return { success: false, message: "Invalid input" };
+    return { success: false, message: "Invalid input", reason: "invalid" };
   }
 
   try {
@@ -120,12 +119,11 @@ export async function addToLibraryAction(
     revalidatePath("/dashboard");
     return { success: true, message: "Added to library" };
   } catch (error) {
-    const message =
-      error instanceof Error && error.message.includes("already in your library")
-        ? "Already in your library."
-        : "Failed to add to library";
     console.error("[addToLibraryAction]", error);
-    return { success: false, message };
+    if (error instanceof DuplicateLibraryEntryError) {
+      return { success: false, message: "Already in your library.", reason: "duplicate" };
+    }
+    return { success: false, message: "Failed to add to library", reason: "error" };
   }
 }
 
@@ -143,11 +141,11 @@ export async function changeLibraryProviderAction(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { success: false, message: "Unauthorized" };
+  if (!user) return { success: false, message: "Unauthorized", reason: "unauthorized" };
 
   const parsed = changeLibraryProviderSchema.safeParse(input);
   if (!parsed.success) {
-    return { success: false, message: "Invalid input" };
+    return { success: false, message: "Invalid input", reason: "invalid" };
   }
 
   try {
@@ -161,6 +159,6 @@ export async function changeLibraryProviderAction(
     return { success: true, message: "Provider updated" };
   } catch (error) {
     console.error("[changeLibraryProviderAction]", error);
-    return { success: false, message: "Failed to update provider" };
+    return { success: false, message: "Failed to update provider", reason: "error" };
   }
 }

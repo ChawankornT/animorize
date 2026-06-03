@@ -22,6 +22,8 @@ export class SupabaseFranchiseRepository implements IFranchiseRepository {
       const q = sanitizeSearchTerm(options.search);
       if (q) {
         query = query.or(`title_th.ilike.%${q}%,title_en.ilike.%${q}%,title_romaji.ilike.%${q}%`);
+      } else {
+        return [];
       }
     }
 

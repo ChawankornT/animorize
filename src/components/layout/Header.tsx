@@ -16,8 +16,14 @@ export async function Header() {
 
   let isAdmin = false;
   if (user) {
-    const { data } = await supabase.from("profiles").select("role").eq("id", user.id).single();
-    isAdmin = (data as { role: string } | null)?.role === "admin";
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    if (!error) {
+      isAdmin = (data as { role: string } | null)?.role === "admin";
+    }
   }
 
   return (

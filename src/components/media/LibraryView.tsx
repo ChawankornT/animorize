@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button-variants";
@@ -53,10 +53,12 @@ function renderCard(item: UserMediaWithMedia, showStatus: boolean) {
 
 export function LibraryView({ items, allCount, watchingCount, favoritesCount }: LibraryViewProps) {
   const [tab, setTab] = useState("all");
-  const sorted = [...items].sort(librarySort);
-
-  const watching = sorted.filter(i => i.status === "watching");
-  const favNonWatching = sorted.filter(i => i.isFavorite && i.status !== "watching");
+  const sorted = useMemo(() => [...items].sort(librarySort), [items]);
+  const watching = useMemo(() => sorted.filter(i => i.status === "watching"), [sorted]);
+  const favNonWatching = useMemo(
+    () => sorted.filter(i => i.isFavorite && i.status !== "watching"),
+    [sorted],
+  );
 
   const tabItems = [
     { value: "all", label: "All", count: allCount },

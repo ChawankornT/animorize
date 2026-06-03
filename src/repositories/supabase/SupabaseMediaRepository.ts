@@ -33,6 +33,9 @@ export class SupabaseMediaRepository implements IMediaRepository {
       const q = sanitizeSearchTerm(options.search);
       if (q) {
         query = query.or(`title_en.ilike.%${q}%,title_romaji.ilike.%${q}%,title_th.ilike.%${q}%`);
+        query = query.limit(50);
+      } else {
+        return [];
       }
     }
 

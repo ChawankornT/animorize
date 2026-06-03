@@ -11,8 +11,7 @@ export default async function SearchPage() {
   let libraryMediaIds: string[] = [];
   if (user) {
     const repo = createUserMediaRepository(supabase);
-    const items = await repo.findByUserId(user.id);
-    libraryMediaIds = items.map(item => item.mediaId);
+    libraryMediaIds = await repo.findMediaIdsByUserId(user.id);
   }
 
   return <SearchView libraryMediaIds={libraryMediaIds} />;
