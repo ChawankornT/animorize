@@ -1,8 +1,8 @@
-import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
-import { createFranchiseRepository } from '@/repositories';
-import { listFranchises } from '@/domain/usecases/ListFranchises';
-import { ImportPanel } from '@/components/admin/ImportPanel';
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import { createFranchiseRepository } from "@/repositories";
+import { listFranchises } from "@/domain/usecases/ListFranchises";
+import { ImportPanel } from "@/components/admin/ImportPanel";
 
 export default async function ImportPage() {
   const supabase = await createClient();

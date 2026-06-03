@@ -1,17 +1,13 @@
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import { createMediaRepository, createFranchiseRepository } from '@/repositories';
-import { getMedia } from '@/domain/usecases/GetMedia';
-import { listFranchises } from '@/domain/usecases/ListFranchises';
-import { getDisplayTitle } from '@/domain/entities/Media';
-import { MediaForm } from '@/components/admin/MediaForm';
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { createMediaRepository, createFranchiseRepository } from "@/repositories";
+import { getMedia } from "@/domain/usecases/GetMedia";
+import { listFranchises } from "@/domain/usecases/ListFranchises";
+import { getDisplayTitle } from "@/domain/entities/Media";
+import { MediaForm } from "@/components/admin/MediaForm";
 
-export default async function EditMediaPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function EditMediaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
   const [media, franchises] = await Promise.all([
@@ -40,7 +36,7 @@ export default async function EditMediaPage({
       </nav>
 
       <h1 className="text-2xl font-medium text-primary tracking-tight">
-        Edit{displayTitle ? `: ${displayTitle}` : ''}
+        Edit{displayTitle ? `: ${displayTitle}` : ""}
       </h1>
 
       <MediaForm media={media} franchises={franchises} />

@@ -1,4 +1,4 @@
-import { Skeleton } from '@/components/ui/Skeleton';
+import { Skeleton } from "@/components/ui/Skeleton";
 
 export default function AuthLoading() {
   return (
@@ -11,7 +11,7 @@ export default function AuthLoading() {
         <div className="space-y-3">
           <Skeleton className="h-9 w-full rounded-button" />
           <Skeleton className="h-9 w-full rounded-button" />
-          <Skeleton className="h-[34px] w-full rounded-button" />
+          <Skeleton className="h-8.5 w-full rounded-button" />
         </div>
       </div>
     </div>

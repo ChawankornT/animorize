@@ -1,4 +1,4 @@
-import type { SystemSettings, UpdateSystemSettingsInput } from '@/domain/entities/SystemSettings';
+import type { SystemSettings, UpdateSystemSettingsInput } from "@/domain/entities/SystemSettings";
 
 export interface ISystemSettingsRepository {
   get(): Promise<SystemSettings>;

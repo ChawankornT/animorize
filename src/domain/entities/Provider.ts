@@ -25,18 +25,14 @@ export interface UpdateProviderInput {
   baseUrl?: string | null;
 }
 
-export function validateProvider(data: {
-  name?: string;
-  slug?: string;
-  color?: string;
-}): void {
-  if (data.name !== undefined && data.name.trim() === '') {
-    throw new Error('Provider name cannot be empty');
+export function validateProvider(data: { name?: string; slug?: string; color?: string }): void {
+  if (data.name !== undefined && data.name.trim() === "") {
+    throw new Error("Provider name cannot be empty");
   }
   if (data.slug !== undefined && !/^[a-z0-9-]+$/.test(data.slug)) {
-    throw new Error('Provider slug must contain only lowercase letters, numbers, and hyphens');
+    throw new Error("Provider slug must contain only lowercase letters, numbers, and hyphens");
   }
   if (data.color !== undefined && !/^#[0-9a-fA-F]{6}$/.test(data.color)) {
-    throw new Error('Provider color must be a valid hex color (e.g. #FF5733)');
+    throw new Error("Provider color must be a valid hex color (e.g. #FF5733)");
   }
 }

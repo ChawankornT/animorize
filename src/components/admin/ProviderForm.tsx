@@ -1,35 +1,32 @@
-'use client';
+"use client";
 
-import { useState, useActionState } from 'react';
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
-import { cn } from '@/lib/utils/cn';
-import type { Provider } from '@/domain/entities/Provider';
+import { useState, useActionState } from "react";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/utils/cn";
+import type { Provider } from "@/domain/entities/Provider";
 import {
   createProviderAction,
   updateProviderAction,
   type ProviderActionState,
-} from '@/app/actions/provider';
+} from "@/app/actions/provider";
 
 function slugify(name: string): string {
   return name
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 export function ProviderForm({ provider }: { provider?: Provider }) {
   const isEdit = !!provider;
   const action = isEdit ? updateProviderAction : createProviderAction;
-  const [state, formAction, pending] = useActionState<ProviderActionState, FormData>(
-    action,
-    {},
-  );
+  const [state, formAction, pending] = useActionState<ProviderActionState, FormData>(action, {});
 
-  const [slug, setSlug] = useState(provider?.slug ?? '');
+  const [slug, setSlug] = useState(provider?.slug ?? "");
   const [slugTouched, setSlugTouched] = useState(isEdit);
-  const [color, setColor] = useState(provider?.color ?? '#000000');
+  const [color, setColor] = useState(provider?.color ?? "#000000");
 
   const colorIsValid = /^#[0-9A-Fa-f]{6}$/.test(color);
 
@@ -51,7 +48,7 @@ export function ProviderForm({ provider }: { provider?: Provider }) {
         placeholder="e.g. Crunchyroll"
         autoComplete="off"
         required
-        onChange={(e) => {
+        onChange={e => {
           if (!slugTouched) {
             setSlug(slugify(e.target.value));
           }
@@ -67,27 +64,25 @@ export function ProviderForm({ provider }: { provider?: Provider }) {
         hint="Lowercase letters, numbers, hyphens only. Auto-filled from name."
         autoComplete="off"
         required
-        onChange={(e) => {
+        onChange={e => {
           setSlug(e.target.value);
           setSlugTouched(true);
         }}
       />
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-[13px] font-medium text-secondary">
-          Brand color
-        </label>
+        <label className="text-[13px] font-medium text-secondary">Brand color</label>
         <div className="flex items-center gap-2">
           {/* Clickable swatch — opens native color picker */}
           <label
             className="relative w-8 h-8 rounded-lg shrink-0 border-[0.5px] border-default cursor-pointer overflow-hidden transition-shadow duration-fast hover:shadow-[0_0_0_2px_rgba(0,0,0,0.15)]"
-            style={{ backgroundColor: colorIsValid ? color : '#000000' }}
+            style={{ backgroundColor: colorIsValid ? color : "#000000" }}
             title="Click to open color picker"
           >
             <input
               type="color"
-              value={colorIsValid ? color : '#000000'}
-              onChange={(e) => setColor(e.target.value)}
+              value={colorIsValid ? color : "#000000"}
+              onChange={e => setColor(e.target.value)}
               className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
               tabIndex={-1}
             />
@@ -97,17 +92,17 @@ export function ProviderForm({ provider }: { provider?: Provider }) {
             id="color"
             name="color"
             value={color}
-            onChange={(e) => setColor(e.target.value)}
+            onChange={e => setColor(e.target.value)}
             placeholder="#F47521"
             className={cn(
-              'flex-1 h-9 px-3 bg-page text-sm text-primary rounded-input font-mono',
-              'border-[0.5px] border-default placeholder:text-tertiary',
-              'transition-colors duration-fast ease-out hover:border-strong',
-              'focus:border-primary focus:outline-none',
-              state.errors?.color && 'border-error hover:border-error focus:border-error',
+              "flex-1 h-9 px-3 bg-page text-sm text-primary rounded-input font-mono",
+              "border-[0.5px] border-default placeholder:text-tertiary",
+              "transition-colors duration-fast ease-out hover:border-strong",
+              "focus:border-primary focus:outline-none",
+              state.errors?.color && "border-error hover:border-error focus:border-error",
             )}
             aria-invalid={state.errors?.color ? true : undefined}
-            aria-describedby={state.errors?.color ? 'color-error' : undefined}
+            aria-describedby={state.errors?.color ? "color-error" : undefined}
             autoComplete="off"
           />
         </div>
@@ -122,7 +117,7 @@ export function ProviderForm({ provider }: { provider?: Provider }) {
       <Input
         label="Logo URL"
         name="logoUrl"
-        defaultValue={provider?.logoUrl ?? ''}
+        defaultValue={provider?.logoUrl ?? ""}
         error={state.errors?.logoUrl?.[0]}
         placeholder="https://example.com/logo.svg"
         hint="Optional"
@@ -132,7 +127,7 @@ export function ProviderForm({ provider }: { provider?: Provider }) {
       <Input
         label="Base URL"
         name="baseUrl"
-        defaultValue={provider?.baseUrl ?? ''}
+        defaultValue={provider?.baseUrl ?? ""}
         error={state.errors?.baseUrl?.[0]}
         placeholder="https://example.com"
         hint="Optional"
@@ -143,11 +138,11 @@ export function ProviderForm({ provider }: { provider?: Provider }) {
         <Button type="submit" disabled={pending}>
           {pending
             ? isEdit
-              ? 'Saving…'
-              : 'Creating…'
+              ? "Saving…"
+              : "Creating…"
             : isEdit
-              ? 'Save changes'
-              : 'Create provider'}
+              ? "Save changes"
+              : "Create provider"}
         </Button>
         <a
           href="/admin/providers"

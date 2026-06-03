@@ -1,45 +1,39 @@
-'use client';
+"use client";
 
-import { useActionState, useState, useRef } from 'react';
-import Link from 'next/link';
-import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
-import { Select } from '@/components/ui/Select';
-import { Button } from '@/components/ui/Button';
-import type { Media } from '@/domain/entities/Media';
-import type { Franchise } from '@/domain/entities/Franchise';
-import { getDisplayTitle as getFranchiseTitle } from '@/domain/entities/Franchise';
-import { createMediaAction, updateMediaAction, type MediaActionState } from '@/app/actions/media';
+import { useActionState, useState, useRef } from "react";
+import Link from "next/link";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
+import { Select } from "@/components/ui/Select";
+import { Button } from "@/components/ui/Button";
+import type { Media } from "@/domain/entities/Media";
+import type { Franchise } from "@/domain/entities/Franchise";
+import { getDisplayTitle as getFranchiseTitle } from "@/domain/entities/Franchise";
+import { createMediaAction, updateMediaAction, type MediaActionState } from "@/app/actions/media";
 
-export function MediaForm({
-  media,
-  franchises,
-}: {
-  media?: Media;
-  franchises: Franchise[];
-}) {
+export function MediaForm({ media, franchises }: { media?: Media; franchises: Franchise[] }) {
   const isEdit = !!media;
   const action = isEdit ? updateMediaAction : createMediaAction;
   const [state, formAction, pending] = useActionState<MediaActionState, FormData>(action, {});
 
-  const initialType = media?.mediaType ?? 'anime';
-  const isFixedInitially = initialType === 'movie' || initialType === 'special';
+  const initialType = media?.mediaType ?? "anime";
+  const isFixedInitially = initialType === "movie" || initialType === "special";
 
   const [mediaType, setMediaType] = useState<string>(initialType);
-  const isFixedEpisodes = mediaType === 'movie' || mediaType === 'special';
+  const isFixedEpisodes = mediaType === "movie" || mediaType === "special";
 
   const prevEpisodesRef = useRef<string>(
-    !isFixedInitially && media?.totalEpisodes ? String(media.totalEpisodes) : '',
+    !isFixedInitially && media?.totalEpisodes ? String(media.totalEpisodes) : "",
   );
   const [totalEpisodes, setTotalEpisodes] = useState<string>(
-    isFixedInitially ? '1' : (media?.totalEpisodes ? String(media.totalEpisodes) : ''),
+    isFixedInitially ? "1" : media?.totalEpisodes ? String(media.totalEpisodes) : "",
   );
 
   function handleMediaTypeChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const newType = e.target.value;
-    if (newType === 'movie' || newType === 'special') {
+    if (newType === "movie" || newType === "special") {
       prevEpisodesRef.current = totalEpisodes;
-      setTotalEpisodes('1');
+      setTotalEpisodes("1");
     } else {
       setTotalEpisodes(prevEpisodesRef.current);
     }
@@ -58,13 +52,9 @@ export function MediaForm({
 
       {/* Franchise + Type */}
       <div className="grid grid-cols-2 gap-4">
-        <Select
-          label="Franchise"
-          name="franchiseId"
-          defaultValue={media?.franchiseId ?? ''}
-        >
+        <Select label="Franchise" name="franchiseId" defaultValue={media?.franchiseId ?? ""}>
           <option value="">None</option>
-          {franchises.map((f) => (
+          {franchises.map(f => (
             <option key={f.id} value={f.id}>
               {getFranchiseTitle(f)}
             </option>
@@ -91,7 +81,7 @@ export function MediaForm({
         <Input
           label="Title (Thai)"
           name="titleTh"
-          defaultValue={media?.titleTh ?? ''}
+          defaultValue={media?.titleTh ?? ""}
           error={state.errors?.titleTh?.[0]}
           placeholder="e.g. ดาบพิฆาตอสูร"
           autoComplete="off"
@@ -99,7 +89,7 @@ export function MediaForm({
         <Input
           label="Title (English)"
           name="titleEn"
-          defaultValue={media?.titleEn ?? ''}
+          defaultValue={media?.titleEn ?? ""}
           error={state.errors?.titleEn?.[0]}
           placeholder="e.g. Demon Slayer"
           autoComplete="off"
@@ -107,7 +97,7 @@ export function MediaForm({
         <Input
           label="Title (Romaji)"
           name="titleRomaji"
-          defaultValue={media?.titleRomaji ?? ''}
+          defaultValue={media?.titleRomaji ?? ""}
           error={state.errors?.titleRomaji?.[0]}
           placeholder="e.g. Kimetsu no Yaiba"
           autoComplete="off"
@@ -118,7 +108,7 @@ export function MediaForm({
       <Textarea
         label="Synopsis"
         name="synopsis"
-        defaultValue={media?.synopsis ?? ''}
+        defaultValue={media?.synopsis ?? ""}
         error={state.errors?.synopsis?.[0]}
         placeholder="Brief description…"
         hint="Optional"
@@ -130,7 +120,7 @@ export function MediaForm({
         <Input
           label="Poster URL"
           name="posterUrl"
-          defaultValue={media?.posterUrl ?? ''}
+          defaultValue={media?.posterUrl ?? ""}
           error={state.errors?.posterUrl?.[0]}
           placeholder="https://…"
           hint="Optional"
@@ -139,7 +129,7 @@ export function MediaForm({
         <Input
           label="Genres"
           name="genres"
-          defaultValue={media?.genres.join(', ') ?? ''}
+          defaultValue={media?.genres.join(", ") ?? ""}
           error={state.errors?.genres?.[0]}
           placeholder="Action, Fantasy, Drama"
           hint="Separate with commas"
@@ -155,15 +145,15 @@ export function MediaForm({
           type="number"
           min={isFixedEpisodes ? 1 : 0}
           value={totalEpisodes}
-          onChange={(e) => setTotalEpisodes(e.target.value)}
+          onChange={e => setTotalEpisodes(e.target.value)}
           disabled={isFixedEpisodes}
           error={state.errors?.totalEpisodes?.[0]}
-          hint={isFixedEpisodes ? 'Fixed at 1' : 'Optional'}
+          hint={isFixedEpisodes ? "Fixed at 1" : "Optional"}
         />
         <Select
           label="Season"
           name="seasonQuarter"
-          defaultValue={String(media?.seasonQuarter ?? '')}
+          defaultValue={String(media?.seasonQuarter ?? "")}
           error={state.errors?.seasonQuarter?.[0]}
         >
           <option value="">—</option>
@@ -176,7 +166,7 @@ export function MediaForm({
           label="Year"
           name="seasonYear"
           type="number"
-          defaultValue={media?.seasonYear ?? ''}
+          defaultValue={media?.seasonYear ?? ""}
           error={state.errors?.seasonYear?.[0]}
           placeholder="e.g. 2024"
           min={1900}
@@ -190,20 +180,20 @@ export function MediaForm({
           label="Air Date Start"
           name="airDateStart"
           type="date"
-          defaultValue={media?.airDateStart ?? ''}
+          defaultValue={media?.airDateStart ?? ""}
           error={state.errors?.airDateStart?.[0]}
         />
         <Input
           label="Air Date End"
           name="airDateEnd"
           type="date"
-          defaultValue={media?.airDateEnd ?? ''}
+          defaultValue={media?.airDateEnd ?? ""}
           error={state.errors?.airDateEnd?.[0]}
         />
         <Select
           label="Airing Status"
           name="airingStatus"
-          defaultValue={media?.airingStatus ?? 'upcoming'}
+          defaultValue={media?.airingStatus ?? "upcoming"}
           error={state.errors?.airingStatus?.[0]}
         >
           <option value="upcoming">Upcoming</option>
@@ -237,13 +227,7 @@ export function MediaForm({
 
       <div className="flex items-center gap-3 pt-1">
         <Button type="submit" disabled={pending}>
-          {pending
-            ? isEdit
-              ? 'Saving…'
-              : 'Creating…'
-            : isEdit
-              ? 'Save changes'
-              : 'Create media'}
+          {pending ? (isEdit ? "Saving…" : "Creating…") : isEdit ? "Save changes" : "Create media"}
         </Button>
         <Link
           href="/admin/media"

@@ -1,9 +1,9 @@
-export type UserRole = 'user' | 'admin';
-export type MediaType = 'anime' | 'series' | 'movie' | 'ova' | 'special';
-export type WatchStatus = 'watching' | 'completed' | 'on_hold' | 'dropped' | 'plan_to_watch';
-export type AiringStatus = 'ongoing' | 'finished' | 'upcoming';
-export type AudioType = 'sub' | 'dub';
-export type SyncResult = 'success' | 'failed';
+export type UserRole = "user" | "admin";
+export type MediaType = "anime" | "series" | "movie" | "ova" | "special";
+export type WatchStatus = "watching" | "completed" | "on_hold" | "dropped" | "plan_to_watch";
+export type AiringStatus = "ongoing" | "finished" | "upcoming";
+export type AudioType = "sub" | "dub";
+export type SyncResult = "success" | "failed";
 
 export interface Database {
   public: {

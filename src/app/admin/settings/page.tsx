@@ -1,7 +1,7 @@
-import { createClient } from '@/lib/supabase/server';
-import { createSystemSettingsRepository } from '@/repositories';
-import { getSystemSettings } from '@/domain/usecases/GetSystemSettings';
-import { SystemSettingsForm } from '@/components/admin/SystemSettingsForm';
+import { createClient } from "@/lib/supabase/server";
+import { createSystemSettingsRepository } from "@/repositories";
+import { getSystemSettings } from "@/domain/usecases/GetSystemSettings";
+import { SystemSettingsForm } from "@/components/admin/SystemSettingsForm";
 
 export default async function SettingsPage() {
   const supabase = await createClient();

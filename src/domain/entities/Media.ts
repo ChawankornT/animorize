@@ -1,7 +1,7 @@
-import type { MediaType, AiringStatus } from '@/types/database';
+import type { MediaType, AiringStatus } from "@/types/database";
 
 export type { MediaType, AiringStatus };
-export { getDisplayTitle } from '@/domain/entities/title';
+export { getDisplayTitle } from "@/domain/entities/title";
 
 export interface Media {
   id: string;
@@ -74,18 +74,17 @@ export function validateMedia(data: {
   totalEpisodes?: number;
 }): void {
   if (!data.titleTh && !data.titleEn && !data.titleRomaji) {
-    throw new Error('Media must have at least one title (titleTh, titleEn, or titleRomaji)');
+    throw new Error("Media must have at least one title (titleTh, titleEn, or titleRomaji)");
   }
   if (
-    (data.mediaType === 'movie' || data.mediaType === 'special') &&
+    (data.mediaType === "movie" || data.mediaType === "special") &&
     data.totalEpisodes !== undefined &&
     data.totalEpisodes !== 1
   ) {
-    throw new Error('Movie and special media must have exactly 1 episode');
+    throw new Error("Movie and special media must have exactly 1 episode");
   }
 }
 
-
-export function isTrackable(media: Pick<Media, 'mediaType'>): boolean {
-  return media.mediaType !== 'movie' && media.mediaType !== 'special';
+export function isTrackable(media: Pick<Media, "mediaType">): boolean {
+  return media.mediaType !== "movie" && media.mediaType !== "special";
 }

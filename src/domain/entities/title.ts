@@ -4,5 +4,5 @@ export function getDisplayTitle(titles: {
   titleRomaji?: string | null;
   titleTh?: string | null;
 }): string {
-  return titles.titleEn ?? titles.titleRomaji ?? titles.titleTh ?? '';
+  return titles.titleEn ?? titles.titleRomaji ?? titles.titleTh ?? "";
 }

@@ -1,5 +1,5 @@
-import type { ISystemSettingsRepository } from '@/repositories/interfaces/ISystemSettingsRepository';
-import type { SystemSettings } from '@/domain/entities/SystemSettings';
+import type { ISystemSettingsRepository } from "@/repositories/interfaces/ISystemSettingsRepository";
+import type { SystemSettings } from "@/domain/entities/SystemSettings";
 
 /**
  * Returns the global system settings (singleton row, id = 1).

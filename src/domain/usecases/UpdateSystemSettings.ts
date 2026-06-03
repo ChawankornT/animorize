@@ -1,5 +1,5 @@
-import type { ISystemSettingsRepository } from '@/repositories/interfaces/ISystemSettingsRepository';
-import type { SystemSettings, UpdateSystemSettingsInput } from '@/domain/entities/SystemSettings';
+import type { ISystemSettingsRepository } from "@/repositories/interfaces/ISystemSettingsRepository";
+import type { SystemSettings, UpdateSystemSettingsInput } from "@/domain/entities/SystemSettings";
 
 /**
  * Updates the global system settings.

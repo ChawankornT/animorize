@@ -9,6 +9,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"*.{json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"*.{json,md}\"",
     "prepare": "husky"
   },
   "dependencies": {
@@ -27,8 +29,12 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
+      "prettier --write",
       "eslint --fix",
       "tsc-files --noEmit"
+    ],
+    "*.{json,md,css}": [
+      "prettier --write"
     ]
   },
   "devDependencies": {
@@ -41,9 +47,11 @@
     "@vitejs/plugin-react": "^6.0.2",
     "eslint": "^9",
     "eslint-config-next": "16.0.5",
+    "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "jsdom": "^29.1.1",
     "lint-staged": "^16.4.0",
+    "prettier": "^3.8.3",
     "tailwindcss": "^4",
     "tsc-files": "^1.1.4",
     "typescript": "^5",

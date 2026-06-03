@@ -59,10 +59,31 @@ UseCases: `IncrementEpisode.ts` / Repos: `IMediaRepository.ts` / Actions: `updat
 - movie/special → total_episodes=1, toggle "Watched" / ova → episode tracking ปกติ
 - +1 Episode: current_episode++ → INSERT watchlog → ถ้า current=total → status='completed'
 - Title: title_en > title_romaji > title_th — impl เดียวที่ `domain/entities/title.ts#getDisplayTitle`, re-exported จาก Media + Franchise
-- Dashboard: status='watching' OR is_favorite=true
+- Dashboard (/dashboard) = full library (tab All); 'watching' OR favorite = highlight sections + sort priority ไม่ใช่ filter ของทั้งหน้า — ดู DECISIONS.md
 - Provider URL: custom_url ?? base_url
 - Auto-sync: system enabled AND media.auto_sync AND airing_status='ongoing'
 - Sync ไม่ overwrite: title_th, synopsis, poster_url
+
+## Git & Deploy
+
+> ⛔ **ระหว่าง phase: ห้ามเปิด PR เข้า `main` เด็ดขาด**
+> `feature/*` / `fix/*` → **PR เข้า `develop` เท่านั้น**
+> `main` update เฉพาะ **release PR `develop` → `main`** ที่เจ้าของอนุมัติเองตอนปิด phase
+> ยกเว้น: เจ้าของเปิด PR เอง และเป็น `develop` → `main` เท่านั้น — ห้ามข้าม branch ใดๆ
+> ⚠️ **เคยมี PR หลุดเข้า `main` ทั้งที่กฎระบุไว้ → verify base branch ก่อนเปิด PR ทุกครั้งเสมอ**
+
+กฎเพิ่มเติม: ดู `.claude/rules/git.md`
+
+## UI / Design workflow
+
+> ⛔ **ห้ามประดิษฐ์ UI เอง** — ก่อน implement UI ทุกครั้ง ต้องมี Claude Design handoff bundle ก่อน
+
+1. ขอ/ใช้ Claude Design handoff URL ล่าสุดจากเจ้าของ (อย่าใช้ลิงก์เก่าโดยไม่ยืนยัน)
+2. `fetch` bundle → อ่าน README + screens → verify ว่ามี screen/component ที่เกี่ยวข้อง
+3. ถ้ายังไม่มี → สั่ง design ก่อน แล้วค่อย implement
+4. `BRAND.md` = source of truth ของ token/spec
+
+กฎเพิ่มเติม: ดู `.claude/rules/ui.md`
 
 ## Session Sync
 - จบทุก session → รัน `/sync-progress` เพื่ออัปเดท PROGRESS.md

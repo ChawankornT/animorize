@@ -1,15 +1,11 @@
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import { createProviderRepository } from '@/repositories';
-import { getProvider } from '@/domain/usecases/GetProvider';
-import { ProviderForm } from '@/components/admin/ProviderForm';
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { createProviderRepository } from "@/repositories";
+import { getProvider } from "@/domain/usecases/GetProvider";
+import { ProviderForm } from "@/components/admin/ProviderForm";
 
-export default async function EditProviderPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function EditProviderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
   const repo = createProviderRepository(supabase);
@@ -24,19 +20,20 @@ export default async function EditProviderPage({
           Admin
         </Link>
         <span className="text-tertiary">›</span>
-        <Link href="/admin/providers" className="hover:text-primary transition-colors duration-fast">
+        <Link
+          href="/admin/providers"
+          className="hover:text-primary transition-colors duration-fast"
+        >
           Providers
         </Link>
         <span className="text-tertiary">›</span>
-        <span className="text-primary truncate max-w-[160px]">{provider.name}</span>
+        <span className="text-primary truncate max-w-40">{provider.name}</span>
         <span className="text-tertiary">›</span>
         <span className="text-primary font-medium">Edit</span>
       </nav>
 
       <div>
-        <h1 className="text-2xl font-medium text-primary tracking-tight">
-          Edit {provider.name}
-        </h1>
+        <h1 className="text-2xl font-medium text-primary tracking-tight">Edit {provider.name}</h1>
       </div>
 
       <ProviderForm provider={provider} />

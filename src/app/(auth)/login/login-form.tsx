@@ -1,15 +1,12 @@
-'use client';
+"use client";
 
-import { useActionState } from 'react';
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
-import { loginAction, type AuthResult } from '../actions';
+import { useActionState } from "react";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { loginAction, type AuthResult } from "../actions";
 
 export function LoginForm() {
-  const [state, formAction, pending] = useActionState<AuthResult, FormData>(
-    loginAction,
-    {},
-  );
+  const [state, formAction, pending] = useActionState<AuthResult, FormData>(loginAction, {});
 
   return (
     <form action={formAction} className="space-y-4">
@@ -35,7 +32,7 @@ export function LoginForm() {
         required
       />
       <Button type="submit" disabled={pending} className="w-full">
-        {pending ? 'Logging in...' : 'Log in'}
+        {pending ? "Logging in..." : "Log in"}
       </Button>
     </form>
   );

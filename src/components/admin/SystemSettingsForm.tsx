@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useActionState } from 'react';
-import { Button } from '@/components/ui/Button';
-import type { SystemSettings } from '@/domain/entities/SystemSettings';
-import { updateSystemSettingsAction, type SystemSettingsState } from '@/app/actions/systemSettings';
+import { useActionState } from "react";
+import { Button } from "@/components/ui/Button";
+import type { SystemSettings } from "@/domain/entities/SystemSettings";
+import { updateSystemSettingsAction, type SystemSettingsState } from "@/app/actions/systemSettings";
 
 interface Props {
   settings: SystemSettings;
@@ -18,10 +18,7 @@ export function SystemSettingsForm({ settings }: Props) {
   return (
     <form action={action} className="space-y-6">
       {state.message && (
-        <p
-          className={`text-sm ${state.success ? 'text-success' : 'text-error'}`}
-          role="alert"
-        >
+        <p className={`text-sm ${state.success ? "text-success" : "text-error"}`} role="alert">
           {state.message}
         </p>
       )}
@@ -36,7 +33,10 @@ export function SystemSettingsForm({ settings }: Props) {
           className="mt-0.5 h-4 w-4 rounded border-default accent-primary"
         />
         <div className="space-y-0.5">
-          <label htmlFor="autoSyncEnabled" className="text-sm font-medium text-primary cursor-pointer">
+          <label
+            htmlFor="autoSyncEnabled"
+            className="text-sm font-medium text-primary cursor-pointer"
+          >
             Auto-sync enabled
           </label>
           <p className="text-xs text-secondary">
@@ -46,7 +46,7 @@ export function SystemSettingsForm({ settings }: Props) {
       </div>
 
       <Button type="submit" size="sm" disabled={pending}>
-        {pending ? 'Saving…' : 'Save settings'}
+        {pending ? "Saving…" : "Save settings"}
       </Button>
     </form>
   );

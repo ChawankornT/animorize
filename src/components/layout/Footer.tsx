@@ -1,4 +1,4 @@
-import { Wordmark } from '@/components/brand/Wordmark';
+import { Wordmark } from "@/components/brand/Wordmark";
 
 export function Footer() {
   return (

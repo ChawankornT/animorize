@@ -1,8 +1,8 @@
-import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
-import { createFranchiseRepository } from '@/repositories';
-import { listFranchises } from '@/domain/usecases/ListFranchises';
-import { MediaForm } from '@/components/admin/MediaForm';
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import { createFranchiseRepository } from "@/repositories";
+import { listFranchises } from "@/domain/usecases/ListFranchises";
+import { MediaForm } from "@/components/admin/MediaForm";
 
 export default async function NewMediaPage() {
   const supabase = await createClient();

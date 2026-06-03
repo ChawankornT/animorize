@@ -1,5 +1,5 @@
-import type { AnilistMediaResponse } from './types';
-import type { CreateMediaInput } from '@/domain/entities/Media';
+import type { AnilistMediaResponse } from "./types";
+import type { CreateMediaInput } from "@/domain/entities/Media";
 
 const SEASON_MAP: Record<string, number> = {
   WINTER: 1,
@@ -8,19 +8,23 @@ const SEASON_MAP: Record<string, number> = {
   FALL: 4,
 };
 
-const STATUS_MAP: Record<string, 'ongoing' | 'finished' | 'upcoming'> = {
-  RELEASING: 'ongoing',
-  FINISHED: 'finished',
-  NOT_YET_RELEASED: 'upcoming',
+const STATUS_MAP: Record<string, "ongoing" | "finished" | "upcoming"> = {
+  RELEASING: "ongoing",
+  FINISHED: "finished",
+  NOT_YET_RELEASED: "upcoming",
 };
 
-function toDateString(year?: number | null, month?: number | null, day?: number | null): string | undefined {
+function toDateString(
+  year?: number | null,
+  month?: number | null,
+  day?: number | null,
+): string | undefined {
   if (!year || !month || !day) return undefined;
-  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
 function stripHtml(text: string): string {
-  return text.replace(/<[^>]*>/g, '').trim();
+  return text.replace(/<[^>]*>/g, "").trim();
 }
 
 export function mapAnilistToMedia(
@@ -30,7 +34,7 @@ export function mapAnilistToMedia(
 
   return {
     anilistId: m.id,
-    mediaType: 'anime',
+    mediaType: "anime",
     titleRomaji: m.title.romaji ?? undefined,
     titleEn: m.title.english ?? undefined,
     posterUrl: m.coverImage.large ?? undefined,
@@ -41,7 +45,7 @@ export function mapAnilistToMedia(
     seasonYear: m.seasonYear ?? undefined,
     airDateStart: toDateString(m.startDate.year, m.startDate.month, m.startDate.day),
     airDateEnd: toDateString(m.endDate.year, m.endDate.month, m.endDate.day),
-    airingStatus: m.status ? (STATUS_MAP[m.status] ?? 'upcoming') : 'upcoming',
+    airingStatus: m.status ? (STATUS_MAP[m.status] ?? "upcoming") : "upcoming",
     autoSync: true,
   };
 }

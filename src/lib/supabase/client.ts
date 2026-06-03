@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { createBrowserClient } from '@supabase/ssr';
-import type { CompatDatabase } from '@/lib/supabase/types';
+import { createBrowserClient } from "@supabase/ssr";
+import type { CompatDatabase } from "@/lib/supabase/types";
 
 export function createClient() {
   return createBrowserClient<CompatDatabase>(

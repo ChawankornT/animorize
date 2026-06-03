@@ -1,4 +1,4 @@
-import type { IMediaProviderRepository } from '@/repositories/interfaces/IMediaProviderRepository';
+import type { IMediaProviderRepository } from "@/repositories/interfaces/IMediaProviderRepository";
 
 /**
  * Removes a provider assignment from a media entry.

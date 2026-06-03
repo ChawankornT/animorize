@@ -1,5 +1,5 @@
-import type { IProviderRepository } from '@/repositories/interfaces/IProviderRepository';
-import type { Provider } from '@/domain/entities/Provider';
+import type { IProviderRepository } from "@/repositories/interfaces/IProviderRepository";
+import type { Provider } from "@/domain/entities/Provider";
 
 /**
  * Retrieves a single provider by ID.

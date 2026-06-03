@@ -1,5 +1,9 @@
-import type { IProviderRepository } from '@/repositories/interfaces/IProviderRepository';
-import { validateProvider, type CreateProviderInput, type Provider } from '@/domain/entities/Provider';
+import type { IProviderRepository } from "@/repositories/interfaces/IProviderRepository";
+import {
+  validateProvider,
+  type CreateProviderInput,
+  type Provider,
+} from "@/domain/entities/Provider";
 
 /**
  * Creates a new streaming provider.

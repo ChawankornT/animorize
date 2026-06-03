@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useActionState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { DeleteConfirmModal } from './DeleteConfirmModal';
-import { deleteMediaAction, type DeleteActionState } from '@/app/actions/media';
+import { useState, useActionState } from "react";
+import { Button } from "@/components/ui/Button";
+import { DeleteConfirmModal } from "./DeleteConfirmModal";
+import { deleteMediaAction, type DeleteActionState } from "@/app/actions/media";
 
 export function MediaDeleteButton({ id, title }: { id: string; title: string }) {
   const [open, setOpen] = useState(false);

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Modal } from '@/components/ui/Modal';
-import { Button } from '@/components/ui/Button';
+import { Modal } from "@/components/ui/Modal";
+import { Button } from "@/components/ui/Button";
 
 interface DeleteConfirmModalProps {
   open: boolean;
@@ -23,8 +23,8 @@ export function DeleteConfirmModal({
   error,
   title,
   description,
-  submitLabel = 'Delete',
-  submitPendingLabel = 'Deleting…',
+  submitLabel = "Delete",
+  submitPendingLabel = "Deleting…",
 }: DeleteConfirmModalProps) {
   return (
     <Modal

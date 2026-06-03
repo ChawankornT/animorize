@@ -1,9 +1,9 @@
-import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
-import { createProviderRepository } from '@/repositories';
-import { listProviders } from '@/domain/usecases/ListProviders';
-import { buttonVariants } from '@/components/ui/button-variants';
-import { ProviderDeleteButton } from '@/components/admin/ProviderDeleteButton';
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import { createProviderRepository } from "@/repositories";
+import { listProviders } from "@/domain/usecases/ListProviders";
+import { buttonVariants } from "@/components/ui/button-variants";
+import { ProviderDeleteButton } from "@/components/admin/ProviderDeleteButton";
 
 export default async function ProvidersPage() {
   const supabase = await createClient();
@@ -15,17 +15,17 @@ export default async function ProvidersPage() {
         <div>
           <h1 className="text-2xl font-medium text-primary tracking-tight">Providers</h1>
           <p className="mt-1 text-sm text-secondary">
-            {providers.length} provider{providers.length !== 1 ? 's' : ''} configured
+            {providers.length} provider{providers.length !== 1 ? "s" : ""} configured
           </p>
         </div>
-        <Link href="/admin/providers/new" className={buttonVariants({ size: 'sm' })}>
+        <Link href="/admin/providers/new" className={buttonVariants({ size: "sm" })}>
           Add provider
         </Link>
       </div>
 
       {providers.length === 0 ? (
         <div className="py-16 text-center text-secondary text-sm border-[0.5px] border-default rounded-card">
-          No providers yet.{' '}
+          No providers yet.{" "}
           <Link
             href="/admin/providers/new"
             className="text-primary underline-offset-2 hover:underline"
@@ -38,7 +38,7 @@ export default async function ProvidersPage() {
           {providers.map((provider, i) => (
             <div
               key={provider.id}
-              className={`flex items-center gap-4 px-4 py-3.5 transition-colors duration-fast hover:bg-surface${i < providers.length - 1 ? ' border-b-[0.5px] border-default' : ''}`}
+              className={`flex items-center gap-4 px-4 py-3.5 transition-colors duration-fast hover:bg-surface${i < providers.length - 1 ? " border-b-[0.5px] border-default" : ""}`}
             >
               {/* Color chip */}
               <div
@@ -53,7 +53,7 @@ export default async function ProvidersPage() {
                   <span className="font-mono">{provider.slug}</span>
                   {provider.baseUrl && (
                     <span className="truncate max-w-[240px]">
-                      {provider.baseUrl.replace('https://', '')}
+                      {provider.baseUrl.replace("https://", "")}
                     </span>
                   )}
                   <span className="font-mono">{provider.color}</span>
@@ -64,7 +64,7 @@ export default async function ProvidersPage() {
               <div className="flex items-center gap-2 shrink-0">
                 <Link
                   href={`/admin/providers/${provider.id}/edit`}
-                  className={buttonVariants({ variant: 'secondary', size: 'sm' })}
+                  className={buttonVariants({ variant: "secondary", size: "sm" })}
                 >
                   Edit
                 </Link>

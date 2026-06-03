@@ -1,5 +1,5 @@
-import type { IFranchiseRepository } from '@/repositories/interfaces/IFranchiseRepository';
-import type { Franchise } from '@/domain/entities/Franchise';
+import type { IFranchiseRepository } from "@/repositories/interfaces/IFranchiseRepository";
+import type { Franchise } from "@/domain/entities/Franchise";
 
 /**
  * Returns all franchises, ordered by title_en.

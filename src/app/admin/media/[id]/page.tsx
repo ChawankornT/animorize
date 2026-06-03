@@ -1,46 +1,41 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import {
   createMediaRepository,
   createMediaProviderRepository,
   createProviderRepository,
   createSyncLogRepository,
-} from '@/repositories';
-import { getMedia } from '@/domain/usecases/GetMedia';
-import { listMediaProviders } from '@/domain/usecases/ListMediaProviders';
-import { listProviders } from '@/domain/usecases/ListProviders';
-import { listSyncLogs } from '@/domain/usecases/ListSyncLogs';
-import { getDisplayTitle } from '@/domain/entities/Media';
+} from "@/repositories";
+import { getMedia } from "@/domain/usecases/GetMedia";
+import { listMediaProviders } from "@/domain/usecases/ListMediaProviders";
+import { listProviders } from "@/domain/usecases/ListProviders";
+import { listSyncLogs } from "@/domain/usecases/ListSyncLogs";
+import { getDisplayTitle } from "@/domain/entities/Media";
 import {
   MEDIA_TYPE_LABELS,
   MEDIA_STATUS_VARIANT,
   SEASON_LABELS,
   TILE_COLORS,
-} from '@/constants/admin';
-import { Badge } from '@/components/ui/Badge';
-import { buttonVariants } from '@/components/ui/button-variants';
-import { MediaDeleteButton } from '@/components/admin/MediaDeleteButton';
-import { RetrySyncButton } from '@/components/admin/RetrySyncButton';
-import { AssignProviderForm } from '@/components/admin/AssignProviderForm';
-import { RemoveProviderButton } from '@/components/admin/RemoveProviderButton';
-
+} from "@/constants/admin";
+import { Badge } from "@/components/ui/Badge";
+import { buttonVariants } from "@/components/ui/button-variants";
+import { MediaDeleteButton } from "@/components/admin/MediaDeleteButton";
+import { RetrySyncButton } from "@/components/admin/RetrySyncButton";
+import { AssignProviderForm } from "@/components/admin/AssignProviderForm";
+import { RemoveProviderButton } from "@/components/admin/RemoveProviderButton";
 
 function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
+  if (!dateStr) return "—";
+  return new Date(dateStr).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
   });
 }
 
-export default async function MediaDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function MediaDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
 
@@ -74,7 +69,7 @@ export default async function MediaDetailPage({
       {/* Header actions */}
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-2xl font-medium text-primary tracking-tight">
-          {displayTitle || 'Untitled'}
+          {displayTitle || "Untitled"}
         </h1>
         <div className="flex items-center gap-2">
           {media.anilistId && (
@@ -87,7 +82,7 @@ export default async function MediaDetailPage({
           )}
           <Link
             href={`/admin/media/${id}/edit`}
-            className={buttonVariants({ variant: 'secondary', size: 'sm' })}
+            className={buttonVariants({ variant: "secondary", size: "sm" })}
           >
             Edit
           </Link>
@@ -105,7 +100,7 @@ export default async function MediaDetailPage({
           {media.posterUrl && (
             <Image
               src={media.posterUrl}
-              alt={displayTitle || ''}
+              alt={displayTitle || ""}
               fill
               className="object-cover"
               sizes="110px"
@@ -127,11 +122,18 @@ export default async function MediaDetailPage({
               {media.airingStatus}
             </Badge>
             {media.anilistId && <Badge>AniList #{media.anilistId}</Badge>}
-            {media.autoSync && <Badge variant="info" dot>Auto-sync</Badge>}
+            {media.autoSync && (
+              <Badge variant="info" dot>
+                Auto-sync
+              </Badge>
+            )}
           </div>
 
           {/* Metadata dl */}
-          <dl className="grid gap-x-3 gap-y-0.5 text-sm" style={{ gridTemplateColumns: '130px 1fr' }}>
+          <dl
+            className="grid gap-x-3 gap-y-0.5 text-sm"
+            style={{ gridTemplateColumns: "130px 1fr" }}
+          >
             {media.titleTh && (
               <>
                 <dt className="text-secondary">Thai title</dt>
@@ -151,7 +153,7 @@ export default async function MediaDetailPage({
               </>
             )}
             <dt className="text-secondary">Episodes</dt>
-            <dd className="text-primary">{media.totalEpisodes || '—'}</dd>
+            <dd className="text-primary">{media.totalEpisodes || "—"}</dd>
             {(media.seasonQuarter || media.seasonYear) && (
               <>
                 <dt className="text-secondary">Season</dt>
@@ -161,7 +163,7 @@ export default async function MediaDetailPage({
                     media.seasonYear,
                   ]
                     .filter(Boolean)
-                    .join(' ')}
+                    .join(" ")}
                 </dd>
               </>
             )}
@@ -170,14 +172,14 @@ export default async function MediaDetailPage({
                 <dt className="text-secondary">Air date</dt>
                 <dd className="text-primary">
                   {formatDate(media.airDateStart)}
-                  {media.airDateEnd ? ` – ${formatDate(media.airDateEnd)}` : ''}
+                  {media.airDateEnd ? ` – ${formatDate(media.airDateEnd)}` : ""}
                 </dd>
               </>
             )}
             {media.genres.length > 0 && (
               <>
                 <dt className="text-secondary">Genres</dt>
-                <dd className="text-primary">{media.genres.join(', ')}</dd>
+                <dd className="text-primary">{media.genres.join(", ")}</dd>
               </>
             )}
           </dl>
@@ -212,7 +214,7 @@ export default async function MediaDetailPage({
                 </tr>
               </thead>
               <tbody className="divide-y-[0.5px] divide-default">
-                {assignments.map((a) => (
+                {assignments.map(a => (
                   <tr key={a.id} className="hover:bg-surface transition-colors duration-fast">
                     <td className="px-4 py-2">
                       <div className="flex items-center gap-2">
@@ -226,15 +228,9 @@ export default async function MediaDetailPage({
                     <td className="px-4 py-2">
                       <Badge>{a.audio.toUpperCase()}</Badge>
                     </td>
-                    <td className="px-4 py-2 text-secondary text-xs">
-                      {a.baseUrl ?? '—'}
-                    </td>
+                    <td className="px-4 py-2 text-secondary text-xs">{a.baseUrl ?? "—"}</td>
                     <td className="px-4 py-2 text-right">
-                      <RemoveProviderButton
-                        id={a.id}
-                        mediaId={id}
-                        providerName={a.providerName}
-                      />
+                      <RemoveProviderButton id={a.id} mediaId={id} providerName={a.providerName} />
                     </td>
                   </tr>
                 ))}
@@ -269,19 +265,15 @@ export default async function MediaDetailPage({
                 </tr>
               </thead>
               <tbody className="divide-y-[0.5px] divide-default">
-                {syncLogs.map((log) => (
+                {syncLogs.map(log => (
                   <tr key={log.id}>
                     <td className="px-4 py-2">
-                      <Badge variant={log.result === 'success' ? 'success' : 'error'} dot>
+                      <Badge variant={log.result === "success" ? "success" : "error"} dot>
                         {log.result}
                       </Badge>
                     </td>
-                    <td className="px-4 py-2 text-secondary text-xs">
-                      {log.errorMessage ?? '—'}
-                    </td>
-                    <td className="px-4 py-2 text-secondary text-xs">
-                      {formatDate(log.syncedAt)}
-                    </td>
+                    <td className="px-4 py-2 text-secondary text-xs">{log.errorMessage ?? "—"}</td>
+                    <td className="px-4 py-2 text-secondary text-xs">{formatDate(log.syncedAt)}</td>
                   </tr>
                 ))}
               </tbody>

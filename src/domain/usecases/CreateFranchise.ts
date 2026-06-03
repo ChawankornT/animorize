@@ -1,5 +1,9 @@
-import type { IFranchiseRepository } from '@/repositories/interfaces/IFranchiseRepository';
-import { validateFranchise, type CreateFranchiseInput, type Franchise } from '@/domain/entities/Franchise';
+import type { IFranchiseRepository } from "@/repositories/interfaces/IFranchiseRepository";
+import {
+  validateFranchise,
+  type CreateFranchiseInput,
+  type Franchise,
+} from "@/domain/entities/Franchise";
 
 /**
  * Creates a new franchise (series grouping container).

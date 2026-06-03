@@ -1,4 +1,8 @@
-import type { Franchise, CreateFranchiseInput, UpdateFranchiseInput } from '@/domain/entities/Franchise';
+import type {
+  Franchise,
+  CreateFranchiseInput,
+  UpdateFranchiseInput,
+} from "@/domain/entities/Franchise";
 
 export interface IFranchiseRepository {
   findAll(options?: { search?: string }): Promise<Franchise[]>;

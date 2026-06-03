@@ -42,3 +42,6 @@ next-env.d.ts
 
 # claude
 CLAUDE.local.md
+
+# design bundle (extracted from Claude Design handoff)
+.design-bundle/
