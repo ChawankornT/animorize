@@ -5,6 +5,14 @@
 
 ---
 
+## [2026-06-03] Release: Phase 3 → main (PR #19)
+
+- **Code review** (high effort, 7 parallel angles) — 10 findings surfaced, 3 correctness bugs backlogged
+- **PR #19 merged** — `develop` → `main`, CI passed (guard + lint/typecheck/test + build)
+- **develop recreated** from main — clean history, no divergence
+
+---
+
 ## [2026-06-03] Code Review Fixes — 10 findings across Phase 3 codebase
 
 ### Domain

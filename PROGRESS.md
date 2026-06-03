@@ -17,8 +17,8 @@ claude_md_version: 2026-06-02-v1
 
 ## Current Phase
 
-- **Active:** Phase 3 — User Library & Dashboard
-- **Status:** Part 2c merged to develop (PR #18) ✅ + Prettier + Header pushed — Phase 3 Features complete
+- **Completed:** Phase 3 — User Library & Dashboard ✅ (released to `main` via PR #19, 2026-06-03)
+- **Next:** Phase 4 — Progress Tracking + Watchlog
 
 ## Phase 3 Progress
 
@@ -84,7 +84,7 @@ claude_md_version: 2026-06-02-v1
 - [x] Header — admin nav link with `internal` badge (query `profiles.role`), renamed "Dashboard" → "Library"
 - [x] DECISIONS.md — Phase 5 roadmap items (admin card shortcut, media search, extraLarge poster, filter/sort, motion); Phase 6 (admin pagination)
 
-### Code review fixes (on develop — not yet pushed)
+### Code review fixes (on develop ✅)
 
 - [x] `AddToLibraryModal` — hardcoded toast `"Already in your library."` for all errors → uses `result.message` (curated by action)
 - [x] `AddToLibraryModal` — no `.catch()` on data fetch → `try/catch/finally` with error toast + `setLoading(false)`
@@ -145,12 +145,11 @@ claude_md_version: 2026-06-02-v1
 
 | วันที่     | เปลี่ยนอะไร                                                                                                                                    | เปลี่ยนในไฟล์ไหน                                                                                                                                                                                                                                   |
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-03 | **Release: Phase 3 → main (PR #19)** — code review high effort (10 findings) + merge develop→main + recreate develop from main (clean history) | PR #19 merged; develop recreated from main                                                                                                                                                                                                         |
 | 2026-06-03 | fix: code review — 10 findings (toast, error handling, search safety, a11y, perf, typed errors, reason codes)                                  | AddToLibraryModal, FavoriteButton, LibraryView, Header, useToast, AddToLibrary usecase, userMedia actions, repos (UserMedia/Media/Franchise), mappers, search/page, IUserMediaRepository                                                           |
 | 2026-06-02 | feat: admin nav in Header + Prettier setup + roadmap Phase 5/6 items                                                                           | components/layout/Header.tsx, .prettierrc.json, .prettierignore, eslint.config.mjs, package.json, DECISIONS.md, src/\*_/_ (format)                                                                                                                 |
 | 2026-06-02 | feat(phase3): Part 2c — Library/Dashboard page (PR #18), Tabs+Empty DS, librarySort, DashboardEmpty, image quality 90, DECISIONS+CLAUDE reword | components/media/ (LibraryView, DashboardEmpty), components/ui/ (Tabs, Empty), app/(main)/dashboard/ (page, loading, error), lib/utils/librarySort, constants/userMedia, DECISIONS.md, CLAUDE.md                                                   |
 | 2026-06-01 | feat(phase3): Part 2b — Search + Add-to-library modal + TanStack Query (search) + sanitize helper + franchise backport                         | components/media/ (SearchView, AddToLibraryModal), components/providers/QueryProvider, app/(main)/search/, app/actions/userMedia.ts, domain/usecases/UpdateLibraryProvider, lib/supabase/sanitizeSearchTerm, repositories/ (interface+impl search) |
-| 2026-06-01 | feat(phase3): Part 2a — MediaCard (2 variants) + FavoriteButton (optimistic) + SetFavorite usecase + actions + Icon/ProviderBadge/StatusPill   | components/media/ (4 files), components/ui/Icon.tsx, constants/userMedia.ts, domain/usecases/SetFavorite.ts, app/actions/userMedia.ts, hooks/useToast.ts                                                                                           |
-| 2026-05-31 | docs: DECISIONS.md เพิ่ม "User-facing AniList Import — Deferred (post-Phase 7)" — ไอเดีย request queue + ต้องเคาะตอนเริ่ม                      | DECISIONS.md                                                                                                                                                                                                                                       |
 
 ## Blockers
 
@@ -225,9 +224,8 @@ claude_md_version: 2026-06-02-v1
 
 ### Git state (สำคัญ)
 
-- **develop** — มี Foundation (PR #14) + rules (PR #15) + Part 2a (PR #16) + Part 2b (PR #17) + Part 2c (PR #18) + Prettier + Header ✅ pushed
-- **main** — ยังเป็น reverted state (PR #13 Revert) — update เมื่อปิด phase เท่านั้น
-- **uncommitted** — code review fixes (15 files) — ยังไม่ push
+- **main** = **develop** — Phase 3 released (PR #19 merged 2026-06-03); develop recreated from main (clean history, no divergence)
+- ไม่มี uncommitted changes
 - Design bundle ล่าสุด (verified 2026-06-02): `https://api.anthropic.com/v1/design/h/5D8CVsBqRlaHcpRuEicJrw`
 
 ### Prettier (session 2026-06-02)
@@ -248,6 +246,16 @@ claude_md_version: 2026-06-02-v1
 - **Import flow**: fetchAnilistPreviewAction → saveImportAction — ห้าม auto-save
 - **src/constants/admin.ts** — `MEDIA_TYPE_LABELS`, `MEDIA_STATUS_VARIANT`, `SEASON_LABELS`, `TILE_COLORS`
 - **next/image host** — `s4.anilist.co` config อยู่แล้ว
+
+### Code review findings (session 2026-06-03 — high effort, 10 findings)
+
+Top 3 correctness findings (not yet fixed — backlog for Phase 5 or next fix round):
+
+1. **`AddToLibraryModal.handleSubmit` no try/catch** — network error → submitting stuck, no feedback
+2. **`FavoriteButton` startTransition no try/catch** — network error → optimistic state reverts silently, no toast
+3. **`AddToLibrary` TOCTOU race** — concurrent add → DB unique constraint catches it but returns wrong error reason ("error" instead of "duplicate")
+
+Other findings: Modal reinvents `<dialog>`, toast portal duplicated, sanitizeSearchTerm strips instead of escapes, favorites tab inline filter not memoized, auth boilerplate repeated 6x, redundant server/client count computation, sort has no stable tiebreaker
 
 ### Misc
 
