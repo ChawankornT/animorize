@@ -12,13 +12,13 @@
 
 A tool for tracking anime, series, movies, OVAs, and specials — replacing the messy Excel spreadsheets fans use to remember what they watched, where they watched it, and which episode they're on.
 
-| Field | Value |
-|---|---|
-| Name (wordmark) | `animorize` — always lowercase |
-| Name (running text) | `Animorize` — capitalized as a proper noun, sentence case |
-| Audience | Anime fans, age 18–35, who watch enough to need organization. People who pay for Notion. |
-| Tone | Quiet, organized, slightly playful. Closer to Notion or Linear than to MyAnimeList. |
-| Don't be | Crunchyroll, Funimation, anything shouty, anime mascot. |
+| Field               | Value                                                                                    |
+| ------------------- | ---------------------------------------------------------------------------------------- |
+| Name (wordmark)     | `animorize` — always lowercase                                                           |
+| Name (running text) | `Animorize` — capitalized as a proper noun, sentence case                                |
+| Audience            | Anime fans, age 18–35, who watch enough to need organization. People who pay for Notion. |
+| Tone                | Quiet, organized, slightly playful. Closer to Notion or Linear than to MyAnimeList.      |
+| Don't be            | Crunchyroll, Funimation, anything shouty, anime mascot.                                  |
 
 ---
 
@@ -61,16 +61,27 @@ ViewBox `0 0 100 160`. Four points connected by concave cubic-bezier curves towa
 Render the "i" as the dotless U+0131 character (`ı`) and absolutely position the sparkle SVG above it. This keeps placement perfect at any size and survives font fallback.
 
 ```html
-<span class="wordmark">an<span class="i-slot">ı<svg class="sparkle">…</svg></span>morize</span>
+<span class="wordmark"
+  >an<span class="i-slot">ı<svg class="sparkle">…</svg></span>morize</span
+>
 ```
 
 ```css
-.wordmark { font: 500 56px/1 'Inter'; letter-spacing: -0.02em; }
-.wordmark .i-slot { position: relative; display: inline-block; }
+.wordmark {
+  font: 500 56px/1 "Inter";
+  letter-spacing: -0.02em;
+}
+.wordmark .i-slot {
+  position: relative;
+  display: inline-block;
+}
 .wordmark .sparkle {
-  position: absolute; left: 50%; bottom: 0.72em;
+  position: absolute;
+  left: 50%;
+  bottom: 0.72em;
   transform: translateX(-50%);
-  height: 0.42em; width: auto;
+  height: 0.42em;
+  width: auto;
 }
 ```
 
@@ -83,14 +94,14 @@ Render the "i" as the dotless U+0131 character (`ı`) and absolutely position th
 
 ### 2.6 Color treatments
 
-| Treatment | Background | Wordmark/stem | Sparkle |
-|---|---|---|---|
-| **Primary (light)** | paper | ink | accent |
-| **Primary (dark)** | ink | paper | accent |
-| Mono dark | ink | paper | paper |
-| Mono light | paper | ink | ink |
-| Accent fill | accent | paper | paper |
-| Outline | paper | ink (1.5px stroked, transparent fill) | ink |
+| Treatment           | Background | Wordmark/stem                         | Sparkle |
+| ------------------- | ---------- | ------------------------------------- | ------- |
+| **Primary (light)** | paper      | ink                                   | accent  |
+| **Primary (dark)**  | ink        | paper                                 | accent  |
+| Mono dark           | ink        | paper                                 | paper   |
+| Mono light          | paper      | ink                                   | ink     |
+| Accent fill         | accent     | paper                                 | paper   |
+| Outline             | paper      | ink (1.5px stroked, transparent fill) | ink     |
 
 ### 2.7 Clear space
 
@@ -114,36 +125,36 @@ Minimal 2-color brand system. Status colors live in the UI layer (Section 7).
 
 ### 3.1 Brand colors
 
-| Token | Hex | Usage |
-|---|---|---|
-| `color-ink` | `#0F0F0F` | Primary text, logo on dark, icons |
-| `color-ink-2` | `#1A1A1A` | Page background (dark mode) |
-| `color-soft-dark` | `#222222` | Surface (dark mode) |
-| `color-paper` | `#FFFFFF` | Page background (light mode) |
-| `color-soft` | `#F5F4EF` | Surface, cards, secondary background (light mode) |
-| `color-accent` | `#D4537E` | **Sparkle only.** Favorites, brand presence. Nothing else. |
+| Token             | Hex       | Usage                                                      |
+| ----------------- | --------- | ---------------------------------------------------------- |
+| `color-ink`       | `#0F0F0F` | Primary text, logo on dark, icons                          |
+| `color-ink-2`     | `#1A1A1A` | Page background (dark mode)                                |
+| `color-soft-dark` | `#222222` | Surface (dark mode)                                        |
+| `color-paper`     | `#FFFFFF` | Page background (light mode)                               |
+| `color-soft`      | `#F5F4EF` | Surface, cards, secondary background (light mode)          |
+| `color-accent`    | `#D4537E` | **Sparkle only.** Favorites, brand presence. Nothing else. |
 
 ### 3.2 Accent rule
 
-The pink accent `#D4537E` is the *only* chromatic color in the brand. It signals: favorites, sparkle, brand presence. It does **not** signal: primary buttons, links, errors, hover states, focus rings, success, anything routine. **Save it.**
+The pink accent `#D4537E` is the _only_ chromatic color in the brand. It signals: favorites, sparkle, brand presence. It does **not** signal: primary buttons, links, errors, hover states, focus rings, success, anything routine. **Save it.**
 
 ### 3.3 Semantic colors — light mode
 
-| Token | Value | Where it lives |
-|---|---|---|
-| `bg-page` | `#FFFFFF` | `<html>` and `<body>` |
-| `bg-surface` | `#F5F4EF` | Cards, modals, popovers, sidebar |
-| `bg-surface-2` | `#EEEDE7` | Progress track, skeleton base, table stripes |
-| `bg-overlay` | `rgba(15,15,15,0.50)` | Modal backdrop |
-| `text-primary` | `#0F0F0F` | Body, headings |
-| `text-secondary` | `rgba(15,15,15,0.65)` | Descriptions, captions |
-| `text-tertiary` | `rgba(15,15,15,0.45)` | Meta, labels, placeholders |
-| `text-disabled` | `rgba(15,15,15,0.25)` | Disabled controls |
-| `text-inverse` | `#FFFFFF` | Text on primary buttons / ink surfaces |
-| `border-subtle` | `rgba(0,0,0,0.06)` | Dividers between rows |
-| `border-default` | `rgba(0,0,0,0.08)` | Default 0.5px hairline (cards, inputs, all surfaces) |
-| `border-strong` | `rgba(0,0,0,0.16)` | Hover state, secondary button outline |
-| `border-focus` | `rgba(15,15,15,0.55)` | Focus rings |
+| Token            | Value                 | Where it lives                                       |
+| ---------------- | --------------------- | ---------------------------------------------------- |
+| `bg-page`        | `#FFFFFF`             | `<html>` and `<body>`                                |
+| `bg-surface`     | `#F5F4EF`             | Cards, modals, popovers, sidebar                     |
+| `bg-surface-2`   | `#EEEDE7`             | Progress track, skeleton base, table stripes         |
+| `bg-overlay`     | `rgba(15,15,15,0.50)` | Modal backdrop                                       |
+| `text-primary`   | `#0F0F0F`             | Body, headings                                       |
+| `text-secondary` | `rgba(15,15,15,0.65)` | Descriptions, captions                               |
+| `text-tertiary`  | `rgba(15,15,15,0.45)` | Meta, labels, placeholders                           |
+| `text-disabled`  | `rgba(15,15,15,0.25)` | Disabled controls                                    |
+| `text-inverse`   | `#FFFFFF`             | Text on primary buttons / ink surfaces               |
+| `border-subtle`  | `rgba(0,0,0,0.06)`    | Dividers between rows                                |
+| `border-default` | `rgba(0,0,0,0.08)`    | Default 0.5px hairline (cards, inputs, all surfaces) |
+| `border-strong`  | `rgba(0,0,0,0.16)`    | Hover state, secondary button outline                |
+| `border-focus`   | `rgba(15,15,15,0.55)` | Focus rings                                          |
 
 ### 3.4 Provider colors
 
@@ -168,31 +179,31 @@ Dark mode is **required**, with **1 : 1 parity** for every component. Toggled vi
 
 ### 4.1 Dark mode color mappings
 
-| Token | Light | Dark |
-|---|---|---|
-| `bg-page` | `#FFFFFF` | `#1A1A1A` |
-| `bg-surface` | `#F5F4EF` | `#222222` |
-| `bg-surface-2` | `#EEEDE7` | `#2A2A2A` |
-| `bg-overlay` | `rgba(15,15,15,0.50)` | `rgba(0,0,0,0.60)` |
-| `bg-skeleton` | `rgba(15,15,15,0.06)` | `rgba(255,255,255,0.05)` |
-| `bg-skeleton-2` | `rgba(15,15,15,0.10)` | `rgba(255,255,255,0.09)` |
-| `text-primary` | `#0F0F0F` | `#F5F4EF` |
-| `text-secondary` | `rgba(15,15,15,0.65)` | `rgba(245,244,239,0.65)` |
-| `text-tertiary` | `rgba(15,15,15,0.45)` | `rgba(245,244,239,0.45)` |
-| `text-disabled` | `rgba(15,15,15,0.25)` | `rgba(245,244,239,0.25)` |
-| `text-inverse` | `#FFFFFF` | `#0F0F0F` |
-| `border-subtle` | `rgba(0,0,0,0.06)` | `rgba(255,255,255,0.06)` |
-| `border-default` | `rgba(0,0,0,0.08)` | `rgba(255,255,255,0.10)` |
-| `border-strong` | `rgba(0,0,0,0.16)` | `rgba(255,255,255,0.18)` |
-| `border-focus` | `rgba(15,15,15,0.55)` | `rgba(245,244,239,0.55)` |
-| `status-success` | `#2F8A5C` | `#4FB07F` |
-| `status-success-bg` | `#E8F2EC` | `rgba(79,176,127,0.14)` |
-| `status-warning` | `#B45309` | `#D7873A` |
-| `status-warning-bg` | `#FBF1E5` | `rgba(215,135,58,0.14)` |
-| `status-error` | `#C53030` | `#E25555` |
-| `status-error-bg` | `#FBE9E9` | `rgba(226,85,85,0.14)` |
-| `status-info` | `#1F6FEB` | `#5589F0` |
-| `status-info-bg` | `#E8EFFC` | `rgba(85,137,240,0.14)` |
+| Token               | Light                 | Dark                     |
+| ------------------- | --------------------- | ------------------------ |
+| `bg-page`           | `#FFFFFF`             | `#1A1A1A`                |
+| `bg-surface`        | `#F5F4EF`             | `#222222`                |
+| `bg-surface-2`      | `#EEEDE7`             | `#2A2A2A`                |
+| `bg-overlay`        | `rgba(15,15,15,0.50)` | `rgba(0,0,0,0.60)`       |
+| `bg-skeleton`       | `rgba(15,15,15,0.06)` | `rgba(255,255,255,0.05)` |
+| `bg-skeleton-2`     | `rgba(15,15,15,0.10)` | `rgba(255,255,255,0.09)` |
+| `text-primary`      | `#0F0F0F`             | `#F5F4EF`                |
+| `text-secondary`    | `rgba(15,15,15,0.65)` | `rgba(245,244,239,0.65)` |
+| `text-tertiary`     | `rgba(15,15,15,0.45)` | `rgba(245,244,239,0.45)` |
+| `text-disabled`     | `rgba(15,15,15,0.25)` | `rgba(245,244,239,0.25)` |
+| `text-inverse`      | `#FFFFFF`             | `#0F0F0F`                |
+| `border-subtle`     | `rgba(0,0,0,0.06)`    | `rgba(255,255,255,0.06)` |
+| `border-default`    | `rgba(0,0,0,0.08)`    | `rgba(255,255,255,0.10)` |
+| `border-strong`     | `rgba(0,0,0,0.16)`    | `rgba(255,255,255,0.18)` |
+| `border-focus`      | `rgba(15,15,15,0.55)` | `rgba(245,244,239,0.55)` |
+| `status-success`    | `#2F8A5C`             | `#4FB07F`                |
+| `status-success-bg` | `#E8F2EC`             | `rgba(79,176,127,0.14)`  |
+| `status-warning`    | `#B45309`             | `#D7873A`                |
+| `status-warning-bg` | `#FBF1E5`             | `rgba(215,135,58,0.14)`  |
+| `status-error`      | `#C53030`             | `#E25555`                |
+| `status-error-bg`   | `#FBE9E9`             | `rgba(226,85,85,0.14)`   |
+| `status-info`       | `#1F6FEB`             | `#5589F0`                |
+| `status-info-bg`    | `#E8EFFC`             | `rgba(85,137,240,0.14)`  |
 
 ### 4.2 What stays the same across modes
 
@@ -216,22 +227,27 @@ Dark mode is **required**, with **1 : 1 parity** for every component. Toggled vi
 **Inter** — final choice. One family across the entire surface, both the wordmark and the UI. Weights **400** and **500** only. No 700, no italic, no display face.
 
 ```css
-font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+font-family:
+  "Inter",
+  ui-sans-serif,
+  system-ui,
+  -apple-system,
+  sans-serif;
 ```
 
 ### 5.2 Type scale
 
-| Token | Size | Line-height | Weight | Letter-spacing | Use |
-|---|---|---|---|---|---|
-| `font-size-5xl` | **40px** | 1.05 | 500 | -0.025em | Marketing hero h1, page heroes |
-| `font-size-4xl` | **32px** | 1.1 | 500 | -0.02em | Page titles (h1 in app) |
-| `font-size-3xl` | **24px** | 1.2 | 500 | -0.015em | Section titles (h2) |
-| `font-size-2xl` | **20px** | 1.25 | 500 | -0.01em | Subsection (h3) |
-| `font-size-xl` | **17px** | 1.3 | 500 | -0.005em | Card titles, modal titles (h4) |
-| `font-size-lg` | **15px** | 1.55 | 400 | 0 | Long-form body, modal body |
-| `font-size-md` | **14px** | 1.6 | 400 | 0 | Default body, descriptions |
-| `font-size-sm` | **13px** | 1.4 | 500 | 0 | UI labels, tabs, button text |
-| `font-size-xs` | **12px** | 1.4 | 400 | 0 | Meta, captions, hints |
+| Token           | Size     | Line-height | Weight | Letter-spacing | Use                            |
+| --------------- | -------- | ----------- | ------ | -------------- | ------------------------------ |
+| `font-size-5xl` | **40px** | 1.05        | 500    | -0.025em       | Marketing hero h1, page heroes |
+| `font-size-4xl` | **32px** | 1.1         | 500    | -0.02em        | Page titles (h1 in app)        |
+| `font-size-3xl` | **24px** | 1.2         | 500    | -0.015em       | Section titles (h2)            |
+| `font-size-2xl` | **20px** | 1.25        | 500    | -0.01em        | Subsection (h3)                |
+| `font-size-xl`  | **17px** | 1.3         | 500    | -0.005em       | Card titles, modal titles (h4) |
+| `font-size-lg`  | **15px** | 1.55        | 400    | 0              | Long-form body, modal body     |
+| `font-size-md`  | **14px** | 1.6         | 400    | 0              | Default body, descriptions     |
+| `font-size-sm`  | **13px** | 1.4         | 500    | 0              | UI labels, tabs, button text   |
+| `font-size-xs`  | **12px** | 1.4         | 400    | 0              | Meta, captions, hints          |
 
 ### 5.3 Case
 
@@ -250,14 +266,14 @@ font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
 
 8px base unit. **Stick to the scale.** No half-steps, no 10px, no 18px.
 
-| Token | Value |
-|---|---|
-| `space-1` | **4px** |
-| `space-2` | **8px** |
-| `space-3` | **12px** |
-| `space-4` | **16px** |
-| `space-6` | **24px** |
-| `space-8` | **32px** |
+| Token      | Value    |
+| ---------- | -------- |
+| `space-1`  | **4px**  |
+| `space-2`  | **8px**  |
+| `space-3`  | **12px** |
+| `space-4`  | **16px** |
+| `space-6`  | **24px** |
+| `space-8`  | **32px** |
 | `space-12` | **48px** |
 | `space-16` | **64px** |
 
@@ -269,12 +285,12 @@ Marketing sections use **96px** vertical padding (3× `space-8`). App page paddi
 
 Status colors live in the **UI layer**, not the brand layer. They communicate state, never identity.
 
-| Status | FG (light) | BG (light) | FG (dark) | BG (dark) |
-|---|---|---|---|---|
-| Success | `#2F8A5C` | `#E8F2EC` | `#4FB07F` | `rgba(79,176,127,0.14)` |
-| Warning | `#B45309` | `#FBF1E5` | `#D7873A` | `rgba(215,135,58,0.14)` |
-| Error | `#C53030` | `#FBE9E9` | `#E25555` | `rgba(226,85,85,0.14)` |
-| Info | `#1F6FEB` | `#E8EFFC` | `#5589F0` | `rgba(85,137,240,0.14)` |
+| Status  | FG (light) | BG (light) | FG (dark) | BG (dark)               |
+| ------- | ---------- | ---------- | --------- | ----------------------- |
+| Success | `#2F8A5C`  | `#E8F2EC`  | `#4FB07F` | `rgba(79,176,127,0.14)` |
+| Warning | `#B45309`  | `#FBF1E5`  | `#D7873A` | `rgba(215,135,58,0.14)` |
+| Error   | `#C53030`  | `#FBE9E9`  | `#E25555` | `rgba(226,85,85,0.14)`  |
+| Info    | `#1F6FEB`  | `#E8EFFC`  | `#5589F0` | `rgba(85,137,240,0.14)` |
 
 **Usage:** Badges (`watching` = success, `dropped` = error), Toasts, form-field errors, sync-log rows. Never use these colors for branding, links, or buttons.
 
@@ -284,22 +300,22 @@ Status colors live in the **UI layer**, not the brand layer. They communicate st
 
 ### 8.1 Border widths
 
-| Token | Value | Use |
-|---|---|---|
+| Token           | Value     | Use                                                        |
+| --------------- | --------- | ---------------------------------------------------------- |
 | `border-w-hair` | **0.5px** | Default for all surfaces (cards, inputs, tables, dividers) |
-| `border-w-1` | **1px** | Secondary-button outline emphasis |
-| `border-w-icon` | **1.5px** | Outline icon stroke |
+| `border-w-1`    | **1px**   | Secondary-button outline emphasis                          |
+| `border-w-icon` | **1.5px** | Outline icon stroke                                        |
 
 ### 8.2 Radii
 
-| Token | Value | Use |
-|---|---|---|
-| `radius-input` | **8px** | Inputs, selects, textareas |
-| `radius-button` | **8px** | All buttons |
-| `radius-card` | **12px** | Cards, popovers, library tiles |
-| `radius-modal` | **16px** | Modals |
-| `radius-pill` | **999px** | Badges, theme toggle, avatar, progress track |
-| `radius-app-icon` | **18%** | iOS-style app icon |
+| Token             | Value     | Use                                          |
+| ----------------- | --------- | -------------------------------------------- |
+| `radius-input`    | **8px**   | Inputs, selects, textareas                   |
+| `radius-button`   | **8px**   | All buttons                                  |
+| `radius-card`     | **12px**  | Cards, popovers, library tiles               |
+| `radius-modal`    | **16px**  | Modals                                       |
+| `radius-pill`     | **999px** | Badges, theme toggle, avatar, progress track |
+| `radius-app-icon` | **18%**   | iOS-style app icon                           |
 
 ### 8.3 Shadows: none
 
@@ -326,95 +342,97 @@ Each component below uses the tokens above. Heights, paddings, and radii are exa
 
 ### 10.1 Button
 
-| Variant | Background | Border | Text | Use |
-|---|---|---|---|---|
-| `primary` | `text-primary` | none | `text-inverse` | Main action (Add, Save, Start tracking) |
-| `secondary` | `bg-page` | `0.5px border-strong` | `text-primary` | Cancel, alt action |
-| `ghost` | transparent | none | `text-primary` | Tertiary action, icon buttons |
-| `destructive` | `bg-page` | `0.5px border-strong` | `status-error` | Remove, delete |
+| Variant       | Background     | Border                | Text           | Use                                     |
+| ------------- | -------------- | --------------------- | -------------- | --------------------------------------- |
+| `primary`     | `text-primary` | none                  | `text-inverse` | Main action (Add, Save, Start tracking) |
+| `secondary`   | `bg-page`      | `0.5px border-strong` | `text-primary` | Cancel, alt action                      |
+| `ghost`       | transparent    | none                  | `text-primary` | Tertiary action, icon buttons           |
+| `destructive` | `bg-page`      | `0.5px border-strong` | `status-error` | Remove, delete                          |
 
 **Never** color a button with `color-accent`. Pink is not for actions.
 
-| Size | Height | Padding-x | Font-size | Gap |
-|---|---|---|---|---|
-| `sm` | 28px | 10px | 13px | 6px |
-| `md` (default) | 34px | 14px | 14px | 8px |
-| `lg` | 42px | 18px | 15px | 8px |
-| Marketing hero | 44px | 20px | 15px | 8px |
+| Size           | Height | Padding-x | Font-size | Gap | Use                                               |
+| -------------- | ------ | --------- | --------- | --- | ------------------------------------------------- |
+| `xs`           | 22px   | 8px       | 12px      | 4px | Compact inline (search-result Add, dense actions) |
+| `sm`           | 28px   | 10px      | 13px      | 6px | Dense (toolbar, table row, footer, nav)           |
+| `md` (default) | 34px   | 14px      | 14px      | 8px | Page-header / standalone primary                  |
+| `lg`           | 42px   | 18px      | 15px      | 8px | Hero / marketing                                  |
+| Marketing hero | 44px   | 20px      | 15px      | 8px | Landing page only                                 |
 
 - **Radius:** 8px (button), 10px (marketing hero only)
 - **Hairline:** 0.5px on `secondary` / `destructive`. Primary has no border.
 - **Icon-only:** square; width = height.
 - **Focus:** 2px outline using `border-focus` with 2px offset.
+- **Icons:** use `<Icon>` wrapper, default `size={15}` (xs = 12). Icon is the first child; gap comes from size token.
 
 ### 10.2 Input / Select / Textarea / Search
 
-| Property | Value |
-|---|---|
-| Height (text/select) | **36px** |
-| Padding-x | **12px** |
-| Background | `bg-page` |
-| Border | `0.5px solid border-default` |
-| Hover border | `border-strong` |
-| Focus border | `text-primary` (single hairline, no ring) |
-| Error border | `status-error` |
-| Radius | **8px** |
-| Font-size | **14px** |
-| Placeholder color | `text-tertiary` |
-| Textarea padding | `10px 12px`, min-height 64px |
-| Field label | 13px / 500 / `text-secondary` |
-| Field hint | 12px / 400 / `text-tertiary` |
+| Property             | Value                                     |
+| -------------------- | ----------------------------------------- |
+| Height (text/select) | **36px**                                  |
+| Padding-x            | **12px**                                  |
+| Background           | `bg-page`                                 |
+| Border               | `0.5px solid border-default`              |
+| Hover border         | `border-strong`                           |
+| Focus border         | `text-primary` (single hairline, no ring) |
+| Error border         | `status-error`                            |
+| Radius               | **8px**                                   |
+| Font-size            | **14px**                                  |
+| Placeholder color    | `text-tertiary`                           |
+| Textarea padding     | `10px 12px`, min-height 64px              |
+| Field label          | 13px / 500 / `text-secondary`             |
+| Field hint           | 12px / 400 / `text-tertiary`              |
 
 ### 10.3 Card
 
-| Property | Value |
-|---|---|
-| Background | `bg-page` (default) or `bg-surface` (`surface` variant) |
-| Border | `0.5px solid border-default` |
-| Radius | **12px** |
-| Padding | **16px 20px** (minimum) |
-| Hover (interactive) | border → `border-strong` |
-| Title | 17px / 500 / `text-primary` |
-| Body | 14px / 400 / `text-secondary`, line-height 1.6 |
-| Actions row | 8px gap, top margin 8px |
+| Property            | Value                                                   |
+| ------------------- | ------------------------------------------------------- |
+| Background          | `bg-page` (default) or `bg-surface` (`surface` variant) |
+| Border              | `0.5px solid border-default`                            |
+| Radius              | **12px**                                                |
+| Padding             | **16px 20px** (minimum)                                 |
+| Hover (interactive) | border → `border-strong`                                |
+| Title               | 17px / 500 / `text-primary`                             |
+| Body                | 14px / 400 / `text-secondary`, line-height 1.6          |
+| Actions row         | 8px gap, top margin 8px                                 |
 
 ### 10.4 Media card (library tile)
 
-| Property | Value |
-|---|---|
-| Container border | `0.5px solid border-default`, radius 12px |
-| Poster aspect ratio | **16:10** (compact list view) or **2:3** (detail page poster) |
-| Poster gradient | bottom 70%, `linear-gradient(180deg, transparent, rgba(0,0,0,0.55))` |
-| Fav button | absolute, 8/8 top-right, 26×26 circle, `rgba(15,15,15,0.55)` bg |
-| +1 ep button | absolute, 8/8 bottom-right, 24px height, `rgba(255,255,255,0.95)` bg, pill |
-| Meta padding | `10px 12px 12px` |
-| Title (meta) | 14px / 500, truncated single line |
-| Provider badge | inline, swatch only |
-| Progress bar | 3px, `bg-surface-2` track, `text-primary` fill |
+| Property            | Value                                                                      |
+| ------------------- | -------------------------------------------------------------------------- |
+| Container border    | `0.5px solid border-default`, radius 12px                                  |
+| Poster aspect ratio | **16:10** (compact list view) or **2:3** (detail page poster)              |
+| Poster gradient     | bottom 70%, `linear-gradient(180deg, transparent, rgba(0,0,0,0.55))`       |
+| Fav button          | absolute, 8/8 top-right, 26×26 circle, `rgba(15,15,15,0.55)` bg            |
+| +1 ep button        | absolute, 8/8 bottom-right, 24px height, `rgba(255,255,255,0.95)` bg, pill |
+| Meta padding        | `10px 12px 12px`                                                           |
+| Title (meta)        | 14px / 500, truncated single line                                          |
+| Provider badge      | inline, swatch only                                                        |
+| Progress bar        | 3px, `bg-surface-2` track, `text-primary` fill                             |
 
 ### 10.5 Badge
 
-| Property | Value |
-|---|---|
-| Height | **20px** (default), **18px** (count) |
-| Padding-x | 8px |
-| Radius | 999px (pill) |
-| Font-size | 12px |
-| Weight | 500 |
-| Border | `0.5px solid border-default` (default), transparent (status & count) |
-| Status BG | `status-{kind}-bg`, text = `status-{kind}` |
-| Count BG | `text-primary`, text = `text-inverse` |
-| Dot | 6×6 circle, `currentColor` |
-| Provider | swatch 8×8 with 2px radius + plain text; no fill |
+| Property  | Value                                                                |
+| --------- | -------------------------------------------------------------------- |
+| Height    | **20px** (default), **18px** (count)                                 |
+| Padding-x | 8px                                                                  |
+| Radius    | 999px (pill)                                                         |
+| Font-size | 12px                                                                 |
+| Weight    | 500                                                                  |
+| Border    | `0.5px solid border-default` (default), transparent (status & count) |
+| Status BG | `status-{kind}-bg`, text = `status-{kind}`                           |
+| Count BG  | `text-primary`, text = `text-inverse`                                |
+| Dot       | 6×6 circle, `currentColor`                                           |
+| Provider  | swatch 8×8 with 2px radius + plain text; no fill                     |
 
 ### 10.6 Avatar
 
 | Size | Diameter | Font-size |
-|---|---|---|
-| `xs` | 20px | 10px |
-| `sm` | 28px | 12px |
-| `md` | 36px | 13px |
-| `lg` | 48px | 16px |
+| ---- | -------- | --------- |
+| `xs` | 20px     | 10px      |
+| `sm` | 28px     | 12px      |
+| `md` | 36px     | 13px      |
+| `lg` | 48px     | 16px      |
 
 - Background: `bg-surface`. Border: `0.5px solid border-default`. Radius: 999px.
 - Initials: up to 2 letters, lowercase, weight 500.
@@ -445,17 +463,17 @@ Each component below uses the tokens above. Heights, paddings, and radii are exa
 
 ### 10.10 Modal
 
-| Property | Value |
-|---|---|
-| Backdrop | `bg-overlay` (no blur) |
-| Background | `bg-page` |
-| Border | `0.5px solid border-default` |
-| Radius | **16px** |
-| Width | `min(420px, calc(100% - 32px))` |
-| Padding | 24px |
-| Title | 17px / 500 / -0.02em |
-| Body | 14px / 400 / `text-secondary` / 1.6 |
-| Actions | right-aligned, 8px gap |
+| Property   | Value                               |
+| ---------- | ----------------------------------- |
+| Backdrop   | `bg-overlay` (no blur)              |
+| Background | `bg-page`                           |
+| Border     | `0.5px solid border-default`        |
+| Radius     | **16px**                            |
+| Width      | `min(420px, calc(100% - 32px))`     |
+| Padding    | 24px                                |
+| Title      | 17px / 500 / -0.02em                |
+| Body       | 14px / 400 / `text-secondary` / 1.6 |
+| Actions    | right-aligned, 8px gap              |
 
 ### 10.11 Popover
 
@@ -468,18 +486,18 @@ Each component below uses the tokens above. Heights, paddings, and radii are exa
 
 ### 10.12 Toast
 
-| Property | Value |
-|---|---|
-| Background | `bg-page` |
-| Border | `0.5px solid border-default` |
-| Radius | 12px |
-| Padding | 12px 14px |
-| Min width | 280px |
-| Max width | 360px |
-| Title | 14px / 500 |
-| Description | 13px / 400 / `text-secondary` |
-| Status icon color | `status-{variant}` |
-| No emoji, ever |
+| Property          | Value                         |
+| ----------------- | ----------------------------- |
+| Background        | `bg-page`                     |
+| Border            | `0.5px solid border-default`  |
+| Radius            | 12px                          |
+| Padding           | 12px 14px                     |
+| Min width         | 280px                         |
+| Max width         | 360px                         |
+| Title             | 14px / 500                    |
+| Description       | 13px / 400 / `text-secondary` |
+| Status icon color | `status-{variant}`            |
+| No emoji, ever    |
 
 ### 10.13 Progress
 
@@ -515,12 +533,12 @@ Each component below uses the tokens above. Heights, paddings, and radii are exa
 
 ## 11 · Motion
 
-| Token | Value | Use |
-|---|---|---|
-| `duration-fast` | **120ms** | Color and border transitions (hover, focus) |
-| `duration-base` | **180ms** | Default for most state changes |
-| `duration-slow` | **240ms** | Progress bar fill, larger layout movement |
-| `ease-out` | `cubic-bezier(0.16, 1, 0.3, 1)` | The only easing curve. Used everywhere. |
+| Token           | Value                           | Use                                         |
+| --------------- | ------------------------------- | ------------------------------------------- |
+| `duration-fast` | **120ms**                       | Color and border transitions (hover, focus) |
+| `duration-base` | **180ms**                       | Default for most state changes              |
+| `duration-slow` | **240ms**                       | Progress bar fill, larger layout movement   |
+| `ease-out`      | `cubic-bezier(0.16, 1, 0.3, 1)` | The only easing curve. Used everywhere.     |
 
 ### Hover
 
@@ -548,17 +566,17 @@ Respect `prefers-reduced-motion: reduce`. Cut all animations to a 0–120ms fade
 - Direct, short, conversational.
 - **Sentence case** everywhere.
 - **No exclamation marks** in routine UI. Reserve for genuine celebration moments (rare).
-- **No emoji** in product copy. (Marketing copy may include emoji *only* when quoting a user.)
-- Use first person when speaking *as* the product: "we'll sync your list nightly."
+- **No emoji** in product copy. (Marketing copy may include emoji _only_ when quoting a user.)
+- Use first person when speaking _as_ the product: "we'll sync your list nightly."
 
 ### Pattern examples
 
-| Don't | Do |
-|---|---|
-| Add To Your Library! | Add to library |
-| 12/24 episodes watched 🎉 | Episode 12 of 24 |
-| All caught up! Yay! | You're up to date |
-| Sign Up Free Today! | Start tracking |
+| Don't                      | Do                                                                         |
+| -------------------------- | -------------------------------------------------------------------------- |
+| Add To Your Library!       | Add to library                                                             |
+| 12/24 episodes watched 🎉  | Episode 12 of 24                                                           |
+| All caught up! Yay!        | You're up to date                                                          |
+| Sign Up Free Today!        | Start tracking                                                             |
 | Premium Anime Tracking App | A quiet, fast tool for the watch list you've been keeping in a spreadsheet |
 
 ---
@@ -578,85 +596,85 @@ Paste this into `tokens.css` and import once at the top of the app.
 ```css
 :root {
   /* Brand (raw) */
-  --color-ink:        #0F0F0F;
-  --color-ink-2:      #1A1A1A;
-  --color-soft-dark:  #222222;
-  --color-paper:      #FFFFFF;
-  --color-soft:       #F5F4EF;
-  --color-accent:     #D4537E;   /* sparkle / favorites / brand presence ONLY */
+  --color-ink: #0f0f0f;
+  --color-ink-2: #1a1a1a;
+  --color-soft-dark: #222222;
+  --color-paper: #ffffff;
+  --color-soft: #f5f4ef;
+  --color-accent: #d4537e; /* sparkle / favorites / brand presence ONLY */
 
   /* Semantic — light mode */
-  --bg-page:          var(--color-paper);
-  --bg-surface:       var(--color-soft);
-  --bg-surface-2:     #EEEDE7;
-  --bg-overlay:       rgba(15, 15, 15, 0.50);
-  --bg-skeleton:      rgba(15, 15, 15, 0.06);
-  --bg-skeleton-2:    rgba(15, 15, 15, 0.10);
+  --bg-page: var(--color-paper);
+  --bg-surface: var(--color-soft);
+  --bg-surface-2: #eeede7;
+  --bg-overlay: rgba(15, 15, 15, 0.5);
+  --bg-skeleton: rgba(15, 15, 15, 0.06);
+  --bg-skeleton-2: rgba(15, 15, 15, 0.1);
 
-  --text-primary:     var(--color-ink);
-  --text-secondary:   rgba(15, 15, 15, 0.65);
-  --text-tertiary:    rgba(15, 15, 15, 0.45);
-  --text-disabled:    rgba(15, 15, 15, 0.25);
-  --text-inverse:     var(--color-paper);
+  --text-primary: var(--color-ink);
+  --text-secondary: rgba(15, 15, 15, 0.65);
+  --text-tertiary: rgba(15, 15, 15, 0.45);
+  --text-disabled: rgba(15, 15, 15, 0.25);
+  --text-inverse: var(--color-paper);
 
-  --border-subtle:    rgba(0, 0, 0, 0.06);
-  --border-default:   rgba(0, 0, 0, 0.08);
-  --border-strong:    rgba(0, 0, 0, 0.16);
-  --border-focus:     rgba(15, 15, 15, 0.55);
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-default: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.16);
+  --border-focus: rgba(15, 15, 15, 0.55);
 
   /* Status (UI layer) */
-  --status-success:    #2F8A5C;
-  --status-success-bg: #E8F2EC;
-  --status-warning:    #B45309;
-  --status-warning-bg: #FBF1E5;
-  --status-error:      #C53030;
-  --status-error-bg:   #FBE9E9;
-  --status-info:       #1F6FEB;
-  --status-info-bg:    #E8EFFC;
+  --status-success: #2f8a5c;
+  --status-success-bg: #e8f2ec;
+  --status-warning: #b45309;
+  --status-warning-bg: #fbf1e5;
+  --status-error: #c53030;
+  --status-error-bg: #fbe9e9;
+  --status-info: #1f6feb;
+  --status-info-bg: #e8effc;
 
   /* Spacing (8px base) */
-  --space-1:  4px;
-  --space-2:  8px;
-  --space-3:  12px;
-  --space-4:  16px;
-  --space-6:  24px;
-  --space-8:  32px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
   --space-12: 48px;
   --space-16: 64px;
 
   /* Radii */
-  --radius-input:    8px;
-  --radius-button:   8px;
-  --radius-card:     12px;
-  --radius-modal:    16px;
-  --radius-pill:     999px;
+  --radius-input: 8px;
+  --radius-button: 8px;
+  --radius-card: 12px;
+  --radius-modal: 16px;
+  --radius-pill: 999px;
   --radius-app-icon: 18%;
 
   /* Borders */
   --border-w-hair: 0.5px;
-  --border-w-1:    1px;
+  --border-w-1: 1px;
   --border-w-icon: 1.5px;
 
   /* Typography */
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
 
-  --font-size-xs:  12px;
-  --font-size-sm:  13px;
-  --font-size-md:  14px;
-  --font-size-lg:  15px;
-  --font-size-xl:  17px;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 15px;
+  --font-size-xl: 17px;
   --font-size-2xl: 20px;
   --font-size-3xl: 24px;
   --font-size-4xl: 32px;
   --font-size-5xl: 40px;
 
   --line-tight: 1.2;
-  --line-snug:  1.4;
-  --line-body:  1.6;
+  --line-snug: 1.4;
+  --line-body: 1.6;
 
   --weight-regular: 400;
-  --weight-medium:  500;
-  --weight-semi:    600;
+  --weight-medium: 500;
+  --weight-semi: 600;
 
   --letter-tight: -0.02em;
   --letter-normal: 0;
@@ -668,44 +686,46 @@ Paste this into `tokens.css` and import once at the top of the app.
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* z-index (no shadows in the system) */
-  --z-base:    1;
-  --z-sticky:  30;
+  --z-base: 1;
+  --z-sticky: 30;
   --z-popover: 60;
-  --z-modal:   80;
-  --z-toast:   90;
+  --z-modal: 80;
+  --z-toast: 90;
 }
 
 [data-theme="dark"] {
-  --bg-page:          var(--color-ink-2);
-  --bg-surface:       var(--color-soft-dark);
-  --bg-surface-2:     #2A2A2A;
-  --bg-overlay:       rgba(0, 0, 0, 0.60);
-  --bg-skeleton:      rgba(255, 255, 255, 0.05);
-  --bg-skeleton-2:    rgba(255, 255, 255, 0.09);
+  --bg-page: var(--color-ink-2);
+  --bg-surface: var(--color-soft-dark);
+  --bg-surface-2: #2a2a2a;
+  --bg-overlay: rgba(0, 0, 0, 0.6);
+  --bg-skeleton: rgba(255, 255, 255, 0.05);
+  --bg-skeleton-2: rgba(255, 255, 255, 0.09);
 
-  --text-primary:     #F5F4EF;
-  --text-secondary:   rgba(245, 244, 239, 0.65);
-  --text-tertiary:    rgba(245, 244, 239, 0.45);
-  --text-disabled:    rgba(245, 244, 239, 0.25);
-  --text-inverse:     var(--color-ink);
+  --text-primary: #f5f4ef;
+  --text-secondary: rgba(245, 244, 239, 0.65);
+  --text-tertiary: rgba(245, 244, 239, 0.45);
+  --text-disabled: rgba(245, 244, 239, 0.25);
+  --text-inverse: var(--color-ink);
 
-  --border-subtle:    rgba(255, 255, 255, 0.06);
-  --border-default:   rgba(255, 255, 255, 0.10);
-  --border-strong:    rgba(255, 255, 255, 0.18);
-  --border-focus:     rgba(245, 244, 239, 0.55);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --border-focus: rgba(245, 244, 239, 0.55);
 
-  --status-success:    #4FB07F;
+  --status-success: #4fb07f;
   --status-success-bg: rgba(79, 176, 127, 0.14);
-  --status-warning:    #D7873A;
+  --status-warning: #d7873a;
   --status-warning-bg: rgba(215, 135, 58, 0.14);
-  --status-error:      #E25555;
-  --status-error-bg:   rgba(226, 85, 85, 0.14);
-  --status-info:       #5589F0;
-  --status-info-bg:    rgba(85, 137, 240, 0.14);
+  --status-error: #e25555;
+  --status-error-bg: rgba(226, 85, 85, 0.14);
+  --status-info: #5589f0;
+  --status-info-bg: rgba(85, 137, 240, 0.14);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
@@ -753,5 +773,5 @@ Don't:       emoji · exclamation marks · pink anywhere routine · Title Case
 
 ---
 
-*Last updated: May 25, 2026 · v1.0*
-*Owners: design + frontend. Changes via PR.*
+_Last updated: May 25, 2026 · v1.0_
+_Owners: design + frontend. Changes via PR._

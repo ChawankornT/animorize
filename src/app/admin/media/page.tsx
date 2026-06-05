@@ -5,8 +5,10 @@ import { createMediaRepository } from "@/repositories";
 import { listMedia } from "@/domain/usecases/ListMedia";
 import { getDisplayTitle } from "@/domain/entities/Media";
 import type { MediaType, AiringStatus } from "@/domain/entities/Media";
+import { Eye, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { Icon } from "@/components/ui/Icon";
 import { MediaDeleteButton } from "@/components/admin/MediaDeleteButton";
 import {
   MEDIA_TYPE_LABELS,
@@ -39,7 +41,8 @@ export default async function MediaPage({
           <h1 className="text-2xl font-medium text-primary tracking-tight">Media</h1>
           <p className="mt-1 text-sm text-secondary">{mediaList.length} entries</p>
         </div>
-        <Link href="/admin/import" className={buttonVariants({ size: "sm" })}>
+        <Link href="/admin/import" className={buttonVariants({ size: "md" })}>
+          <Icon as={Plus} size={15} />
           Import media
         </Link>
       </div>
@@ -192,6 +195,7 @@ export default async function MediaPage({
                           href={`/admin/media/${m.id}`}
                           className={buttonVariants({ variant: "secondary", size: "sm" })}
                         >
+                          <Icon as={Eye} size={15} />
                           View
                         </Link>
                         <MediaDeleteButton id={m.id} title={primaryTitle} />

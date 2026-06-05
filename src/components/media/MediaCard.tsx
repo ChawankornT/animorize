@@ -7,20 +7,10 @@ import { Icon } from "@/components/ui/Icon";
 import { ProviderBadge } from "@/components/media/ProviderBadge";
 import { getDisplayTitle } from "@/domain/entities/UserMedia";
 import { TILE_COLORS } from "@/constants/admin";
-import { STATUS_LABEL } from "@/constants/userMedia";
+import { STATUS_LABEL, STATUS_VARIANT } from "@/constants/userMedia";
 import type { WatchStatus } from "@/domain/entities/UserMedia";
 
 // ── StatusPill ────────────────────────────────────────────────────
-
-type StatusVariant = "default" | "success" | "warning" | "error" | "info";
-
-const STATUS_VARIANT: Record<WatchStatus, StatusVariant> = {
-  watching: "success",
-  completed: "info",
-  on_hold: "warning",
-  dropped: "error",
-  plan_to_watch: "default",
-};
 
 function StatusPill({ status }: { status: WatchStatus }) {
   return (
@@ -205,12 +195,7 @@ function SearchCard({ data, onAdd }: SearchCardProps) {
             {seasonYear ? ` · ${seasonYear}` : ""}
           </span>
           {onAdd ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-5.5 px-2 text-[11px] ml-auto"
-              onClick={onAdd}
-            >
+            <Button variant="ghost" size="xs" className="ml-auto" onClick={onAdd}>
               <Icon as={Plus} size={12} />
               Add
             </Button>

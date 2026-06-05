@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Library, Plus } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { Icon } from "@/components/ui/Icon";
 import { Empty } from "@/components/ui/Empty";
 import { Tabs } from "@/components/ui/Tabs";
 
@@ -28,9 +29,9 @@ export function DashboardEmpty() {
           action={
             <Link
               href="/search"
-              className={buttonVariants({ variant: "primary", size: "md" }) + " gap-2 mt-1"}
+              className={buttonVariants({ variant: "primary", size: "md", className: "mt-1" })}
             >
-              <Plus size={16} strokeWidth={1.5} />
+              <Icon as={Plus} size={15} />
               Add your first title
             </Link>
           }
