@@ -1,14 +1,21 @@
 "use client";
 
 import { useActionState } from "react";
+import { RefreshCw, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Icon } from "@/components/ui/Icon";
+import type { ButtonSize } from "@/components/ui/button-variants";
 import { retrySyncAction, type RetrySyncState } from "@/app/actions/anilist";
+
+const ICONS = { retry: RotateCcw, sync: RefreshCw } as const;
 
 interface Props {
   mediaId: string;
   mediaTitle: string;
   label?: string;
   pendingLabel?: string;
+  icon?: keyof typeof ICONS;
+  size?: ButtonSize;
 }
 
 export function RetrySyncButton({
@@ -16,6 +23,8 @@ export function RetrySyncButton({
   mediaTitle,
   label = "Retry",
   pendingLabel = "Retrying…",
+  icon = "retry",
+  size = "sm",
 }: Props) {
   const [state, action, pending] = useActionState<RetrySyncState, FormData>(retrySyncAction, {});
 
@@ -24,11 +33,12 @@ export function RetrySyncButton({
       <input type="hidden" name="mediaId" value={mediaId} />
       <Button
         type="submit"
-        size="sm"
+        size={size}
         variant="secondary"
         disabled={pending}
         aria-label={`${label} sync for ${mediaTitle}`}
       >
+        {!pending && <Icon as={ICONS[icon]} size={15} />}
         {pending ? pendingLabel : label}
       </Button>
       {state.message && (

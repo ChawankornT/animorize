@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils/cn";
 
-type BadgeVariant = "default" | "success" | "warning" | "error" | "info" | "count";
+export type BadgeVariant = "default" | "success" | "warning" | "error" | "info" | "count";
 
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant;

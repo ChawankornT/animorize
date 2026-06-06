@@ -3,7 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { createFranchiseRepository } from "@/repositories";
 import { listFranchises } from "@/domain/usecases/ListFranchises";
 import { getDisplayTitle } from "@/domain/entities/Franchise";
+import { Plus } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { Icon } from "@/components/ui/Icon";
 import { FranchiseDeleteButton } from "@/components/admin/FranchiseDeleteButton";
 
 export default async function FranchisesPage() {
@@ -20,7 +22,8 @@ export default async function FranchisesPage() {
             Manage franchise groupings for media series.
           </p>
         </div>
-        <Link href="/admin/franchises/new" className={buttonVariants({ size: "sm" })}>
+        <Link href="/admin/franchises/new" className={buttonVariants({ size: "md" })}>
+          <Icon as={Plus} size={15} />
           Add franchise
         </Link>
       </div>

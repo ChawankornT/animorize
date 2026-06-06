@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useActionState } from "react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Icon } from "@/components/ui/Icon";
 import { DeleteConfirmModal } from "./DeleteConfirmModal";
 import { removeProviderAction, type RemoveProviderState } from "@/app/actions/mediaProvider";
 
@@ -28,6 +30,7 @@ export function RemoveProviderButton({ id, mediaId, providerName }: Props) {
   return (
     <>
       <Button variant="destructive" size="sm" onClick={() => setOpen(true)}>
+        <Icon as={Trash2} size={15} />
         Remove
       </Button>
       <DeleteConfirmModal
