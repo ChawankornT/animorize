@@ -1,4 +1,5 @@
 # ANIMORIZE — Project Instructions
+
 > Claude อ่านไฟล์นี้ทุก conversation
 > สำหรับรายละเอียดและเหตุผลเชิงลึก ดู DECISIONS.md และ schema/ (ดู schema/README.md)
 
@@ -14,21 +15,21 @@ Admin จัดการเนื้อหา + import จาก AniList
 
 ## Tech Stack (Locked — ห้ามเปลี่ยนโดยไม่บันทึกใน DECISIONS.md)
 
-| Category     | Package               | Version |
-|--------------|-----------------------|---------|
-| Framework    | Next.js               | 16.0.5  |
-| Language     | TypeScript            | latest  |
-| Styling      | Tailwind CSS          | v4      |
-| Database     | Supabase (PostgreSQL) | latest  |
-| Auth         | Supabase Auth         | —       |
-| State        | Zustand               | v5      |
-| Server State | TanStack Query        | v5      |
-| Animations   | Motion (Framer Motion)| v11+    |
-| Forms        | React Hook Form + Zod | latest  |
-| Testing      | Vitest + RTL          | latest  |
-| Linting      | ESLint + Prettier     | latest  |
-| Git Hooks    | Husky + lint-staged   | latest  |
-| Package Mgr  | npm                   | latest  |
+| Category     | Package                | Version |
+| ------------ | ---------------------- | ------- |
+| Framework    | Next.js                | 16.0.5  |
+| Language     | TypeScript             | latest  |
+| Styling      | Tailwind CSS           | v4      |
+| Database     | Supabase (PostgreSQL)  | latest  |
+| Auth         | Supabase Auth          | —       |
+| State        | Zustand                | v5      |
+| Server State | TanStack Query         | v5      |
+| Animations   | Motion (Framer Motion) | v11+    |
+| Forms        | React Hook Form + Zod  | latest  |
+| Testing      | Vitest + RTL           | latest  |
+| Linting      | ESLint + Prettier      | latest  |
+| Git Hooks    | Husky + lint-staged    | latest  |
+| Package Mgr  | npm                    | latest  |
 
 ---
 
@@ -128,7 +129,7 @@ anime / series    →  episode tracking ปกติ
   current_episode++  →  INSERT watchlog  →  ถ้า current = total → status = 'completed'
 
 Title display:    title_en > title_romaji > title_th
-Dashboard filter: status = 'watching' OR is_favorite = true
+Dashboard:        /dashboard = full library (tab "All"); status='watching' OR is_favorite = highlight sections + sort priority, ไม่ใช่ page filter (ดู DECISIONS §C3)
 Provider URL:     custom_url ?? base_url
 
 Auto-sync logic:  system_settings.enabled = true
