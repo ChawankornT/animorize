@@ -8,8 +8,10 @@ import {
 import { listSyncLogs } from "@/domain/usecases/ListSyncLogs";
 import { listMedia } from "@/domain/usecases/ListMedia";
 import { listProviders } from "@/domain/usecases/ListProviders";
+import { CheckCircle2, Clock, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { Icon } from "@/components/ui/Icon";
 import { RetrySyncButton } from "@/components/admin/RetrySyncButton";
 
 function formatSyncTime(dateStr: string): string {
@@ -51,11 +53,13 @@ export default async function AdminDashboardPage() {
         <div className="flex items-center gap-2 shrink-0">
           <Link
             href="/admin/sync-logs"
-            className={buttonVariants({ variant: "secondary", size: "sm" })}
+            className={buttonVariants({ variant: "secondary", size: "md" })}
           >
+            <Icon as={Clock} size={15} />
             Sync logs
           </Link>
-          <Link href="/admin/import" className={buttonVariants({ size: "sm" })}>
+          <Link href="/admin/import" className={buttonVariants({ size: "md" })}>
+            <Icon as={Plus} size={15} />
             Import media
           </Link>
         </div>
@@ -87,7 +91,7 @@ export default async function AdminDashboardPage() {
                 <Badge variant="error" dot>
                   Failed
                 </Badge>
-                <span className="text-sm font-medium text-primary min-w-[180px] max-w-[220px] truncate">
+                <span className="text-sm font-medium text-primary min-w-45 max-w-55 truncate">
                   {log.mediaTitle ?? log.mediaId}
                 </span>
                 <span className="flex-1 text-xs text-secondary truncate">
@@ -103,16 +107,7 @@ export default async function AdminDashboardPage() {
         </div>
       ) : (
         <div className="flex items-center gap-2.5 px-4 py-3.5 border-[0.5px] border-default rounded-card bg-success-bg text-success text-sm">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
-            <circle cx="8" cy="8" r="7.25" stroke="currentColor" strokeWidth="1.5" />
-            <path
-              d="M5 8l2 2 4-4"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <Icon as={CheckCircle2} size={16} />
           <span>
             Everything is up to date.{" "}
             {lastSync

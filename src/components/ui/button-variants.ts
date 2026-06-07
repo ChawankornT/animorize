@@ -1,17 +1,19 @@
 import { cn } from "@/lib/utils/cn";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive";
-export type ButtonSize = "sm" | "md" | "lg";
+export type ButtonSize = "xs" | "sm" | "md" | "lg";
 
 export const variantStyles: Record<ButtonVariant, string> = {
   primary: "bg-primary text-inverse hover:bg-[#2A2A2A] dark:hover:bg-[#E5E4DE]",
   secondary:
     "bg-page text-primary border-[0.5px] border-strong hover:border-focus hover:bg-surface",
   ghost: "bg-transparent text-primary hover:bg-surface",
-  destructive: "bg-page text-error border-[0.5px] border-strong hover:border-error",
+  destructive:
+    "bg-page text-error border-[0.5px] border-strong hover:border-error hover:bg-error-bg",
 };
 
 export const sizeStyles: Record<ButtonSize, string> = {
+  xs: "h-5.5 px-2 text-xs gap-1",
   sm: "h-7 px-2.5 text-sm gap-1.5",
   md: "h-8.5 px-3.5 text-md gap-2",
   lg: "h-10.5 px-4.5 text-lg gap-2",

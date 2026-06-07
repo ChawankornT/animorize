@@ -1,4 +1,13 @@
 import type { WatchStatus } from "@/domain/entities/UserMedia";
+import type { BadgeVariant } from "@/components/ui/Badge";
+
+export const STATUS_VARIANT: Record<WatchStatus, BadgeVariant> = {
+  watching: "success",
+  completed: "info",
+  on_hold: "warning",
+  dropped: "error",
+  plan_to_watch: "default",
+};
 
 export const STATUS_LABEL: Record<WatchStatus, string> = {
   watching: "Watching",

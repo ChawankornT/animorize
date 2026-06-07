@@ -77,11 +77,8 @@ export function LibraryView({ items, allCount, watchingCount, favoritesCount }: 
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Link
-            href="/search"
-            className={buttonVariants({ variant: "primary", size: "md" }) + " gap-2"}
-          >
-            <Icon as={Plus} size={16} />
+          <Link href="/search" className={buttonVariants({ variant: "primary", size: "md" })}>
+            <Icon as={Plus} size={15} />
             Add media
           </Link>
         </div>

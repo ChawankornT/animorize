@@ -19,8 +19,10 @@ import {
   SEASON_LABELS,
   TILE_COLORS,
 } from "@/constants/admin";
+import { Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { Icon } from "@/components/ui/Icon";
 import { MediaDeleteButton } from "@/components/admin/MediaDeleteButton";
 import { RetrySyncButton } from "@/components/admin/RetrySyncButton";
 import { AssignProviderForm } from "@/components/admin/AssignProviderForm";
@@ -78,15 +80,18 @@ export default async function MediaDetailPage({ params }: { params: Promise<{ id
               mediaTitle={displayTitle || id}
               label="Sync now"
               pendingLabel="Syncing…"
+              icon="sync"
+              size="md"
             />
           )}
           <Link
             href={`/admin/media/${id}/edit`}
-            className={buttonVariants({ variant: "secondary", size: "sm" })}
+            className={buttonVariants({ variant: "secondary", size: "md" })}
           >
+            <Icon as={Pencil} size={15} />
             Edit
           </Link>
-          <MediaDeleteButton id={id} title={displayTitle || id} />
+          <MediaDeleteButton id={id} title={displayTitle || id} size="md" />
         </div>
       </div>
 
@@ -107,7 +112,7 @@ export default async function MediaDetailPage({ params }: { params: Promise<{ id
             />
           )}
           {/* Gradient overlay */}
-          <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-black/50 to-transparent pointer-events-none" />
           {/* Title text */}
           <span className="relative z-10 text-[10px] font-medium text-white leading-snug">
             {getDisplayTitle(media)}

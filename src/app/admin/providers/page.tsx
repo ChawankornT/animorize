@@ -2,7 +2,9 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createProviderRepository } from "@/repositories";
 import { listProviders } from "@/domain/usecases/ListProviders";
+import { Pencil, Plus } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button-variants";
+import { Icon } from "@/components/ui/Icon";
 import { ProviderDeleteButton } from "@/components/admin/ProviderDeleteButton";
 
 export default async function ProvidersPage() {
@@ -18,7 +20,8 @@ export default async function ProvidersPage() {
             {providers.length} provider{providers.length !== 1 ? "s" : ""} configured
           </p>
         </div>
-        <Link href="/admin/providers/new" className={buttonVariants({ size: "sm" })}>
+        <Link href="/admin/providers/new" className={buttonVariants({ size: "md" })}>
+          <Icon as={Plus} size={15} />
           Add provider
         </Link>
       </div>
@@ -42,7 +45,7 @@ export default async function ProvidersPage() {
             >
               {/* Color chip */}
               <div
-                className="w-9 h-9 rounded-lg shrink-0 border-[0.5px] border-black/[0.08]"
+                className="w-9 h-9 rounded-lg shrink-0 border-[0.5px] border-black/8"
                 style={{ backgroundColor: provider.color }}
               />
 
@@ -52,7 +55,7 @@ export default async function ProvidersPage() {
                 <div className="flex items-center gap-3 text-xs text-tertiary">
                   <span className="font-mono">{provider.slug}</span>
                   {provider.baseUrl && (
-                    <span className="truncate max-w-[240px]">
+                    <span className="truncate max-w-60">
                       {provider.baseUrl.replace("https://", "")}
                     </span>
                   )}
@@ -66,6 +69,7 @@ export default async function ProvidersPage() {
                   href={`/admin/providers/${provider.id}/edit`}
                   className={buttonVariants({ variant: "secondary", size: "sm" })}
                 >
+                  <Icon as={Pencil} size={15} />
                   Edit
                 </Link>
                 <ProviderDeleteButton id={provider.id} name={provider.name} />
