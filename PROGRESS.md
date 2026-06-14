@@ -10,9 +10,9 @@
 
 ```
 instructions_version: 2026-05-30-v2
-decisions_version: 2026-06-02-v2
+decisions_version: 2026-06-07-v1
 schema_version: 2026-05-27-v2
-claude_md_version: 2026-06-02-v1
+claude_md_version: 2026-06-07-v1
 ```
 
 ## Current Phase
@@ -145,6 +145,7 @@ claude_md_version: 2026-06-02-v1
 
 | วันที่     | เปลี่ยนอะไร                                                                                                                                    | เปลี่ยนในไฟล์ไหน                                                                                                                                                                                                                                   |
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-07 | docs: Pre-Phase 4 decisions (§P4 — CAS RPC, completion guard, Rewatch, error convention) + annotate stale entries                              | DECISIONS.md, CLAUDE.md, PROGRESS.md, CHANGELOG.md                                                                                                                                                                                                 |
 | 2026-06-06 | refactor(ds): Button DRY + xs size + admin md buttons + icons + STATUS_VARIANT → constants + BadgeVariant export                               | button-variants.ts, MediaDeleteButton, RetrySyncButton, ProviderDeleteButton, Badge.tsx, MediaCard.tsx, constants/userMedia.ts, admin pages                                                                                                        |
 | 2026-06-03 | **Release: Phase 3 → main (PR #19)** — code review high effort (10 findings) + merge develop→main + recreate develop from main (clean history) | PR #19 merged; develop recreated from main                                                                                                                                                                                                         |
 | 2026-06-03 | fix: code review — 10 findings (toast, error handling, search safety, a11y, perf, typed errors, reason codes)                                  | AddToLibraryModal, FavoriteButton, LibraryView, Header, useToast, AddToLibrary usecase, userMedia actions, repos (UserMedia/Media/Franchise), mappers, search/page, IUserMediaRepository                                                           |
@@ -223,6 +224,18 @@ claude_md_version: 2026-06-02-v1
 - **`sanitizeSearchTerm`** → empty string → repos return `[]` (ไม่ใช่ full catalog); search query มี `.limit(50)` (เฉพาะ search mode ไม่กระทบ admin list)
 - **`mappers.ts`** — exported `UserMediaRowWithJoin` type; repo cast `as unknown as UserMediaRowWithJoin` แทน `as any`
 
+### Phase 4 pre-implementation (2026-06-07)
+
+- **Pre-Phase 4 decisions locked** — ดู DECISIONS.md §P4 (9 sub-decisions)
+- **Phase 4 scope**: +1 CAS RPC (`increment_episode` — SECURITY INVOKER, atomic) + Rewatch (confirm → reset pointer, rewatch_count+1) + per-media watch history (5 entries) + movie/special toggle Watched (mark=RPC, unmark=reset pointer)
+- **Completion guard revised**: `new_ep >= total AND airing_status <> 'ongoing'` (แทนกฎเดิม `current=total → completed` — กัน false-complete ของ ongoing + ครอบ movie/special ที่ default upcoming)
+- **Schema addition**: `user_media.rewatch_count integer NOT NULL DEFAULT 0` — migration manual + regenerate types
+- **−1 / correction deferred** → Phase 5 "Edit progress" (⋯ More menu)
+- **Design addendum pending**: Rewatch UI ยังไม่มีใน design bundle → ต้องขอ design ก่อนทำ UI; backend เริ่มก่อนได้
+- **Error-handling convention**: imperative client mutation → try/catch + toast เสมอ; TanStack queryFn → throw ไม่ swallow
+- **Fix round backlog** (5 จุดจาก code review): handleSubmit try/catch, FavoriteButton try/catch, AddToLibrary TOCTOU race — กำลังตามมาใน `fix/pre-phase4-hardening`
+- ⚠️ **PROJECT_INSTRUCTIONS.md (ฝั่ง Chat) ต้องอัปเดต**: (ก) +1 business rule (CAS) ให้ตรง CLAUDE.md, (ข) cross-ref "ดู DECISIONS §C3" → ชี้ heading จริง `/dashboard = full library` (repo ไม่ได้ใช้ anchor §C3)
+
 ### Git state (สำคัญ)
 
 - **main** = **develop** — Phase 3 released (PR #19 merged 2026-06-03); develop recreated from main (clean history, no divergence)
@@ -262,5 +275,5 @@ Other findings: Modal reinvents `<dialog>`, toast portal duplicated, sanitizeSea
 
 - Google OAuth ยังไม่ทำ — Email/Password เท่านั้น
 - ⚠️ **PROJECT_INSTRUCTIONS.md เปลี่ยน** (เพิ่ม Phase 7) — Chat ต้อง re-upload (instructions_version → 2026-05-30-v2)
-- ⚠️ **CLAUDE.md เปลี่ยน** (Dashboard business rule reworded) — claude_md_version → 2026-06-02-v1
-- ⚠️ **DECISIONS.md เปลี่ยน** (เพิ่ม `/dashboard` decision + Phase 5/6 roadmap items) — decisions_version → 2026-06-02-v2
+- ⚠️ **CLAUDE.md เปลี่ยน** (Phase 4 business rules + error-handling convention) — claude_md_version → 2026-06-07-v1
+- ⚠️ **DECISIONS.md เปลี่ยน** (เพิ่ม §P4 section — 9 pre-implementation decisions) — decisions_version → 2026-06-07-v1

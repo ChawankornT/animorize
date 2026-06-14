@@ -5,6 +5,34 @@
 
 ---
 
+## [2026-06-07] docs: Pre-Phase 4 decisions + conventions
+
+### DECISIONS.md
+
+- **§P4 section appended** — 9 sub-decisions for Phase 4 Progress Tracking:
+  - §P4 1.1: +1 Episode = CAS idempotent increment via Postgres RPC (`SECURITY INVOKER`)
+  - §P4 1.2: Auto-status + completion guard revised (`airing_status <> 'ongoing'` แทน `current = total`)
+  - §P4 1.3: −1/correction deferred → Phase 5 "Edit progress"
+  - §P4 1.4: Rewatch added to Phase 4 scope (confirm → reset pointer, rewatch_count+1)
+  - §P4 1.5: movie/special toggle Watched (mark = RPC, unmark = reset pointer)
+  - §P4 1.6: Schema `user_media.rewatch_count`
+  - §P4 1.7: History scope = per-media only (global deferred)
+  - §P4 1.8: Error-handling convention (client try/catch + toast mandatory)
+  - §P4 1.9: AniList ongoing data caveat documented
+- **Stale entries annotated** — "Atomic +1 Episode" section + Phase 4 roadmap bullets ชี้ §P4
+
+### CLAUDE.md
+
+- **Key Business Rules** — replaced `+1 Episode` line with CAS block (guard, matched/no-match, movie/special, Rewatch, −1 deferred)
+- **Conventions DO block** — added error-handling rules (imperative mutation try/catch, TanStack queryFn throw)
+
+### PROGRESS.md
+
+- **Notes for Chat** — Phase 4 pre-implementation summary + fix round backlog + design addendum pending
+- **Versions bumped** — `decisions_version: 2026-06-07-v1`, `claude_md_version: 2026-06-07-v1`
+
+---
+
 ## [2026-06-03] Release: Phase 3 → main (PR #19)
 
 - **Code review** (high effort, 7 parallel angles) — 10 findings surfaced, 3 correctness bugs backlogged
