@@ -1,3 +1,4 @@
+import { SupabaseError } from "@/lib/supabase/errors";
 import type { SupabaseDb } from "@/lib/supabase/types";
 import type {
   IUserMediaRepository,
@@ -29,7 +30,8 @@ export class SupabaseUserMediaRepository implements IUserMediaRepository {
       .select()
       .single();
 
-    if (error) throw new Error(`Failed to add media to library: ${error.message}`);
+    if (error)
+      throw new SupabaseError(`Failed to add media to library: ${error.message}`, error.code);
     return toUserMedia(data);
   }
 

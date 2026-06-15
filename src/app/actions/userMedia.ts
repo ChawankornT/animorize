@@ -2,7 +2,8 @@
 
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthedUser } from "@/lib/supabase/auth";
+import { isPgUniqueViolation } from "@/lib/supabase/errors";
 import {
   createUserMediaRepository,
   createMediaRepository,
@@ -28,14 +29,11 @@ export async function toggleFavoriteAction(
   userMediaId: string,
   next: boolean,
 ): Promise<UserMediaActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { success: false, message: "Unauthorized", reason: "unauthorized" };
+  const auth = await getAuthedUser();
+  if (!auth) return { success: false, message: "Unauthorized", reason: "unauthorized" };
 
   try {
-    const repo = createUserMediaRepository(supabase);
+    const repo = createUserMediaRepository(auth.supabase);
     await setFavorite(repo, userMediaId, next);
     revalidatePath("/dashboard");
     return { success: true, message: next ? "Added to favorites" : "Removed from favorites" };
@@ -46,14 +44,11 @@ export async function toggleFavoriteAction(
 }
 
 export async function removeFromLibraryAction(userMediaId: string): Promise<UserMediaActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { success: false, message: "Unauthorized", reason: "unauthorized" };
+  const auth = await getAuthedUser();
+  if (!auth) return { success: false, message: "Unauthorized", reason: "unauthorized" };
 
   try {
-    const repo = createUserMediaRepository(supabase);
+    const repo = createUserMediaRepository(auth.supabase);
     await removeFromLibrary(repo, userMediaId);
     revalidatePath("/dashboard");
     return { success: true, message: "Removed from library" };
@@ -64,13 +59,10 @@ export async function removeFromLibraryAction(userMediaId: string): Promise<User
 }
 
 export async function searchMediaAction(query: string): Promise<Media[]> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return [];
+  const auth = await getAuthedUser();
+  if (!auth) return [];
 
-  const repo = createMediaRepository(supabase);
+  const repo = createMediaRepository(auth.supabase);
   return listMedia(repo, { search: query });
 }
 
@@ -78,15 +70,12 @@ export async function getAddToLibraryDataAction(mediaId: string): Promise<{
   allProviders: Provider[];
   mediaProviders: MediaProvider[];
 }> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { allProviders: [], mediaProviders: [] };
+  const auth = await getAuthedUser();
+  if (!auth) return { allProviders: [], mediaProviders: [] };
 
   const [allProviders, mediaProviders] = await Promise.all([
-    listProviders(createProviderRepository(supabase)),
-    listMediaProviders(createMediaProviderRepository(supabase), mediaId),
+    listProviders(createProviderRepository(auth.supabase)),
+    listMediaProviders(createMediaProviderRepository(auth.supabase), mediaId),
   ]);
 
   return { allProviders, mediaProviders };
@@ -102,11 +91,8 @@ const addToLibrarySchema = z.object({
 export async function addToLibraryAction(
   input: z.infer<typeof addToLibrarySchema>,
 ): Promise<UserMediaActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { success: false, message: "Unauthorized", reason: "unauthorized" };
+  const auth = await getAuthedUser();
+  if (!auth) return { success: false, message: "Unauthorized", reason: "unauthorized" };
 
   const parsed = addToLibrarySchema.safeParse(input);
   if (!parsed.success) {
@@ -114,13 +100,13 @@ export async function addToLibraryAction(
   }
 
   try {
-    const repo = createUserMediaRepository(supabase);
-    await addToLibrary(repo, { userId: user.id, ...parsed.data });
+    const repo = createUserMediaRepository(auth.supabase);
+    await addToLibrary(repo, { userId: auth.user.id, ...parsed.data });
     revalidatePath("/dashboard");
     return { success: true, message: "Added to library" };
   } catch (error) {
     console.error("[addToLibraryAction]", error);
-    if (error instanceof DuplicateLibraryEntryError) {
+    if (error instanceof DuplicateLibraryEntryError || isPgUniqueViolation(error)) {
       return { success: false, message: "Already in your library.", reason: "duplicate" };
     }
     return { success: false, message: "Failed to add to library", reason: "error" };
@@ -137,11 +123,8 @@ export async function changeLibraryProviderAction(
   userMediaId: string,
   input: z.infer<typeof changeLibraryProviderSchema>,
 ): Promise<UserMediaActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { success: false, message: "Unauthorized", reason: "unauthorized" };
+  const auth = await getAuthedUser();
+  if (!auth) return { success: false, message: "Unauthorized", reason: "unauthorized" };
 
   const parsed = changeLibraryProviderSchema.safeParse(input);
   if (!parsed.success) {
@@ -149,7 +132,7 @@ export async function changeLibraryProviderAction(
   }
 
   try {
-    const repo = createUserMediaRepository(supabase);
+    const repo = createUserMediaRepository(auth.supabase);
     await updateLibraryProvider(repo, userMediaId, {
       providerId: parsed.data.providerId,
       audio: parsed.data.audio,

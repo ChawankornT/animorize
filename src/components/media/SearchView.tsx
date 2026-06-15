@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search, X } from "lucide-react";
 import { Icon } from "@/components/ui/Icon";
+import { Button } from "@/components/ui/Button";
 import { MediaCard } from "@/components/media/MediaCard";
 import { AddToLibraryModal } from "@/components/media/AddToLibraryModal";
 import { searchMediaAction } from "@/app/actions/userMedia";
@@ -37,7 +38,12 @@ export function SearchView({ libraryMediaIds }: SearchViewProps) {
     [libraryMediaIds, addedIds],
   );
 
-  const { data: results = [], isFetching } = useQuery({
+  const {
+    data: results = [],
+    isFetching,
+    isError,
+    refetch,
+  } = useQuery({
     queryKey: ["search-media", debouncedQuery],
     queryFn: () => searchMediaAction(debouncedQuery),
     enabled: debouncedQuery.length >= 2,
@@ -135,7 +141,16 @@ export function SearchView({ libraryMediaIds }: SearchViewProps) {
             </div>
           )}
 
-          {hasQuery && !isFetching && results.length === 0 && (
+          {hasQuery && isError && (
+            <div className="text-center py-16 flex flex-col items-center gap-3">
+              <p className="text-md text-secondary">Couldn&apos;t search — try again.</p>
+              <Button variant="secondary" size="sm" onClick={() => refetch()}>
+                Retry
+              </Button>
+            </div>
+          )}
+
+          {hasQuery && !isFetching && !isError && results.length === 0 && (
             <div className="text-center py-16">
               <p className="text-md text-secondary">No results found. Try a different title.</p>
             </div>

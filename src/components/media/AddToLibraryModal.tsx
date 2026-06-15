@@ -95,19 +95,25 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
     setUrlError(null);
     setSubmitting(true);
 
-    const result = await addToLibraryAction({
-      mediaId: media.id,
-      providerId: selectedProviderId,
-      audio: selectedAudio,
-      customUrl: customUrl || undefined,
-    });
+    try {
+      const result = await addToLibraryAction({
+        mediaId: media.id,
+        providerId: selectedProviderId,
+        audio: selectedAudio,
+        customUrl: customUrl || undefined,
+      });
 
-    setSubmitting(false);
-
-    if (result.success) {
-      onAdded(media.id);
-    } else {
-      showToast(result.message, "error");
+      if (result.success) {
+        onAdded(media.id);
+      } else {
+        showToast(result.message, "error");
+      }
+    } catch {
+      showToast("Couldn't add to library", "error", {
+        description: "Something went wrong — try again.",
+      });
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -116,7 +122,7 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
   return (
     <>
       {/* Backdrop — bg-overlay, no blur */}
-      { }
+      {}
       <div
         className="fixed inset-0 z-50 bg-overlay flex items-center justify-center"
         onClick={onClose}

@@ -5,6 +5,27 @@
 
 ---
 
+## [2026-06-15] fix: pre-Phase 4 error-handling hardening
+
+### Client error handling (§P4 1.8 convention)
+
+- **`FavoriteButton.handleToggle`** — added try/catch inside `startTransition`; network errors now show curated toast instead of silent optimistic revert
+- **`AddToLibraryModal.handleSubmit`** — added try/catch/finally; network errors show toast with description; `setSubmitting(false)` moved to `finally` (no more stuck "Adding…" button)
+- **`SearchView`** — added `isError` + retry button from `useQuery`; search errors no longer masquerade as "No results found"
+
+### TOCTOU race fix
+
+- **`SupabaseError`** (`lib/supabase/errors.ts`) — typed error class preserving PostgrestError `.code`; `isPgUniqueViolation` helper
+- **`SupabaseUserMediaRepository.add()`** — throws `SupabaseError` instead of plain `Error` (preserves `code` for callers)
+- **`addToLibraryAction`** — catch now checks `isPgUniqueViolation(error)` alongside `DuplicateLibraryEntryError` → concurrent adds correctly return `reason: "duplicate"`
+
+### Auth refactor
+
+- **`getAuthedUser()`** (`lib/supabase/auth.ts`) — extracts repeated `createClient → getUser → null check` boilerplate
+- All 6 user media actions refactored to use helper (behavior unchanged)
+
+---
+
 ## [2026-06-07] docs: Pre-Phase 4 decisions + conventions
 
 ### DECISIONS.md

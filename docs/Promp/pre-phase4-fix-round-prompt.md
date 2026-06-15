@@ -30,11 +30,51 @@
 
 ## Task 3 — TOCTOU → reason "duplicate"
 
-- ไฟล์ใหม่ `src/lib/supabase/errors.ts`: helper `isPgUniqueViolation(err: unknown): boolean` — เช็ค `code === "23505"` แบบ type-safe (type guard บน object/`code` property — **ไม่ string-match message**)
-- ก่อนเขียน: verify shape ของ error ที่ `SupabaseUserMediaRepository.add` โยนจริง (PostgrestError มี `.code`) — ถ้า repo wrap error ไว้ ปรับ helper ให้ตรงของจริง
-- `addToLibraryAction` catch: `error instanceof DuplicateLibraryEntryError || isPgUniqueViolation(error)` → return reason `"duplicate"` + message เดิม
-- **คง pre-check ใน usecase ไว้** (fast path + domain rule testable) — DB constraint เป็น backstop
-- Unit test `isPgUniqueViolation`: true (`{ code: "23505" }`), false (Error ปกติ / null / undefined / code อื่น)
+> ⚠️ **Root cause ที่ต้องแก้ก่อน:** `SupabaseUserMediaRepository.add()` (line ~32) ทำ `throw new Error(\`Failed to add media to library: ${error.message}\`)`— **wrap PostgrestError ใน plain Error →`.code`("23505") หาย**. ถ้าไม่แก้ repo ให้ preserve code, helper จะ return false เสมอใน production และ unit test`{ code: "23505" }` จะ **false-green** (test ผ่านแต่ prod ไม่กัน race จริง). ดังนั้น Task นี้ **ต้องแก้ทั้ง errors.ts + repo + action + test** ให้ตรง path จริง
+
+**3a · `src/lib/supabase/errors.ts` (ไฟล์ใหม่)** — typed error class ที่เก็บ code:
+
+```ts
+export class SupabaseError extends Error {
+  readonly code: string | undefined;
+  constructor(message: string, code?: string) {
+    super(message);
+    this.name = "SupabaseError";
+    this.code = code;
+  }
+}
+
+export function isPgUniqueViolation(err: unknown): boolean {
+  return err instanceof SupabaseError && err.code === "23505";
+}
+```
+
+**3b · `SupabaseUserMediaRepository.add()`** — throw `SupabaseError` (preserve code) แทน plain Error:
+
+```ts
+// import { SupabaseError } from "@/lib/supabase/errors";
+if (error) throw new SupabaseError(`Failed to add media to library: ${error.message}`, error.code);
+```
+
+- **แก้เฉพาะ `add()`** — method อื่นใน repo ปล่อยไว้ (scope discipline); wrap ทั้ง repo ด้วย `SupabaseError` = follow-up จด PROGRESS backlog
+- `lib/supabase/errors.ts` อยู่ชั้น infra → repo import ได้ (ไม่ผิด dependency rule — ต่างจาก `DuplicateLibraryEntryError` ที่อยู่ใน `domain/usecases/` ซึ่ง repo import **ไม่ได้** ตาม `.claude/rules/repositories.md` → จึงเลือกทาง `SupabaseError`)
+
+**3c · `addToLibraryAction` catch:**
+
+```ts
+// import { isPgUniqueViolation } from "@/lib/supabase/errors";
+if (error instanceof DuplicateLibraryEntryError || isPgUniqueViolation(error)) {
+  /* reason "duplicate" + message เดิม */
+}
+```
+
+- **คง pre-check ใน usecase ไว้** (fast path + domain-rule testable) — DB constraint = backstop สำหรับ race
+- usecase `AddToLibrary` คง `return repository.add(input)` ตรงๆ (ไม่ catch/wrap) → `SupabaseError` propagate ถึง action ได้
+
+**3d · Unit test `isPgUniqueViolation`** (สะท้อน path จริง — repo throw `SupabaseError`):
+
+- `new SupabaseError("dup", "23505")` → true
+- `new SupabaseError("fk", "23503")` → false · `new Error("plain")` → false · `null` / `undefined` → false
 
 ## Task 4 — `SearchView` isError branch
 

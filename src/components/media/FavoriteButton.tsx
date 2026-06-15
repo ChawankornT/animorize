@@ -24,10 +24,14 @@ export function FavoriteButton({ userMediaId, isFavorite }: FavoriteButtonProps)
   function handleToggle() {
     const next = !optimisticFav;
     startTransition(async () => {
-      setOptimisticFav(next);
-      const result = await toggleFavoriteAction(userMediaId, next);
-      if (!result.success) {
-        show(result.message, "error");
+      try {
+        setOptimisticFav(next);
+        const result = await toggleFavoriteAction(userMediaId, next);
+        if (!result.success) {
+          show(result.message, "error");
+        }
+      } catch {
+        show("Failed to update favorite", "error");
       }
     });
   }
