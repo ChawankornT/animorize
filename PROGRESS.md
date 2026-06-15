@@ -143,15 +143,13 @@ claude_md_version: 2026-06-07-v1
 
 ## Recent Changes (last 5)
 
-| วันที่     | เปลี่ยนอะไร                                                                                                                                    | เปลี่ยนในไฟล์ไหน                                                                                                                                                                                                                                   |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-06-07 | docs: Pre-Phase 4 decisions (§P4 — CAS RPC, completion guard, Rewatch, error convention) + annotate stale entries                              | DECISIONS.md, CLAUDE.md, PROGRESS.md, CHANGELOG.md                                                                                                                                                                                                 |
-| 2026-06-06 | refactor(ds): Button DRY + xs size + admin md buttons + icons + STATUS_VARIANT → constants + BadgeVariant export                               | button-variants.ts, MediaDeleteButton, RetrySyncButton, ProviderDeleteButton, Badge.tsx, MediaCard.tsx, constants/userMedia.ts, admin pages                                                                                                        |
-| 2026-06-03 | **Release: Phase 3 → main (PR #19)** — code review high effort (10 findings) + merge develop→main + recreate develop from main (clean history) | PR #19 merged; develop recreated from main                                                                                                                                                                                                         |
-| 2026-06-03 | fix: code review — 10 findings (toast, error handling, search safety, a11y, perf, typed errors, reason codes)                                  | AddToLibraryModal, FavoriteButton, LibraryView, Header, useToast, AddToLibrary usecase, userMedia actions, repos (UserMedia/Media/Franchise), mappers, search/page, IUserMediaRepository                                                           |
-| 2026-06-02 | feat: admin nav in Header + Prettier setup + roadmap Phase 5/6 items                                                                           | components/layout/Header.tsx, .prettierrc.json, .prettierignore, eslint.config.mjs, package.json, DECISIONS.md, src/\*_/_ (format)                                                                                                                 |
-| 2026-06-02 | feat(phase3): Part 2c — Library/Dashboard page (PR #18), Tabs+Empty DS, librarySort, DashboardEmpty, image quality 90, DECISIONS+CLAUDE reword | components/media/ (LibraryView, DashboardEmpty), components/ui/ (Tabs, Empty), app/(main)/dashboard/ (page, loading, error), lib/utils/librarySort, constants/userMedia, DECISIONS.md, CLAUDE.md                                                   |
-| 2026-06-01 | feat(phase3): Part 2b — Search + Add-to-library modal + TanStack Query (search) + sanitize helper + franchise backport                         | components/media/ (SearchView, AddToLibraryModal), components/providers/QueryProvider, app/(main)/search/, app/actions/userMedia.ts, domain/usecases/UpdateLibraryProvider, lib/supabase/sanitizeSearchTerm, repositories/ (interface+impl search) |
+| วันที่     | เปลี่ยนอะไร                                                                                                                                    | เปลี่ยนในไฟล์ไหน                                                                                                                                                                         |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-15 | fix: pre-Phase 4 error-handling hardening (5 task) — try/catch+toast, TOCTOU duplicate, SearchView isError, getAuthedUser helper               | FavoriteButton, AddToLibraryModal, SearchView, userMedia actions, lib/supabase/errors.ts, lib/supabase/auth.ts, SupabaseUserMediaRepository                                              |
+| 2026-06-07 | docs: Pre-Phase 4 decisions (§P4 — CAS RPC, completion guard, Rewatch, error convention) + annotate stale entries                              | DECISIONS.md, CLAUDE.md, PROGRESS.md, CHANGELOG.md                                                                                                                                       |
+| 2026-06-06 | refactor(ds): Button DRY + xs size + admin md buttons + icons + STATUS_VARIANT → constants + BadgeVariant export                               | button-variants.ts, MediaDeleteButton, RetrySyncButton, ProviderDeleteButton, Badge.tsx, MediaCard.tsx, constants/userMedia.ts, admin pages                                              |
+| 2026-06-03 | **Release: Phase 3 → main (PR #19)** — code review high effort (10 findings) + merge develop→main + recreate develop from main (clean history) | PR #19 merged; develop recreated from main                                                                                                                                               |
+| 2026-06-03 | fix: code review — 10 findings (toast, error handling, search safety, a11y, perf, typed errors, reason codes)                                  | AddToLibraryModal, FavoriteButton, LibraryView, Header, useToast, AddToLibrary usecase, userMedia actions, repos (UserMedia/Media/Franchise), mappers, search/page, IUserMediaRepository |
 
 ## Blockers
 
@@ -233,8 +231,17 @@ claude_md_version: 2026-06-07-v1
 - **−1 / correction deferred** → Phase 5 "Edit progress" (⋯ More menu)
 - **Design addendum pending**: Rewatch UI ยังไม่มีใน design bundle → ต้องขอ design ก่อนทำ UI; backend เริ่มก่อนได้
 - **Error-handling convention**: imperative client mutation → try/catch + toast เสมอ; TanStack queryFn → throw ไม่ swallow
-- **Fix round backlog** (5 จุดจาก code review): handleSubmit try/catch, FavoriteButton try/catch, AddToLibrary TOCTOU race — กำลังตามมาใน `fix/pre-phase4-hardening`
+- **Fix round backlog** — ~~handleSubmit try/catch, FavoriteButton try/catch, AddToLibrary TOCTOU race~~ แก้แล้วใน `fix/pre-phase4-hardening` (ดู "Pre-Phase 4 fix round" section)
 - ⚠️ **PROJECT_INSTRUCTIONS.md (ฝั่ง Chat) ต้องอัปเดต**: (ก) +1 business rule (CAS) ให้ตรง CLAUDE.md, (ข) cross-ref "ดู DECISIONS §C3" → ชี้ heading จริง `/dashboard = full library` (repo ไม่ได้ใช้ anchor §C3)
+
+### Pre-Phase 4 fix round (on `fix/pre-phase4-hardening`)
+
+- **`FavoriteButton.handleToggle`** — try/catch inside `startTransition`; catch → curated toast "Failed to update favorite" (optimistic revert = React auto)
+- **`AddToLibraryModal.handleSubmit`** — try/catch/finally; catch → toast title "Couldn't add to library" + description "Something went wrong — try again."; `setSubmitting(false)` ย้ายเข้า finally
+- **TOCTOU `addToLibraryAction`** — `SupabaseError` class (`lib/supabase/errors.ts`) preserves `.code` from PostgrestError; `SupabaseUserMediaRepository.add()` throws `SupabaseError` แทน plain Error; `isPgUniqueViolation` helper เช็ค `code === "23505"`; action catch: `instanceof DuplicateLibraryEntryError || isPgUniqueViolation(error)` → reason `"duplicate"`
+- **`SearchView` isError** — destructure `isError` + `refetch` จาก `useQuery`; เพิ่ม error state "Couldn't search — try again." + retry Button; no-results branch เพิ่ม `&& !isError`
+- **`getAuthedUser()` helper** — `lib/supabase/auth.ts`; refactor ทั้ง 6 actions ใน `userMedia.ts` ใช้ helper (behavior เหมือนเดิม 100%); ลบ `createClient` import (ใช้ผ่าน helper แทน)
+- 122 tests passed (116 + 6 ใหม่ `isPgUniqueViolation`) — lint ✅ typecheck ✅
 
 ### Git state (สำคัญ)
 
@@ -263,13 +270,13 @@ claude_md_version: 2026-06-07-v1
 
 ### Code review findings (session 2026-06-03 — high effort, 10 findings)
 
-Top 3 correctness findings (not yet fixed — backlog for Phase 5 or next fix round):
+Top 3 correctness findings — **fixed in `fix/pre-phase4-hardening`**:
 
-1. **`AddToLibraryModal.handleSubmit` no try/catch** — network error → submitting stuck, no feedback
-2. **`FavoriteButton` startTransition no try/catch** — network error → optimistic state reverts silently, no toast
-3. **`AddToLibrary` TOCTOU race** — concurrent add → DB unique constraint catches it but returns wrong error reason ("error" instead of "duplicate")
+1. ~~`AddToLibraryModal.handleSubmit` no try/catch~~ ✅ try/catch/finally + toast with description
+2. ~~`FavoriteButton` startTransition no try/catch~~ ✅ try/catch + curated toast
+3. ~~`AddToLibrary` TOCTOU race~~ ✅ `SupabaseError` (preserves `.code`) + `isPgUniqueViolation` helper → reason `"duplicate"`
 
-Other findings: Modal reinvents `<dialog>`, toast portal duplicated, sanitizeSearchTerm strips instead of escapes, favorites tab inline filter not memoized, auth boilerplate repeated 6x, redundant server/client count computation, sort has no stable tiebreaker
+Other findings (still open): Modal reinvents `<dialog>`, toast portal duplicated, sanitizeSearchTerm strips instead of escapes, favorites tab inline filter not memoized, ~~auth boilerplate repeated 6x~~ ✅ `getAuthedUser()` helper, redundant server/client count computation, sort has no stable tiebreaker
 
 ### Misc
 
