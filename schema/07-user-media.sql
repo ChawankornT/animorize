@@ -13,6 +13,7 @@ create table public.user_media (
   custom_url      text,
   started_at      timestamptz,
   completed_at    timestamptz,
+  rewatch_count   integer not null default 0,
   created_at      timestamptz not null default now(),
   updated_at      timestamptz not null default now(),
 

@@ -9,16 +9,49 @@
 ## Versions (สำหรับ sync check)
 
 ```
-instructions_version: 2026-05-30-v2
+instructions_version: 2026-06-18-v1
 decisions_version: 2026-06-07-v1
-schema_version: 2026-05-27-v2
+schema_version: 2026-06-18-v1
 claude_md_version: 2026-06-07-v1
 ```
 
 ## Current Phase
 
 - **Completed:** Phase 3 — User Library & Dashboard ✅ (released to `main` via PR #19, 2026-06-03)
-- **Next:** Phase 4 — Progress Tracking + Watchlog
+- **In Progress:** Phase 4 — Progress Tracking + Watchlog (Part 1 backend committed on `feature/phase4-backend`)
+
+## Phase 4 Progress
+
+### Part 1 — Backend (on `feature/phase4-backend`)
+
+- [x] Schema migration: `rewatch_count` column (`schema/13`) + `increment_episode` RPC (`schema/14`) + canonical `07` updated
+- [x] `types/database.ts` regenerated (via `supabase gen types`) — `rewatch_count`, `increment_episode` function, `watch_status` enum
+- [x] `types/enums.ts` — centralized enum exports (entity imports refactored)
+- [x] `lib/supabase/types.ts` — `Functions` type changed for `.rpc()` type inference
+- [x] `WatchLog` entity + `IWatchLogRepository` (read-only) + `SupabaseWatchLogRepository` + factory
+- [x] `IUserMediaRepository` extended: `findWithMediaByUserAndMedia`, `incrementEpisode`, `startRewatch`, `unmarkWatched`
+- [x] `SupabaseUserMediaRepository` implements all 4 new methods + mappers (`toWatchLog`, `rewatchCount`)
+- [x] 4 usecases: `IncrementEpisode`, `StartRewatch`, `UnmarkWatched`, `GetLibraryItem` — JSDoc + unit tests
+- [x] 3 server actions: `incrementEpisodeAction`, `startRewatchAction`, `unmarkWatchedAction` — `getAuthedUser()` + reason codes
+- [x] `UserMediaActionResult.reason` extended with `"stale"` for CAS no-op
+- [x] `incrementEpisodeAction` stale branch revalidates before return (§P4 1.1 "ปล่อย revalidate sync เงียบ")
+- [x] 14 new tests (136 total) — lint ✅ typecheck ✅
+- [x] `schema/README.md` updated — prose 00→14 + "Existing Phase 3 DB" section
+- [x] `.gitignore` — added `supabase/.temp/`
+- [x] `PROJECT_INSTRUCTIONS.md` — Phase 4 business rules updated
+
+### Part 1 — Verification findings
+
+- **Stale path `RETURN NULL` → `data == null`** — PostgREST อาจ return all-null composite row แทน true `null`; ต้อง smoke test ตาม dev-manual ก่อนใช้จริง
+- **Docker Supabase ใช้ได้แล้ว** — `supabase gen types --local` ใช้ได้แทน `--project-id` remote
+
+### Part 2 — UI (not started)
+
+- [ ] Design addendum for Rewatch UI (ต้องขอ design ก่อนทำ UI)
+- [ ] EpisodeTracker component + useEpisodeTracker hook
+- [ ] Movie/special toggle Watched UI
+- [ ] Rewatch confirm dialog
+- [ ] Per-media watch history (5 entries on detail page)
 
 ## Phase 3 Progress
 
@@ -143,13 +176,13 @@ claude_md_version: 2026-06-07-v1
 
 ## Recent Changes (last 5)
 
-| วันที่     | เปลี่ยนอะไร                                                                                                                                    | เปลี่ยนในไฟล์ไหน                                                                                                                                                                         |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-06-15 | fix: pre-Phase 4 error-handling hardening (5 task) — try/catch+toast, TOCTOU duplicate, SearchView isError, getAuthedUser helper               | FavoriteButton, AddToLibraryModal, SearchView, userMedia actions, lib/supabase/errors.ts, lib/supabase/auth.ts, SupabaseUserMediaRepository                                              |
-| 2026-06-07 | docs: Pre-Phase 4 decisions (§P4 — CAS RPC, completion guard, Rewatch, error convention) + annotate stale entries                              | DECISIONS.md, CLAUDE.md, PROGRESS.md, CHANGELOG.md                                                                                                                                       |
-| 2026-06-06 | refactor(ds): Button DRY + xs size + admin md buttons + icons + STATUS_VARIANT → constants + BadgeVariant export                               | button-variants.ts, MediaDeleteButton, RetrySyncButton, ProviderDeleteButton, Badge.tsx, MediaCard.tsx, constants/userMedia.ts, admin pages                                              |
-| 2026-06-03 | **Release: Phase 3 → main (PR #19)** — code review high effort (10 findings) + merge develop→main + recreate develop from main (clean history) | PR #19 merged; develop recreated from main                                                                                                                                               |
-| 2026-06-03 | fix: code review — 10 findings (toast, error handling, search safety, a11y, perf, typed errors, reason codes)                                  | AddToLibraryModal, FavoriteButton, LibraryView, Header, useToast, AddToLibrary usecase, userMedia actions, repos (UserMedia/Media/Franchise), mappers, search/page, IUserMediaRepository |
+| วันที่     | เปลี่ยนอะไร                                                                                                                                                             | เปลี่ยนในไฟล์ไหน                                                                                                                                                                                |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-18 | feat(phase4): Part 1 backend — schema, entities, repos, usecases, actions, tests (27 files, +924 lines, 136 tests) + review fixes (revalidate stale, README, gitignore) | schema/13-14, WatchLog entity+repo, IUserMediaRepository+impl, 4 usecases, userMedia actions, mappers, types/enums.ts, types/database.ts, .gitignore, schema/README.md, PROJECT_INSTRUCTIONS.md |
+| 2026-06-15 | fix: pre-Phase 4 error-handling hardening (5 task) — try/catch+toast, TOCTOU duplicate, SearchView isError, getAuthedUser helper                                        | FavoriteButton, AddToLibraryModal, SearchView, userMedia actions, lib/supabase/errors.ts, lib/supabase/auth.ts, SupabaseUserMediaRepository                                                     |
+| 2026-06-07 | docs: Pre-Phase 4 decisions (§P4 — CAS RPC, completion guard, Rewatch, error convention) + annotate stale entries                                                       | DECISIONS.md, CLAUDE.md, PROGRESS.md                                                                                                                                                            |
+| 2026-06-06 | refactor(ds): Button DRY + xs size + admin md buttons + icons + STATUS_VARIANT → constants + BadgeVariant export                                                        | button-variants.ts, MediaDeleteButton, RetrySyncButton, ProviderDeleteButton, Badge.tsx, MediaCard.tsx, constants/userMedia.ts, admin pages                                                     |
+| 2026-06-03 | **Release: Phase 3 → main (PR #19)** — code review high effort (10 findings) + merge develop→main + recreate develop from main (clean history)                          | PR #19 merged; develop recreated from main                                                                                                                                                      |
 
 ## Blockers
 
@@ -222,6 +255,23 @@ claude_md_version: 2026-06-07-v1
 - **`sanitizeSearchTerm`** → empty string → repos return `[]` (ไม่ใช่ full catalog); search query มี `.limit(50)` (เฉพาะ search mode ไม่กระทบ admin list)
 - **`mappers.ts`** — exported `UserMediaRowWithJoin` type; repo cast `as unknown as UserMediaRowWithJoin` แทน `as any`
 
+### Phase 4 Part 1 backend (session 2026-06-18)
+
+- **Schema**: `schema/13-phase4-alter-user-media.sql` (rewatch_count) + `schema/14-increment-episode.sql` (CAS RPC, SECURITY INVOKER)
+- **RPC contract**: `increment_episode(p_user_media_id uuid, p_from_episode int)` → returns `user_media` row on success, `NULL` on CAS miss (stale)
+- **Completion guard**: `new_ep >= total AND airing_status <> 'ongoing'` — ใน RPC SQL
+- **WatchLog entity** — `src/domain/entities/WatchLog.ts`: pure interface `{ id, userId, mediaId, episodeNumber, watchedAt }`
+- **WatchLog repo** — read-only (`findByUserAndMedia` with limit); INSERT happens atomically inside RPC
+- **IUserMediaRepository** — 4 new methods: `findWithMediaByUserAndMedia` (single item), `incrementEpisode` (RPC wrapper → `IncrementEpisodeResult`), `startRewatch` (read-modify-write with status guard), `unmarkWatched` (reset pointer)
+- **`IncrementEpisodeResult`** — discriminated union: `{ status: "updated"; userMedia } | { status: "stale" }`
+- **Usecases** — thin delegates: `IncrementEpisode`, `StartRewatch`, `UnmarkWatched`, `GetLibraryItem`
+- **Actions** — `incrementEpisodeAction` (stale → reason "stale", revalidate always), `startRewatchAction` (null → reason "stale"), `unmarkWatchedAction`
+- **`UserMediaActionResult.reason`** — extended with `"stale"` (CAS no-op, ไม่ใช่ error → client ไม่ toast)
+- **`types/enums.ts`** — centralized enum exports; entity imports refactored (Media, MediaProvider, SyncLog)
+- **`lib/supabase/types.ts`** — `Functions` type changed from `Record<string, never>` to `Database["public"]["Functions"]` for `.rpc()` type inference
+- **Mock harness** — `makeWatchLog`, `createMockWatchLogRepository`, extended `createMockUserMediaRepository` with 4+1 new methods
+- ⚠️ **Stale path unverified** — `RETURN NULL` → `data == null` needs dev-manual smoke test (PostgREST may return all-null composite row)
+
 ### Phase 4 pre-implementation (2026-06-07)
 
 - **Pre-Phase 4 decisions locked** — ดู DECISIONS.md §P4 (9 sub-decisions)
@@ -232,7 +282,7 @@ claude_md_version: 2026-06-07-v1
 - **Design addendum pending**: Rewatch UI ยังไม่มีใน design bundle → ต้องขอ design ก่อนทำ UI; backend เริ่มก่อนได้
 - **Error-handling convention**: imperative client mutation → try/catch + toast เสมอ; TanStack queryFn → throw ไม่ swallow
 - **Fix round backlog** — ~~handleSubmit try/catch, FavoriteButton try/catch, AddToLibrary TOCTOU race~~ แก้แล้วใน `fix/pre-phase4-hardening` (ดู "Pre-Phase 4 fix round" section)
-- ⚠️ **PROJECT_INSTRUCTIONS.md (ฝั่ง Chat) ต้องอัปเดต**: (ก) +1 business rule (CAS) ให้ตรง CLAUDE.md, (ข) cross-ref "ดู DECISIONS §C3" → ชี้ heading จริง `/dashboard = full library` (repo ไม่ได้ใช้ anchor §C3)
+- ~~PROJECT_INSTRUCTIONS.md ต้องอัปเดต~~ ✅ อัปเดตแล้ว session 2026-06-18 — CAS business rule + dashboard cross-ref แก้แล้ว (instructions_version → 2026-06-18-v1)
 
 ### Pre-Phase 4 fix round (on `fix/pre-phase4-hardening`)
 
@@ -245,8 +295,10 @@ claude_md_version: 2026-06-07-v1
 
 ### Git state (สำคัญ)
 
+- **Branch `feature/phase4-backend`** — 3 commits ahead of `develop` (fix + feat + docs)
 - **main** = **develop** — Phase 3 released (PR #19 merged 2026-06-03); develop recreated from main (clean history, no divergence)
-- ไม่มี uncommitted changes
+- Working tree สะอาด — ไม่มี uncommitted changes
+- **Docker Supabase ใช้ได้แล้ว** — `supabase gen types --local` ใช้ได้
 - Design bundle ล่าสุด (verified 2026-06-02): `https://api.anthropic.com/v1/design/h/5D8CVsBqRlaHcpRuEicJrw`
 
 ### Prettier (session 2026-06-02)
@@ -281,6 +333,6 @@ Other findings (still open): Modal reinvents `<dialog>`, toast portal duplicated
 ### Misc
 
 - Google OAuth ยังไม่ทำ — Email/Password เท่านั้น
-- ⚠️ **PROJECT_INSTRUCTIONS.md เปลี่ยน** (เพิ่ม Phase 7) — Chat ต้อง re-upload (instructions_version → 2026-05-30-v2)
+- ⚠️ **PROJECT_INSTRUCTIONS.md เปลี่ยน** (Phase 4 business rules + Phase 7) — Chat ต้อง re-upload (instructions_version → 2026-06-18-v1)
 - ⚠️ **CLAUDE.md เปลี่ยน** (Phase 4 business rules + error-handling convention) — claude_md_version → 2026-06-07-v1
 - ⚠️ **DECISIONS.md เปลี่ยน** (เพิ่ม §P4 section — 9 pre-implementation decisions) — decisions_version → 2026-06-07-v1

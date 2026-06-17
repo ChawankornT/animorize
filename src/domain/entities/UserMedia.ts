@@ -1,4 +1,4 @@
-import type { AudioType, WatchStatus } from "@/types/database";
+import type { AudioType, WatchStatus } from "@/types/enums";
 import { getDisplayTitle } from "@/domain/entities/title";
 
 export type { AudioType, WatchStatus };
@@ -15,6 +15,7 @@ export interface UserMedia {
   customUrl: string | null;
   startedAt: string | null;
   completedAt: string | null;
+  rewatchCount: number;
   createdAt: string;
   updatedAt: string;
 }

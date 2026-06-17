@@ -1,4 +1,4 @@
-import type { AudioType } from "@/types/database";
+import type { AudioType } from "@/types/enums";
 
 export type { AudioType };
 

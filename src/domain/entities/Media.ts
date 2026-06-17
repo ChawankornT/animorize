@@ -1,4 +1,4 @@
-import type { MediaType, AiringStatus } from "@/types/database";
+import type { MediaType, AiringStatus } from "@/types/enums";
 
 export type { MediaType, AiringStatus };
 export { getDisplayTitle } from "@/domain/entities/title";

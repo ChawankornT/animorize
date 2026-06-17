@@ -6,6 +6,7 @@ import {
   toFranchise,
   toUserMedia,
   toUserMediaWithMedia,
+  toWatchLog,
   fromAddToLibraryInput,
 } from "@/repositories/supabase/mappers";
 import type { Database } from "@/types/database";
@@ -185,6 +186,7 @@ function makeUserMediaRow(overrides: Partial<UserMediaRow> = {}): UserMediaRow {
     custom_url: null,
     started_at: null,
     completed_at: null,
+    rewatch_count: 0,
     created_at: "2026-01-01T00:00:00Z",
     updated_at: "2026-01-01T00:00:00Z",
     ...overrides,
@@ -214,9 +216,15 @@ describe("toUserMedia", () => {
       customUrl: "https://custom.url",
       startedAt: null,
       completedAt: null,
+      rewatchCount: 0,
       createdAt: "2026-01-01T00:00:00Z",
       updatedAt: "2026-01-01T00:00:00Z",
     });
+  });
+
+  it("maps rewatch_count to rewatchCount", () => {
+    const result = toUserMedia(makeUserMediaRow({ rewatch_count: 3 }));
+    expect(result.rewatchCount).toBe(3);
   });
 
   it("handles all nullable fields as null", () => {
@@ -347,5 +355,43 @@ describe("fromAddToLibraryInput", () => {
     expect(result.audio).toBe("dub");
     expect(result.status).toBe("watching");
     expect(result.custom_url).toBe("https://custom.url");
+  });
+});
+
+type WatchLogRow = Database["public"]["Tables"]["watchlogs"]["Row"];
+
+function makeWatchLogRow(overrides: Partial<WatchLogRow> = {}): WatchLogRow {
+  return {
+    id: "wl-1",
+    user_id: "user-1",
+    media_id: "media-1",
+    episode_number: 1,
+    watched_at: "2026-01-15T12:00:00Z",
+    ...overrides,
+  };
+}
+
+describe("toWatchLog", () => {
+  it("maps all fields from snake_case to camelCase", () => {
+    const row = makeWatchLogRow({
+      id: "wl-42",
+      user_id: "user-2",
+      media_id: "media-3",
+      episode_number: 7,
+      watched_at: "2026-06-15T08:30:00Z",
+    });
+    const result = toWatchLog(row);
+    expect(result).toEqual({
+      id: "wl-42",
+      userId: "user-2",
+      mediaId: "media-3",
+      episodeNumber: 7,
+      watchedAt: "2026-06-15T08:30:00Z",
+    });
+  });
+
+  it("handles episode 0 edge case", () => {
+    const result = toWatchLog(makeWatchLogRow({ episode_number: 0 }));
+    expect(result.episodeNumber).toBe(0);
   });
 });

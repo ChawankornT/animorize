@@ -6,6 +6,7 @@ import { SupabaseMediaProviderRepository } from "@/repositories/supabase/Supabas
 import { SupabaseSyncLogRepository } from "@/repositories/supabase/SupabaseSyncLogRepository";
 import { SupabaseSystemSettingsRepository } from "@/repositories/supabase/SupabaseSystemSettingsRepository";
 import { SupabaseUserMediaRepository } from "@/repositories/supabase/SupabaseUserMediaRepository";
+import { SupabaseWatchLogRepository } from "@/repositories/supabase/SupabaseWatchLogRepository";
 
 export function createProviderRepository(supabase: SupabaseDb) {
   return new SupabaseProviderRepository(supabase);
@@ -33,4 +34,8 @@ export function createSystemSettingsRepository(supabase: SupabaseDb) {
 
 export function createUserMediaRepository(supabase: SupabaseDb) {
   return new SupabaseUserMediaRepository(supabase);
+}
+
+export function createWatchLogRepository(supabase: SupabaseDb) {
+  return new SupabaseWatchLogRepository(supabase);
 }
