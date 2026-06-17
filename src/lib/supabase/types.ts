@@ -30,7 +30,7 @@ type CompatTables = {
 type CompatSchema = {
   Tables: CompatTables;
   Views: Record<string, never>;
-  Functions: Record<string, never>;
+  Functions: Database["public"]["Functions"];
   Enums: Database["public"]["Enums"];
 };
 

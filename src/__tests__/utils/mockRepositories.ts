@@ -2,9 +2,11 @@ import { vi } from "vitest";
 import type { IMediaRepository } from "@/repositories/interfaces/IMediaRepository";
 import type { ISyncLogRepository } from "@/repositories/interfaces/ISyncLogRepository";
 import type { IUserMediaRepository } from "@/repositories/interfaces/IUserMediaRepository";
+import type { IWatchLogRepository } from "@/repositories/interfaces/IWatchLogRepository";
 import type { Media, CreateMediaInput, UpdateMediaInput } from "@/domain/entities/Media";
 import type { SyncLog, CreateSyncLogInput } from "@/domain/entities/SyncLog";
 import type { UserMedia, UserMediaWithMedia } from "@/domain/entities/UserMedia";
+import type { WatchLog } from "@/domain/entities/WatchLog";
 
 /** Stub Media for use in mock repos. Override individual fields as needed. */
 export function makeMedia(overrides: Partial<Media> = {}): Media {
@@ -97,8 +99,21 @@ export function makeUserMedia(overrides: Partial<UserMedia> = {}): UserMedia {
     customUrl: null,
     startedAt: null,
     completedAt: null,
+    rewatchCount: 0,
     createdAt: "2026-01-01T00:00:00Z",
     updatedAt: "2026-01-01T00:00:00Z",
+    ...overrides,
+  };
+}
+
+/** Stub WatchLog for use in mock repos. Override individual fields as needed. */
+export function makeWatchLog(overrides: Partial<WatchLog> = {}): WatchLog {
+  return {
+    id: "wl-1",
+    userId: "user-1",
+    mediaId: "media-1",
+    episodeNumber: 1,
+    watchedAt: "2026-01-01T00:00:00Z",
     ...overrides,
   };
 }
@@ -148,5 +163,18 @@ export function createMockUserMediaRepository(
       ),
     updateProvider: vi.fn().mockResolvedValue(userMedia),
     remove: vi.fn().mockResolvedValue(undefined),
+    findWithMediaByUserAndMedia: vi.fn().mockResolvedValue(withMedia),
+    incrementEpisode: vi.fn().mockResolvedValue({ status: "updated", userMedia }),
+    startRewatch: vi.fn().mockResolvedValue(userMedia),
+    unmarkWatched: vi.fn().mockResolvedValue(userMedia),
+  };
+}
+
+/**
+ * Creates a fresh IWatchLogRepository mock per test.
+ */
+export function createMockWatchLogRepository(): IWatchLogRepository {
+  return {
+    findByUserAndMedia: vi.fn().mockResolvedValue([]),
   };
 }

@@ -1,315 +1,557 @@
-export type UserRole = "user" | "admin";
-export type MediaType = "anime" | "series" | "movie" | "ova" | "special";
-export type WatchStatus = "watching" | "completed" | "on_hold" | "dropped" | "plan_to_watch";
-export type AiringStatus = "ongoing" | "finished" | "upcoming";
-export type AudioType = "sub" | "dub";
-export type SyncResult = "success" | "failed";
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
-export interface Database {
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5";
+  };
   public: {
     Tables: {
-      profiles: {
-        Row: {
-          id: string;
-          display_name: string | null;
-          avatar_url: string | null;
-          role: UserRole;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id: string;
-          display_name?: string | null;
-          avatar_url?: string | null;
-          role?: UserRole;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          display_name?: string | null;
-          avatar_url?: string | null;
-          role?: UserRole;
-          created_at?: string;
-          updated_at?: string;
-        };
-      };
       franchises: {
         Row: {
+          created_at: string;
           id: string;
-          title_th: string | null;
-          title_en: string | null;
-          title_romaji: string | null;
           poster_url: string | null;
           synopsis: string | null;
-          created_at: string;
+          title_en: string | null;
+          title_romaji: string | null;
+          title_th: string | null;
           updated_at: string;
         };
         Insert: {
+          created_at?: string;
           id?: string;
-          title_th?: string | null;
-          title_en?: string | null;
-          title_romaji?: string | null;
           poster_url?: string | null;
           synopsis?: string | null;
-          created_at?: string;
+          title_en?: string | null;
+          title_romaji?: string | null;
+          title_th?: string | null;
           updated_at?: string;
         };
         Update: {
+          created_at?: string;
           id?: string;
-          title_th?: string | null;
-          title_en?: string | null;
-          title_romaji?: string | null;
           poster_url?: string | null;
           synopsis?: string | null;
-          created_at?: string;
+          title_en?: string | null;
+          title_romaji?: string | null;
+          title_th?: string | null;
           updated_at?: string;
         };
-      };
-      providers: {
-        Row: {
-          id: string;
-          name: string;
-          slug: string;
-          color: string;
-          logo_url: string | null;
-          base_url: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          name: string;
-          slug: string;
-          color: string;
-          logo_url?: string | null;
-          base_url?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          name?: string;
-          slug?: string;
-          color?: string;
-          logo_url?: string | null;
-          base_url?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
+        Relationships: [];
       };
       media: {
         Row: {
-          id: string;
-          franchise_id: string | null;
+          air_date_end: string | null;
+          air_date_start: string | null;
+          airing_status: Database["public"]["Enums"]["airing_status"];
           anilist_id: number | null;
-          media_type: MediaType;
-          title_th: string | null;
-          title_en: string | null;
-          title_romaji: string | null;
-          synopsis: string | null;
-          poster_url: string | null;
+          auto_sync: boolean;
+          created_at: string;
+          franchise_id: string | null;
           genres: string[];
-          total_episodes: number;
+          id: string;
+          media_type: Database["public"]["Enums"]["media_type"];
+          poster_url: string | null;
           season_quarter: number | null;
           season_year: number | null;
-          air_date_start: string | null;
-          air_date_end: string | null;
-          airing_status: AiringStatus;
-          auto_sync: boolean;
           sort_order: number;
-          created_at: string;
+          synopsis: string | null;
+          title_en: string | null;
+          title_romaji: string | null;
+          title_th: string | null;
+          total_episodes: number;
           updated_at: string;
         };
         Insert: {
-          id?: string;
-          franchise_id?: string | null;
+          air_date_end?: string | null;
+          air_date_start?: string | null;
+          airing_status?: Database["public"]["Enums"]["airing_status"];
           anilist_id?: number | null;
-          media_type: MediaType;
-          title_th?: string | null;
-          title_en?: string | null;
-          title_romaji?: string | null;
-          synopsis?: string | null;
-          poster_url?: string | null;
+          auto_sync?: boolean;
+          created_at?: string;
+          franchise_id?: string | null;
           genres?: string[];
-          total_episodes?: number;
+          id?: string;
+          media_type: Database["public"]["Enums"]["media_type"];
+          poster_url?: string | null;
           season_quarter?: number | null;
           season_year?: number | null;
-          air_date_start?: string | null;
-          air_date_end?: string | null;
-          airing_status?: AiringStatus;
-          auto_sync?: boolean;
           sort_order?: number;
-          created_at?: string;
+          synopsis?: string | null;
+          title_en?: string | null;
+          title_romaji?: string | null;
+          title_th?: string | null;
+          total_episodes?: number;
           updated_at?: string;
         };
         Update: {
-          id?: string;
-          franchise_id?: string | null;
+          air_date_end?: string | null;
+          air_date_start?: string | null;
+          airing_status?: Database["public"]["Enums"]["airing_status"];
           anilist_id?: number | null;
-          media_type?: MediaType;
-          title_th?: string | null;
-          title_en?: string | null;
-          title_romaji?: string | null;
-          synopsis?: string | null;
-          poster_url?: string | null;
+          auto_sync?: boolean;
+          created_at?: string;
+          franchise_id?: string | null;
           genres?: string[];
-          total_episodes?: number;
+          id?: string;
+          media_type?: Database["public"]["Enums"]["media_type"];
+          poster_url?: string | null;
           season_quarter?: number | null;
           season_year?: number | null;
-          air_date_start?: string | null;
-          air_date_end?: string | null;
-          airing_status?: AiringStatus;
-          auto_sync?: boolean;
           sort_order?: number;
-          created_at?: string;
+          synopsis?: string | null;
+          title_en?: string | null;
+          title_romaji?: string | null;
+          title_th?: string | null;
+          total_episodes?: number;
           updated_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "media_franchise_id_fkey";
+            columns: ["franchise_id"];
+            isOneToOne: false;
+            referencedRelation: "franchises";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       media_providers: {
         Row: {
+          audio: Database["public"]["Enums"]["audio_type"];
+          base_url: string | null;
+          created_at: string;
           id: string;
           media_id: string;
           provider_id: string;
-          audio: AudioType;
-          base_url: string | null;
-          created_at: string;
         };
         Insert: {
+          audio?: Database["public"]["Enums"]["audio_type"];
+          base_url?: string | null;
+          created_at?: string;
           id?: string;
           media_id: string;
           provider_id: string;
-          audio?: AudioType;
-          base_url?: string | null;
-          created_at?: string;
         };
         Update: {
+          audio?: Database["public"]["Enums"]["audio_type"];
+          base_url?: string | null;
+          created_at?: string;
           id?: string;
           media_id?: string;
           provider_id?: string;
-          audio?: AudioType;
-          base_url?: string | null;
-          created_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "media_providers_media_id_fkey";
+            columns: ["media_id"];
+            isOneToOne: false;
+            referencedRelation: "media";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "media_providers_provider_id_fkey";
+            columns: ["provider_id"];
+            isOneToOne: false;
+            referencedRelation: "providers";
+            referencedColumns: ["id"];
+          },
+        ];
       };
-      user_media: {
+      profiles: {
         Row: {
-          id: string;
-          user_id: string;
-          media_id: string;
-          provider_id: string | null;
-          audio: AudioType;
-          status: WatchStatus;
-          current_episode: number;
-          is_favorite: boolean;
-          custom_url: string | null;
-          started_at: string | null;
-          completed_at: string | null;
+          avatar_url: string | null;
           created_at: string;
+          display_name: string | null;
+          id: string;
+          role: Database["public"]["Enums"]["user_role"];
           updated_at: string;
         };
         Insert: {
-          id?: string;
-          user_id: string;
-          media_id: string;
-          provider_id?: string | null;
-          audio?: AudioType;
-          status?: WatchStatus;
-          current_episode?: number;
-          is_favorite?: boolean;
-          custom_url?: string | null;
-          started_at?: string | null;
-          completed_at?: string | null;
+          avatar_url?: string | null;
           created_at?: string;
+          display_name?: string | null;
+          id: string;
+          role?: Database["public"]["Enums"]["user_role"];
           updated_at?: string;
         };
         Update: {
-          id?: string;
-          user_id?: string;
-          media_id?: string;
-          provider_id?: string | null;
-          audio?: AudioType;
-          status?: WatchStatus;
-          current_episode?: number;
-          is_favorite?: boolean;
-          custom_url?: string | null;
-          started_at?: string | null;
-          completed_at?: string | null;
+          avatar_url?: string | null;
           created_at?: string;
+          display_name?: string | null;
+          id?: string;
+          role?: Database["public"]["Enums"]["user_role"];
           updated_at?: string;
         };
+        Relationships: [];
       };
-      watchlogs: {
+      providers: {
         Row: {
+          base_url: string | null;
+          color: string;
+          created_at: string;
           id: string;
-          user_id: string;
-          media_id: string;
-          episode_number: number;
-          watched_at: string;
+          logo_url: string | null;
+          name: string;
+          slug: string;
+          updated_at: string;
         };
         Insert: {
+          base_url?: string | null;
+          color: string;
+          created_at?: string;
           id?: string;
-          user_id: string;
-          media_id: string;
-          episode_number: number;
-          watched_at?: string;
+          logo_url?: string | null;
+          name: string;
+          slug: string;
+          updated_at?: string;
         };
         Update: {
+          base_url?: string | null;
+          color?: string;
+          created_at?: string;
           id?: string;
-          user_id?: string;
-          media_id?: string;
-          episode_number?: number;
-          watched_at?: string;
+          logo_url?: string | null;
+          name?: string;
+          slug?: string;
+          updated_at?: string;
         };
+        Relationships: [];
       };
       sync_logs: {
         Row: {
+          error_message: string | null;
           id: string;
           media_id: string;
-          result: SyncResult;
-          error_message: string | null;
+          result: Database["public"]["Enums"]["sync_result"];
           synced_at: string;
         };
         Insert: {
+          error_message?: string | null;
           id?: string;
           media_id: string;
-          result: SyncResult;
-          error_message?: string | null;
+          result: Database["public"]["Enums"]["sync_result"];
           synced_at?: string;
         };
         Update: {
+          error_message?: string | null;
           id?: string;
           media_id?: string;
-          result?: SyncResult;
-          error_message?: string | null;
+          result?: Database["public"]["Enums"]["sync_result"];
           synced_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "sync_logs_media_id_fkey";
+            columns: ["media_id"];
+            isOneToOne: false;
+            referencedRelation: "media";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       system_settings: {
         Row: {
-          id: number;
           auto_sync_enabled: boolean;
+          id: number;
           updated_at: string;
         };
         Insert: {
-          id?: number;
           auto_sync_enabled?: boolean;
+          id?: number;
           updated_at?: string;
         };
         Update: {
-          id?: number;
           auto_sync_enabled?: boolean;
+          id?: number;
           updated_at?: string;
         };
+        Relationships: [];
+      };
+      user_media: {
+        Row: {
+          audio: Database["public"]["Enums"]["audio_type"];
+          completed_at: string | null;
+          created_at: string;
+          current_episode: number;
+          custom_url: string | null;
+          id: string;
+          is_favorite: boolean;
+          media_id: string;
+          provider_id: string | null;
+          rewatch_count: number;
+          started_at: string | null;
+          status: Database["public"]["Enums"]["watch_status"];
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          audio?: Database["public"]["Enums"]["audio_type"];
+          completed_at?: string | null;
+          created_at?: string;
+          current_episode?: number;
+          custom_url?: string | null;
+          id?: string;
+          is_favorite?: boolean;
+          media_id: string;
+          provider_id?: string | null;
+          rewatch_count?: number;
+          started_at?: string | null;
+          status?: Database["public"]["Enums"]["watch_status"];
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          audio?: Database["public"]["Enums"]["audio_type"];
+          completed_at?: string | null;
+          created_at?: string;
+          current_episode?: number;
+          custom_url?: string | null;
+          id?: string;
+          is_favorite?: boolean;
+          media_id?: string;
+          provider_id?: string | null;
+          rewatch_count?: number;
+          started_at?: string | null;
+          status?: Database["public"]["Enums"]["watch_status"];
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_media_media_id_fkey";
+            columns: ["media_id"];
+            isOneToOne: false;
+            referencedRelation: "media";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_media_provider_id_fkey";
+            columns: ["provider_id"];
+            isOneToOne: false;
+            referencedRelation: "providers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_media_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      watchlogs: {
+        Row: {
+          episode_number: number;
+          id: string;
+          media_id: string;
+          user_id: string;
+          watched_at: string;
+        };
+        Insert: {
+          episode_number: number;
+          id?: string;
+          media_id: string;
+          user_id: string;
+          watched_at?: string;
+        };
+        Update: {
+          episode_number?: number;
+          id?: string;
+          media_id?: string;
+          user_id?: string;
+          watched_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "watchlogs_media_id_fkey";
+            columns: ["media_id"];
+            isOneToOne: false;
+            referencedRelation: "media";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "watchlogs_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
     };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      increment_episode: {
+        Args: { p_from_episode: number; p_user_media_id: string };
+        Returns: {
+          audio: Database["public"]["Enums"]["audio_type"];
+          completed_at: string | null;
+          created_at: string;
+          current_episode: number;
+          custom_url: string | null;
+          id: string;
+          is_favorite: boolean;
+          media_id: string;
+          provider_id: string | null;
+          rewatch_count: number;
+          started_at: string | null;
+          status: Database["public"]["Enums"]["watch_status"];
+          updated_at: string;
+          user_id: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "user_media";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      is_admin: { Args: never; Returns: boolean };
+    };
     Enums: {
-      user_role: UserRole;
-      media_type: MediaType;
-      watch_status: WatchStatus;
-      airing_status: AiringStatus;
-      audio_type: AudioType;
-      sync_result: SyncResult;
+      airing_status: "ongoing" | "finished" | "upcoming";
+      audio_type: "sub" | "dub";
+      media_type: "anime" | "series" | "movie" | "ova" | "special";
+      sync_result: "success" | "failed";
+      user_role: "user" | "admin";
+      watch_status: "watching" | "completed" | "on_hold" | "dropped" | "plan_to_watch";
+    };
+    CompositeTypes: {
+      [_ in never]: never;
     };
   };
+};
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">];
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
 }
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R;
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
+      }
+      ? R
+      : never
+    : never;
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I;
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I;
+      }
+      ? I
+      : never
+    : never;
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U;
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U;
+      }
+      ? U
+      : never
+    : never;
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never;
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never;
+
+export const Constants = {
+  public: {
+    Enums: {
+      airing_status: ["ongoing", "finished", "upcoming"],
+      audio_type: ["sub", "dub"],
+      media_type: ["anime", "series", "movie", "ova", "special"],
+      sync_result: ["success", "failed"],
+      user_role: ["user", "admin"],
+      watch_status: ["watching", "completed", "on_hold", "dropped", "plan_to_watch"],
+    },
+  },
+} as const;
