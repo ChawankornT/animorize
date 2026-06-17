@@ -5,6 +5,49 @@
 
 ---
 
+## [2026-06-18] feat(phase4): Part 1 backend — schema, entities, repos, usecases, actions, tests
+
+### Schema
+
+- **`schema/13-phase4-alter-user-media.sql`** — `ALTER TABLE user_media ADD COLUMN IF NOT EXISTS rewatch_count integer NOT NULL DEFAULT 0` (idempotent)
+- **`schema/14-increment-episode.sql`** — CAS RPC `increment_episode(p_user_media_id, p_from_episode)`: SECURITY INVOKER, atomic UPDATE + INSERT watchlog, completion guard `new_ep >= total AND airing_status <> 'ongoing'`, `RETURN NULL` on CAS miss, `GRANT TO authenticated`
+- **`schema/07-user-media.sql`** — canonical schema updated with `rewatch_count`
+- **`schema/README.md`** — prose updated 00→14, added "Existing Phase 3 DB" migration section
+
+### Domain
+
+- **`WatchLog` entity** — `src/domain/entities/WatchLog.ts`: pure interface `{ id, userId, mediaId, episodeNumber, watchedAt }`
+- **`types/enums.ts`** — centralized enum exports from `Database["public"]["Enums"]`; entity imports refactored (Media, MediaProvider, SyncLog)
+- **4 usecases**: `IncrementEpisode` (thin delegate to RPC), `StartRewatch` (reset pointer + rewatch_count), `UnmarkWatched` (reset to plan_to_watch), `GetLibraryItem` (single item lookup)
+
+### Repository
+
+- **`IWatchLogRepository`** — read-only interface (`findByUserAndMedia` with limit)
+- **`SupabaseWatchLogRepository`** — implementation using server.ts client
+- **`IUserMediaRepository`** — 4 new methods: `findWithMediaByUserAndMedia`, `incrementEpisode` (RPC wrapper → `IncrementEpisodeResult`), `startRewatch`, `unmarkWatched`
+- **`SupabaseUserMediaRepository`** — all 4 implemented; `startRewatch` uses status guard `WHERE status IN ('completed','dropped','on_hold')`
+- **mappers** — `toWatchLog`, `rewatchCount` field added to `toUserMedia`
+
+### Server Actions
+
+- **`incrementEpisodeAction`** — stale → `reason: "stale"` (no toast); revalidatePath always (§P4 1.1 "ปล่อย revalidate sync เงียบ")
+- **`startRewatchAction`** — null guard miss → `reason: "stale"`
+- **`unmarkWatchedAction`** — standard error handling
+- **`UserMediaActionResult.reason`** — extended with `"stale"`
+
+### Infrastructure
+
+- **`lib/supabase/types.ts`** — `Functions` type changed for `.rpc()` type inference
+- **`.gitignore`** — added `supabase/.temp/` (Supabase CLI local state)
+- **`types/database.ts`** — regenerated via `supabase gen types`
+
+### Tests
+
+- 14 new tests (136 total): 4 usecase test files + 2 mapper tests + mock harness extended
+- lint ✅ typecheck ✅
+
+---
+
 ## [2026-06-15] fix: pre-Phase 4 error-handling hardening
 
 ### Client error handling (§P4 1.8 convention)
