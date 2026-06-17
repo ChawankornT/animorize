@@ -17,13 +17,20 @@ import { listMedia } from "@/domain/usecases/ListMedia";
 import { listMediaProviders } from "@/domain/usecases/ListMediaProviders";
 import { listProviders } from "@/domain/usecases/ListProviders";
 import { updateLibraryProvider } from "@/domain/usecases/UpdateLibraryProvider";
+import { incrementEpisode } from "@/domain/usecases/IncrementEpisode";
+import { startRewatch } from "@/domain/usecases/StartRewatch";
+import { unmarkWatched } from "@/domain/usecases/UnmarkWatched";
 import type { Media } from "@/domain/entities/Media";
 import type { MediaProvider } from "@/domain/entities/MediaProvider";
 import type { Provider } from "@/domain/entities/Provider";
 
 export type UserMediaActionResult =
   | { success: true; message: string }
-  | { success: false; message: string; reason: "duplicate" | "unauthorized" | "invalid" | "error" };
+  | {
+      success: false;
+      message: string;
+      reason: "duplicate" | "unauthorized" | "invalid" | "error" | "stale";
+    };
 
 export async function toggleFavoriteAction(
   userMediaId: string,
@@ -143,5 +150,59 @@ export async function changeLibraryProviderAction(
   } catch (error) {
     console.error("[changeLibraryProviderAction]", error);
     return { success: false, message: "Failed to update provider", reason: "error" };
+  }
+}
+
+export async function incrementEpisodeAction(
+  userMediaId: string,
+  fromEpisode: number,
+): Promise<UserMediaActionResult> {
+  const auth = await getAuthedUser();
+  if (!auth) return { success: false, message: "Unauthorized", reason: "unauthorized" };
+
+  try {
+    const repo = createUserMediaRepository(auth.supabase);
+    const result = await incrementEpisode(repo, userMediaId, fromEpisode);
+    revalidatePath("/dashboard");
+    if (result.status === "stale") {
+      return { success: false, message: "Episode already updated", reason: "stale" };
+    }
+    return { success: true, message: "Episode updated" };
+  } catch (error) {
+    console.error("[incrementEpisodeAction]", error);
+    return { success: false, message: "Failed to update episode", reason: "error" };
+  }
+}
+
+export async function startRewatchAction(userMediaId: string): Promise<UserMediaActionResult> {
+  const auth = await getAuthedUser();
+  if (!auth) return { success: false, message: "Unauthorized", reason: "unauthorized" };
+
+  try {
+    const repo = createUserMediaRepository(auth.supabase);
+    const result = await startRewatch(repo, userMediaId);
+    if (!result) {
+      return { success: false, message: "Cannot rewatch from current status", reason: "stale" };
+    }
+    revalidatePath("/dashboard");
+    return { success: true, message: "Rewatch started" };
+  } catch (error) {
+    console.error("[startRewatchAction]", error);
+    return { success: false, message: "Failed to start rewatch", reason: "error" };
+  }
+}
+
+export async function unmarkWatchedAction(userMediaId: string): Promise<UserMediaActionResult> {
+  const auth = await getAuthedUser();
+  if (!auth) return { success: false, message: "Unauthorized", reason: "unauthorized" };
+
+  try {
+    const repo = createUserMediaRepository(auth.supabase);
+    await unmarkWatched(repo, userMediaId);
+    revalidatePath("/dashboard");
+    return { success: true, message: "Marked as unwatched" };
+  } catch (error) {
+    console.error("[unmarkWatchedAction]", error);
+    return { success: false, message: "Failed to update status", reason: "error" };
   }
 }
