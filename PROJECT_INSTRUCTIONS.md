@@ -125,11 +125,16 @@ movie / special   →  total_episodes = 1 เสมอ, UI เป็น toggle "
 ova               →  episode tracking ปกติ (อาจมีหลายตอน)
 anime / series    →  episode tracking ปกติ
 
-+1 Episode:
-  current_episode++  →  INSERT watchlog  →  ถ้า current = total → status = 'completed'
++1 Episode (CAS): client ส่ง from_episode → RPC increment_episode (SECURITY INVOKER, atomic)
+  guard: user_id = auth.uid() AND current_episode = from AND from+1 <= total_episodes
+  matched → current = from+1 → INSERT watchlog → status: (from+1 >= total AND airing_status ≠ 'ongoing') ? 'completed' : 'watching' (started_at = COALESCE(started_at, now()))
+  no match → no-op ทั้ง update และ watchlog (reason 'stale' — ไม่ใช่ error)
+movie/special: mark = RPC เดิม (0→1) · unmark = reset pointer (current=0, plan_to_watch, ไม่ลบ watchlog)
+Rewatch (completed/dropped/on_hold): confirm → current=0, watching, started_at=now(), completed_at=null, rewatch_count+1 (guard status IN source set)
+−1/แก้ตอน: deferred → Phase 5 "Edit progress" (⋯ More)
 
 Title display:    title_en > title_romaji > title_th
-Dashboard:        /dashboard = full library (tab "All"); status='watching' OR is_favorite = highlight sections + sort priority, ไม่ใช่ page filter (ดู DECISIONS §C3)
+Dashboard:        /dashboard = full library (tab "All"); status='watching' OR is_favorite = highlight sections + sort priority, ไม่ใช่ page filter (ดู DECISIONS.md heading "/dashboard = full library (tab All)")
 Provider URL:     custom_url ?? base_url
 
 Auto-sync logic:  system_settings.enabled = true
