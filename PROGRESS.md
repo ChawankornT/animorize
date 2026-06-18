@@ -35,14 +35,14 @@ claude_md_version: 2026-06-07-v1
 - [x] 3 server actions: `incrementEpisodeAction`, `startRewatchAction`, `unmarkWatchedAction` — `getAuthedUser()` + reason codes
 - [x] `UserMediaActionResult.reason` extended with `"stale"` for CAS no-op
 - [x] `incrementEpisodeAction` stale branch revalidates before return (§P4 1.1 "ปล่อย revalidate sync เงียบ")
-- [x] 14 new tests (136 total) — lint ✅ typecheck ✅
+- [x] 14 new tests (136 → 140 after stale-path hardening) — lint ✅ typecheck ✅
 - [x] `schema/README.md` updated — prose 00→14 + "Existing Phase 3 DB" section
 - [x] `.gitignore` — added `supabase/.temp/`
 - [x] `PROJECT_INSTRUCTIONS.md` — Phase 4 business rules updated
 
 ### Part 1 — Verification findings
 
-- **Stale path `RETURN NULL` → `data == null`** — PostgREST อาจ return all-null composite row แทน true `null`; ต้อง smoke test ตาม dev-manual ก่อนใช้จริง
+- **Stale path hardened** ✅ — `incrementEpisode` repo guard เปลี่ยนเป็น `data == null || data.id == null` (ปิด all-null composite gotcha by construction → Task B runtime probe ไม่จำเป็นแล้ว); `startRewatchAction` ย้าย `revalidatePath` ก่อน stale return (ตรงกับ `incrementEpisodeAction`); 4 repo unit tests lock guard
 - **Docker Supabase ใช้ได้แล้ว** — `supabase gen types --local` ใช้ได้แทน `--project-id` remote
 
 ### Part 2 — UI (not started)
@@ -178,11 +178,11 @@ claude_md_version: 2026-06-07-v1
 
 | วันที่     | เปลี่ยนอะไร                                                                                                                                                             | เปลี่ยนในไฟล์ไหน                                                                                                                                                                                |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-19 | fix: stale-path hardening — `incrementEpisode` all-null composite guard + `startRewatchAction` revalidate consistency + 4 repo unit tests (140 total)                   | SupabaseUserMediaRepository.ts, userMedia.ts (action), SupabaseUserMediaRepository.test.ts, PROGRESS.md                                                                                         |
 | 2026-06-18 | feat(phase4): Part 1 backend — schema, entities, repos, usecases, actions, tests (27 files, +924 lines, 136 tests) + review fixes (revalidate stale, README, gitignore) | schema/13-14, WatchLog entity+repo, IUserMediaRepository+impl, 4 usecases, userMedia actions, mappers, types/enums.ts, types/database.ts, .gitignore, schema/README.md, PROJECT_INSTRUCTIONS.md |
 | 2026-06-15 | fix: pre-Phase 4 error-handling hardening (5 task) — try/catch+toast, TOCTOU duplicate, SearchView isError, getAuthedUser helper                                        | FavoriteButton, AddToLibraryModal, SearchView, userMedia actions, lib/supabase/errors.ts, lib/supabase/auth.ts, SupabaseUserMediaRepository                                                     |
 | 2026-06-07 | docs: Pre-Phase 4 decisions (§P4 — CAS RPC, completion guard, Rewatch, error convention) + annotate stale entries                                                       | DECISIONS.md, CLAUDE.md, PROGRESS.md                                                                                                                                                            |
 | 2026-06-06 | refactor(ds): Button DRY + xs size + admin md buttons + icons + STATUS_VARIANT → constants + BadgeVariant export                                                        | button-variants.ts, MediaDeleteButton, RetrySyncButton, ProviderDeleteButton, Badge.tsx, MediaCard.tsx, constants/userMedia.ts, admin pages                                                     |
-| 2026-06-03 | **Release: Phase 3 → main (PR #19)** — code review high effort (10 findings) + merge develop→main + recreate develop from main (clean history)                          | PR #19 merged; develop recreated from main                                                                                                                                                      |
 
 ## Blockers
 
@@ -270,7 +270,7 @@ claude_md_version: 2026-06-07-v1
 - **`types/enums.ts`** — centralized enum exports; entity imports refactored (Media, MediaProvider, SyncLog)
 - **`lib/supabase/types.ts`** — `Functions` type changed from `Record<string, never>` to `Database["public"]["Functions"]` for `.rpc()` type inference
 - **Mock harness** — `makeWatchLog`, `createMockWatchLogRepository`, extended `createMockUserMediaRepository` with 4+1 new methods
-- ⚠️ **Stale path unverified** — `RETURN NULL` → `data == null` needs dev-manual smoke test (PostgREST may return all-null composite row)
+- ~~Stale path unverified~~ ✅ **Stale path hardened** — `data == null || data.id == null` guard ปิด all-null composite by construction; `startRewatchAction` revalidate ย้ายก่อน stale return; 4 repo unit tests lock guard (fix/phase4-stale-path-hardening)
 
 ### Phase 4 pre-implementation (2026-06-07)
 

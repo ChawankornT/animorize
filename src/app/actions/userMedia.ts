@@ -181,10 +181,10 @@ export async function startRewatchAction(userMediaId: string): Promise<UserMedia
   try {
     const repo = createUserMediaRepository(auth.supabase);
     const result = await startRewatch(repo, userMediaId);
+    revalidatePath("/dashboard");
     if (!result) {
       return { success: false, message: "Cannot rewatch from current status", reason: "stale" };
     }
-    revalidatePath("/dashboard");
     return { success: true, message: "Rewatch started" };
   } catch (error) {
     console.error("[startRewatchAction]", error);
