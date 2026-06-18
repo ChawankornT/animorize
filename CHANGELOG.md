@@ -5,6 +5,22 @@
 
 ---
 
+## [2026-06-19] fix(phase4): stale-path hardening — null guard + revalidate consistency
+
+### Repository
+
+- **`SupabaseUserMediaRepository.incrementEpisode`** — hardened null guard: `data == null || data.id == null` (ปิด all-null composite gotcha by construction — PostgREST อาจ serialize `RETURN NULL` จาก composite function เป็น `{ id: null, ... }` แทน JS `null`; `id` เป็น PK → success จริงไม่มีทาง null → ตรวจ stale ได้ทั้งสอง representation)
+
+### Server Actions
+
+- **`startRewatchAction`** — ย้าย `revalidatePath("/dashboard")` ขึ้นก่อน stale return (ตรงกับ `incrementEpisodeAction` pattern — client sync state เงียบเสมอแม้ stale)
+
+### Tests
+
+- 4 repo unit tests ใหม่ (`SupabaseUserMediaRepository.test.ts`): valid row → updated, JS null → stale, all-null composite → stale, error → throws (140 tests total)
+
+---
+
 ## [2026-06-18] feat(phase4): Part 1 backend — schema, entities, repos, usecases, actions, tests
 
 ### Schema

@@ -158,7 +158,7 @@ export class SupabaseUserMediaRepository implements IUserMediaRepository {
     });
 
     if (error) throw new Error(`Failed to increment episode: ${error.message}`);
-    if (data == null) return { status: "stale" };
+    if (data == null || data.id == null) return { status: "stale" };
     return { status: "updated", userMedia: toUserMedia(data) };
   }
 
