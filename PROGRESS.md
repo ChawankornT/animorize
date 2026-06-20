@@ -18,7 +18,7 @@ claude_md_version: 2026-06-07-v1
 ## Current Phase
 
 - **Completed:** Phase 3 — User Library & Dashboard ✅ (released to `main` via PR #19, 2026-06-03)
-- **In Progress:** Phase 4 — Progress Tracking + Watchlog (Part 1 backend committed on `feature/phase4-backend`)
+- **In Progress:** Phase 4 — Progress Tracking + Watchlog (Part 1 backend merged; Part 2a detail page on `feature/phase4-part2a-detail-page`)
 
 ## Phase 4 Progress
 
@@ -45,13 +45,24 @@ claude_md_version: 2026-06-07-v1
 - **Stale path hardened** ✅ — `incrementEpisode` repo guard เปลี่ยนเป็น `data == null || data.id == null` (ปิด all-null composite gotcha by construction → Task B runtime probe ไม่จำเป็นแล้ว); `startRewatchAction` ย้าย `revalidatePath` ก่อน stale return (ตรงกับ `incrementEpisodeAction`); 4 repo unit tests lock guard
 - **Docker Supabase ใช้ได้แล้ว** — `supabase gen types --local` ใช้ได้แทน `--project-id` remote
 
-### Part 2 — UI (not started)
+### Part 2a — Detail page (read-only) (on `feature/phase4-part2a-detail-page`)
+
+- [x] `app/(main)/media/[id]/page.tsx` — Server Component, data composition (getLibraryItem gate → getMedia + listMediaProviders + watchLogs parallel)
+- [x] `app/(main)/media/[id]/loading.tsx` + `error.tsx` — skeleton + error boundary
+- [x] `components/media/MediaDetailView.tsx` — Server Component: breadcrumb, poster, tracking summary (read-only), titles×3, meta badges, synopsis, provider table (read-only "Switch to"), watch history
+- [x] `lib/utils/formatTimestamp.ts` — relative/absolute timestamp formatter + 6 unit tests
+- [x] `MediaCard.Library` — overlay link (`href` prop) → `/media/${mediaId}`, z-2 above poster text, below fav button (z-3); no nested `<button>` in `<a>`
+- [x] `LibraryView` — passes `href` to renderCard
+- [x] `generateMetadata` — dynamic page title
+- [x] 146 tests (140 + 6 formatTimestamp) — lint ✅ typecheck ✅
+
+### Part 2b — Interactive tracker (not started)
 
 - [ ] Design addendum for Rewatch UI (ต้องขอ design ก่อนทำ UI)
 - [ ] EpisodeTracker component + useEpisodeTracker hook
 - [ ] Movie/special toggle Watched UI
 - [ ] Rewatch confirm dialog
-- [ ] Per-media watch history (5 entries on detail page)
+- [ ] Per-media watch history interactive features
 
 ## Phase 3 Progress
 
@@ -178,17 +189,28 @@ claude_md_version: 2026-06-07-v1
 
 | วันที่     | เปลี่ยนอะไร                                                                                                                                                             | เปลี่ยนในไฟล์ไหน                                                                                                                                                                                |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-21 | feat(phase4): Part 2a — media detail page (read-only) + card→detail link + formatTimestamp util (146 tests)                                                             | MediaDetailView.tsx, media/[id] route (page+loading+error), MediaCard.tsx (overlay link), LibraryView.tsx (href), formatTimestamp.ts + test, PROGRESS.md                                        |
 | 2026-06-19 | fix: stale-path hardening — `incrementEpisode` all-null composite guard + `startRewatchAction` revalidate consistency + 4 repo unit tests (140 total)                   | SupabaseUserMediaRepository.ts, userMedia.ts (action), SupabaseUserMediaRepository.test.ts, PROGRESS.md                                                                                         |
 | 2026-06-18 | feat(phase4): Part 1 backend — schema, entities, repos, usecases, actions, tests (27 files, +924 lines, 136 tests) + review fixes (revalidate stale, README, gitignore) | schema/13-14, WatchLog entity+repo, IUserMediaRepository+impl, 4 usecases, userMedia actions, mappers, types/enums.ts, types/database.ts, .gitignore, schema/README.md, PROJECT_INSTRUCTIONS.md |
 | 2026-06-15 | fix: pre-Phase 4 error-handling hardening (5 task) — try/catch+toast, TOCTOU duplicate, SearchView isError, getAuthedUser helper                                        | FavoriteButton, AddToLibraryModal, SearchView, userMedia actions, lib/supabase/errors.ts, lib/supabase/auth.ts, SupabaseUserMediaRepository                                                     |
 | 2026-06-07 | docs: Pre-Phase 4 decisions (§P4 — CAS RPC, completion guard, Rewatch, error convention) + annotate stale entries                                                       | DECISIONS.md, CLAUDE.md, PROGRESS.md                                                                                                                                                            |
-| 2026-06-06 | refactor(ds): Button DRY + xs size + admin md buttons + icons + STATUS_VARIANT → constants + BadgeVariant export                                                        | button-variants.ts, MediaDeleteButton, RetrySyncButton, ProviderDeleteButton, Badge.tsx, MediaCard.tsx, constants/userMedia.ts, admin pages                                                     |
 
 ## Blockers
 
 [ยังไม่มี]
 
 ## Notes for Chat
+
+### Phase 4 Part 2a — Detail page (on `feature/phase4-part2a-detail-page`)
+
+- **Route** — `app/(main)/media/[id]/page.tsx`: Server Component; gate: `getLibraryItem` → null → `notFound()` (not-in-library = deferred); then `Promise.all([getMedia, listMediaProviders, watchLogs])`
+- **MediaDetailView** — `components/media/MediaDetailView.tsx`: Server Component, 7 sub-sections: breadcrumb (link to `/dashboard`), detail poster (aspect-3/4, `next/image`), tracking summary (read-only — `StatusPill` + `ProgressBar` + `FavoriteButton`), titles×3 (separate fields, not `getDisplayTitle`), meta badges, synopsis, provider table (read-only "Switch to" disabled), watch history
+- **Hand-off slot** — `{/* Part 2b: EpisodeTracker action buttons + interactivity */}` comment in tracking summary section
+- **Provider table** — current marker matches `(providerId, audio)` not just `providerId`; "Switch to" buttons are disabled `<button>` with ghost variant (not wired)
+- **Watch history** — `formatTimestamp` util (`lib/utils/formatTimestamp.ts`): relative < 7d, absolute otherwise; movie uses "Full film" label instead of "ep 1"
+- **Card→detail link** — `MediaCard.Library` has `href?` prop; renders overlay `<Link>` at `z-2` (above poster text, below fav slot z-3); no `<button>` inside `<a>` — proper a11y
+- **`generateMetadata`** — dynamic title using `getDisplayTitle`
+- **Deferred** — not-in-library → `notFound()`, provider "Switch to" → disabled, action buttons → Part 2b
 
 ### Phase 3 Part 2a (merged to develop — PR #16 ✅)
 
