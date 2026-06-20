@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Check, Plus } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Badge } from "@/components/ui/Badge";
@@ -88,9 +89,10 @@ interface LibraryCardProps {
   showStatus?: boolean;
   /** Slot for the interactive FavoriteButton — rendered inside the fav circle */
   favoriteSlot?: React.ReactNode;
+  href?: string;
 }
 
-function LibraryCard({ data, showStatus = false, favoriteSlot }: LibraryCardProps) {
+function LibraryCard({ data, showStatus = false, favoriteSlot, href }: LibraryCardProps) {
   const {
     titleTh,
     titleEn,
@@ -118,10 +120,19 @@ function LibraryCard({ data, showStatus = false, favoriteSlot }: LibraryCardProp
         status === "dropped" && "opacity-[0.78]",
       )}
     >
-      {/* Fav button slot */}
+      {/* Fav button slot — z-3 stays above overlay link */}
       <div className="absolute top-2 right-2 z-3 w-6.5 h-6.5 rounded-pill flex items-center justify-center bg-black/55">
         {favoriteSlot}
       </div>
+
+      {/* Overlay link — z-2 clears poster text (z-2 in child scope), stays under fav (z-3) */}
+      {href && (
+        <Link
+          href={href}
+          className="absolute inset-0 z-2"
+          aria-label={`View details for ${displayTitle}`}
+        />
+      )}
 
       <Poster posterUrl={posterUrl} titleEn={titleEn} tileColorIndex={tileColorIndex} />
 
