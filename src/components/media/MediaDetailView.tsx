@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, ExternalLink, CheckCircle2 } from "lucide-react";
+import { ChevronRight, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Icon } from "@/components/ui/Icon";
 import { Badge } from "@/components/ui/Badge";
-import { StatusPill, ProgressBar } from "@/components/media/MediaCard";
+import { EpisodeTracker } from "@/components/media/EpisodeTracker";
 import { ProviderBadge } from "@/components/media/ProviderBadge";
 import { FavoriteButton } from "@/components/media/FavoriteButton";
 import { buttonVariants } from "@/components/ui/button-variants";
@@ -58,41 +58,24 @@ export function MediaDetailView({ media, userMedia, providers, watchLogs }: Medi
             posterUrl={media.posterUrl}
             titleEn={media.titleEn}
             tileColorIndex={tileColorIndex}
-            isFavorite={userMedia.isFavorite}
-            userMediaId={userMedia.id}
           />
 
-          {/* 2.3 Tracking summary (read-only) */}
-          <div className="flex flex-col gap-3">
-            <StatusPill status={userMedia.status} />
+          <EpisodeTracker
+            userMediaId={userMedia.id}
+            currentEpisode={userMedia.currentEpisode}
+            totalEpisodes={media.totalEpisodes}
+            status={userMedia.status}
+            isMovie={isMovie}
+            airingStatus={media.airingStatus}
+          />
 
-            {isMovie ? (
-              userMedia.status === "completed" && (
-                <span className="inline-flex items-center gap-1.5 text-sm text-success">
-                  <Icon as={CheckCircle2} size={15} />
-                  Watched
-                </span>
-              )
-            ) : (
-              <div className="flex flex-col gap-1.5">
-                <ProgressBar value={userMedia.currentEpisode} total={media.totalEpisodes} />
-                <span className="text-xs text-tertiary tabular-nums">
-                  ep <span className="text-primary font-medium">{userMedia.currentEpisode}</span> of{" "}
-                  {media.totalEpisodes}
-                </span>
-              </div>
-            )}
-
-            <div className="flex items-center gap-2">
-              <div className="w-6.5 h-6.5 rounded-pill flex items-center justify-center bg-black/55">
-                <FavoriteButton userMediaId={userMedia.id} isFavorite={userMedia.isFavorite} />
-              </div>
-              <span className="text-xs text-tertiary">
-                {userMedia.isFavorite ? "Favorited" : "Add to favorites"}
-              </span>
+          <div className="flex items-center gap-2">
+            <div className="w-6.5 h-6.5 rounded-pill flex items-center justify-center bg-black/55">
+              <FavoriteButton userMediaId={userMedia.id} isFavorite={userMedia.isFavorite} />
             </div>
-
-            {/* Part 2b: EpisodeTracker action buttons + interactivity */}
+            <span className="text-xs text-tertiary">
+              {userMedia.isFavorite ? "Favorited" : "Add to favorites"}
+            </span>
           </div>
         </div>
 
@@ -158,8 +141,6 @@ interface DetailPosterProps {
   posterUrl: string | null;
   titleEn: string | null;
   tileColorIndex: number;
-  isFavorite: boolean;
-  userMediaId: string;
 }
 
 function DetailPoster({ posterUrl, titleEn, tileColorIndex }: DetailPosterProps) {
@@ -292,7 +273,7 @@ interface WatchHistoryProps {
 function WatchHistory({ watchLogs, isMovie }: WatchHistoryProps) {
   const sub = isMovie
     ? watchLogs.length > 0
-      ? "1 watch"
+      ? `last ${watchLogs.length} watch${watchLogs.length === 1 ? "" : "es"}`
       : ""
     : `last ${Math.min(watchLogs.length, 5)} episodes`;
 
