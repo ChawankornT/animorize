@@ -1,12 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, ExternalLink, CheckCircle2 } from "lucide-react";
+import { ChevronRight, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Icon } from "@/components/ui/Icon";
 import { Badge } from "@/components/ui/Badge";
-import { StatusPill, ProgressBar } from "@/components/media/MediaCard";
+import { EpisodeTracker } from "@/components/media/EpisodeTracker";
 import { ProviderBadge } from "@/components/media/ProviderBadge";
-import { FavoriteButton } from "@/components/media/FavoriteButton";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { getDisplayTitle } from "@/domain/entities/title";
 import { isTrackable } from "@/domain/entities/Media";
@@ -58,42 +57,17 @@ export function MediaDetailView({ media, userMedia, providers, watchLogs }: Medi
             posterUrl={media.posterUrl}
             titleEn={media.titleEn}
             tileColorIndex={tileColorIndex}
-            isFavorite={userMedia.isFavorite}
-            userMediaId={userMedia.id}
           />
 
-          {/* 2.3 Tracking summary (read-only) */}
-          <div className="flex flex-col gap-3">
-            <StatusPill status={userMedia.status} />
-
-            {isMovie ? (
-              userMedia.status === "completed" && (
-                <span className="inline-flex items-center gap-1.5 text-sm text-success">
-                  <Icon as={CheckCircle2} size={15} />
-                  Watched
-                </span>
-              )
-            ) : (
-              <div className="flex flex-col gap-1.5">
-                <ProgressBar value={userMedia.currentEpisode} total={media.totalEpisodes} />
-                <span className="text-xs text-tertiary tabular-nums">
-                  ep <span className="text-primary font-medium">{userMedia.currentEpisode}</span> of{" "}
-                  {media.totalEpisodes}
-                </span>
-              </div>
-            )}
-
-            <div className="flex items-center gap-2">
-              <div className="w-6.5 h-6.5 rounded-pill flex items-center justify-center bg-black/55">
-                <FavoriteButton userMediaId={userMedia.id} isFavorite={userMedia.isFavorite} />
-              </div>
-              <span className="text-xs text-tertiary">
-                {userMedia.isFavorite ? "Favorited" : "Add to favorites"}
-              </span>
-            </div>
-
-            {/* Part 2b: EpisodeTracker action buttons + interactivity */}
-          </div>
+          <EpisodeTracker
+            userMediaId={userMedia.id}
+            currentEpisode={userMedia.currentEpisode}
+            totalEpisodes={media.totalEpisodes}
+            status={userMedia.status}
+            isMovie={isMovie}
+            airingStatus={media.airingStatus}
+            isFavorite={userMedia.isFavorite}
+          />
         </div>
 
         {/* Right content */}
@@ -158,8 +132,6 @@ interface DetailPosterProps {
   posterUrl: string | null;
   titleEn: string | null;
   tileColorIndex: number;
-  isFavorite: boolean;
-  userMediaId: string;
 }
 
 function DetailPoster({ posterUrl, titleEn, tileColorIndex }: DetailPosterProps) {
@@ -292,7 +264,7 @@ interface WatchHistoryProps {
 function WatchHistory({ watchLogs, isMovie }: WatchHistoryProps) {
   const sub = isMovie
     ? watchLogs.length > 0
-      ? "1 watch"
+      ? `last ${watchLogs.length} watch${watchLogs.length === 1 ? "" : "es"}`
       : ""
     : `last ${Math.min(watchLogs.length, 5)} episodes`;
 
@@ -304,18 +276,20 @@ function WatchHistory({ watchLogs, isMovie }: WatchHistoryProps) {
       </div>
 
       {watchLogs.length === 0 ? (
-        <p className="text-sm text-tertiary">No watches logged yet.</p>
+        <div className="border-[0.5px] border-default rounded-card px-4 py-4 text-sm text-tertiary">
+          No watches logged yet.
+        </div>
       ) : (
-        <div className="flex flex-col gap-1">
+        <div className="border-[0.5px] border-default rounded-card overflow-hidden">
           {watchLogs.map(log => (
             <div
               key={log.id}
-              className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-surface transition-colors"
+              className="grid grid-cols-[80px_1fr] items-center gap-4 px-4 py-2.5 border-b border-default last:border-0"
             >
-              <span className="text-sm text-primary">
+              <span className="text-sm font-medium tabular-nums">
                 {isMovie ? "Full film" : `ep ${log.episodeNumber}`}
               </span>
-              <span className="text-xs text-tertiary tabular-nums">
+              <span className="text-sm text-secondary tabular-nums">
                 {formatTimestamp(log.watchedAt)}
               </span>
             </div>

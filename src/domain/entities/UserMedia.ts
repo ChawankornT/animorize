@@ -1,4 +1,5 @@
 import type { AudioType, WatchStatus } from "@/types/enums";
+import type { AiringStatus } from "@/domain/entities/Media";
 import { getDisplayTitle } from "@/domain/entities/title";
 
 export type { AudioType, WatchStatus };
@@ -71,4 +72,18 @@ export function getEffectiveUrl(
  */
 export function isDashboardItem(userMedia: Pick<UserMedia, "status" | "isFavorite">): boolean {
   return userMedia.status === "watching" || userMedia.isFavorite;
+}
+
+/**
+ * Client-side mirror of the completion guard in increment_episode RPC (schema/14 — SQL = source of truth).
+ * Used for optimistic status calculation on +1 / mark watched.
+ * ⚠️ If the SQL guard changes, update this function to match.
+ */
+export function computeStatusAfterIncrement(
+  nextEpisode: number,
+  totalEpisodes: number,
+  airingStatus: AiringStatus,
+): WatchStatus {
+  if (nextEpisode >= totalEpisodes && airingStatus !== "ongoing") return "completed";
+  return "watching";
 }
