@@ -3,17 +3,6 @@
 แอปติดตามสื่อ (Anime, Series, Movie, OVA) แทน Excel
 Admin จัดการเนื้อหา + import จาก AniList / User ติดตาม progress
 
-## Tech Stack
-
-- Next.js 16.0.5 (App Router) + TypeScript strict
-- Tailwind CSS v4 + Supabase (PostgreSQL + Auth + RLS)
-- Zustand v5 + TanStack Query v5 + React Hook Form + Zod
-- Motion v11 + Vitest + RTL + npm
-
-## Commands
-
-- `npm run dev` / `npm run build` / `npm test` / `npm run lint` / `npm run typecheck`
-
 ## Architecture — Clean Architecture
 
 ```
@@ -24,17 +13,6 @@ UI          → app/ + components/                (render เท่านั้�
 ```
 
 Dependency rule: ชั้นในห้าม import ชั้นนอก — **บังคับโดย ESLint** (`no-restricted-imports` ใน `eslint.config.mjs`)
-
-```
-src/
-├── app/(auth)/ (main)/ admin/ franchise/[id]/ actions/
-├── components/ui/ media/ layout/
-├── domain/entities/ usecases/
-├── repositories/interfaces/ supabase/
-├── hooks/
-├── lib/supabase/(client|server|middleware).ts  anilist/  utils/
-├── stores/  types/  constants/
-```
 
 ## Supabase
 
