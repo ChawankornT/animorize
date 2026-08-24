@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { RotateCcw, CheckCircle2, Check, MoreHorizontal } from "lucide-react";
 import { useEpisodeTracker } from "@/hooks/useEpisodeTracker";
 import { StatusPill, ProgressBar } from "@/components/media/MediaCard";
+import { FavoriteButton } from "@/components/media/FavoriteButton";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { Modal } from "@/components/ui/Modal";
@@ -19,6 +20,7 @@ interface EpisodeTrackerProps {
   status: WatchStatus;
   isMovie: boolean;
   airingStatus: AiringStatus;
+  isFavorite: boolean;
 }
 
 export function EpisodeTracker({
@@ -28,6 +30,7 @@ export function EpisodeTracker({
   status,
   isMovie,
   airingStatus,
+  isFavorite,
 }: EpisodeTrackerProps) {
   const t = useEpisodeTracker({ userMediaId, currentEpisode, totalEpisodes, status, airingStatus });
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -60,6 +63,7 @@ export function EpisodeTracker({
             onRewatch={() => setConfirmOpen(true)}
           />
         )}
+        <FavoriteButton variant="inline" userMediaId={userMediaId} isFavorite={isFavorite} />
       </div>
 
       <Modal

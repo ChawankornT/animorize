@@ -5,6 +5,41 @@
 
 ---
 
+## [2026-08-24] fix(phase4): Part 2b — favorite button per design
+
+### Components
+
+- **`FavoriteButton`** — added `variant?: "icon" | "inline"` prop. `"icon"` (default) = unchanged circular overlay button used by `MediaCard`/`LibraryView`. `"inline"` = full-width `Button variant="ghost"` with `Star`/`Sparkle` icon + "Favorite"/"Favorited" label, matching `TrackerFav` in the design bundle.
+- **`EpisodeTracker`** — takes new `isFavorite` prop; renders `<FavoriteButton variant="inline">` as the last child of the `.tracker` card for both `MovieTracker` and `SeriesTracker` branches.
+- **`MediaDetailView`** — removed the separate circular favorite row rendered below the tracker; passes `isFavorite` straight into `EpisodeTracker` instead.
+
+Resolves design-vs-implementation gap #1 from the Part 2b impl prompt (previously deferred as "decision i — ห้ามแตะ FavoriteButton.tsx"; owner overrode this session: "fav เอาตาม design เลย"). Lint ✅ typecheck ✅ 150 tests ✅.
+
+---
+
+## [2026-08-24] feat(phase4): Part 2b — EpisodeTracker interactive component
+
+### Domain
+
+- **`computeStatusAfterIncrement`** — `domain/entities/UserMedia.ts`: client-side mirror of completion guard in RPC (`schema/14`). `nextEp >= total AND airing !== 'ongoing'` → `'completed'`; else → `'watching'`. Used for optimistic status in `useEpisodeTracker`. 4 unit tests (mid-series, finished-at-total, ongoing-caught-up, movie-mark).
+
+### Hooks
+
+- **`useEpisodeTracker`** — `hooks/useEpisodeTracker.ts`: `useOptimistic<TrackerState>` + `useTransition` + `useToast` + `useRouter`. Returns `{ episode, status, isPending, toasts, dismiss, incrementEpisode, markWatched, startRewatch, unmarkWatched }`. Stale CAS miss (reason="stale") → `router.refresh()` silently, no toast. Error → curated toast. Pattern adapted from `FavoriteButton`.
+
+### Components
+
+- **`EpisodeTracker`** — `components/media/EpisodeTracker.tsx`: delegates to `MovieTracker` or `SeriesTracker` based on `isMovie` prop (`!isTrackable(media)`). Confirm modal for rewatch/watch-again. Toast portal. `More` button always disabled (Phase 5).
+- **`MovieTracker`** — watched = `status === "completed"`. Unwatched: "Mark as watched". Watched: "Watch again" (confirm) + "Unmark as watched".
+- **`SeriesTracker`** — 5-state precedence: ① interrupted mid-way → ② completed at cap → ③ mid-way +1 → ④ ongoing caught-up → ⑤ all episodes watched (dead-end — Phase 5 dependency).
+- **`MediaDetailView`** — replaced read-only tracking summary with `<EpisodeTracker>`. FavoriteButton moved below. DetailPoster dead props removed. WatchHistory movie subtext dynamic count.
+
+### Tests
+
+- 150 tests total (146 + 4 computeStatusAfterIncrement) — lint ✅ typecheck ✅
+
+---
+
 ## [2026-06-19] fix(phase4): stale-path hardening — null guard + revalidate consistency
 
 ### Repository
