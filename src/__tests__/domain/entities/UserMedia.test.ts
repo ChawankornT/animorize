@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { getEffectiveUrl, isDashboardItem } from "@/domain/entities/UserMedia";
+import {
+  getEffectiveUrl,
+  isDashboardItem,
+  computeStatusAfterIncrement,
+} from "@/domain/entities/UserMedia";
 import { getDisplayTitle } from "@/domain/entities/title";
 
 describe("getEffectiveUrl", () => {
@@ -75,5 +79,23 @@ describe("getDisplayTitle (re-exported via title.ts)", () => {
 
   it("returns empty string when all titles are null", () => {
     expect(getDisplayTitle({ titleEn: null, titleRomaji: null, titleTh: null })).toBe("");
+  });
+});
+
+describe("computeStatusAfterIncrement", () => {
+  it("returns watching when mid-series (next < total)", () => {
+    expect(computeStatusAfterIncrement(5, 12, "finished")).toBe("watching");
+  });
+
+  it("returns completed when finished series reaches total", () => {
+    expect(computeStatusAfterIncrement(12, 12, "finished")).toBe("completed");
+  });
+
+  it("returns watching when ongoing series reaches total (caught up, not done)", () => {
+    expect(computeStatusAfterIncrement(12, 12, "ongoing")).toBe("watching");
+  });
+
+  it("returns completed for movie mark (1/1, airing=upcoming)", () => {
+    expect(computeStatusAfterIncrement(1, 1, "upcoming")).toBe("completed");
   });
 });

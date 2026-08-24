@@ -1,7 +1,9 @@
+import { SupabaseError } from "@/lib/supabase/errors";
 import type { SupabaseDb } from "@/lib/supabase/types";
 import type {
   IUserMediaRepository,
   UpdateProviderInput,
+  IncrementEpisodeResult,
 } from "@/repositories/interfaces/IUserMediaRepository";
 import type {
   UserMedia,
@@ -29,7 +31,8 @@ export class SupabaseUserMediaRepository implements IUserMediaRepository {
       .select()
       .single();
 
-    if (error) throw new Error(`Failed to add media to library: ${error.message}`);
+    if (error)
+      throw new SupabaseError(`Failed to add media to library: ${error.message}`, error.code);
     return toUserMedia(data);
   }
 
@@ -127,5 +130,86 @@ export class SupabaseUserMediaRepository implements IUserMediaRepository {
 
     if (error) throw new Error(`Failed to remove from library: ${error.message}`);
     if (!data || data.length === 0) throw new Error(`User media not found: ${id}`);
+  }
+
+  async findWithMediaByUserAndMedia(
+    userId: string,
+    mediaId: string,
+  ): Promise<UserMediaWithMedia | null> {
+    const { data, error } = await this.supabase
+      .from("user_media")
+      .select(USER_MEDIA_WITH_MEDIA_SELECT)
+      .eq("user_id", userId)
+      .eq("media_id", mediaId)
+      .maybeSingle();
+
+    if (error) throw new Error(`Failed to find library item: ${error.message}`);
+    if (!data) return null;
+    return toUserMediaWithMedia(data as unknown as UserMediaRowWithJoin);
+  }
+
+  async incrementEpisode(
+    userMediaId: string,
+    fromEpisode: number,
+  ): Promise<IncrementEpisodeResult> {
+    const { data, error } = await this.supabase.rpc("increment_episode", {
+      p_user_media_id: userMediaId,
+      p_from_episode: fromEpisode,
+    });
+
+    if (error) throw new Error(`Failed to increment episode: ${error.message}`);
+    if (data == null || data.id == null) return { status: "stale" };
+    return { status: "updated", userMedia: toUserMedia(data) };
+  }
+
+  async startRewatch(userMediaId: string): Promise<UserMedia | null> {
+    const { data: current, error: readError } = await this.supabase
+      .from("user_media")
+      .select("rewatch_count, status")
+      .eq("id", userMediaId)
+      .single();
+
+    if (readError) throw new Error(`Failed to read user media: ${readError.message}`);
+    if (!["completed", "dropped", "on_hold"].includes(current.status)) return null;
+
+    const { data, error } = await this.supabase
+      .from("user_media")
+      .update({
+        current_episode: 0,
+        status: "watching" as WatchStatus,
+        started_at: new Date().toISOString(),
+        completed_at: null,
+        rewatch_count: current.rewatch_count + 1,
+      })
+      .eq("id", userMediaId)
+      .in("status", ["completed", "dropped", "on_hold"])
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") return null;
+      throw new Error(`Failed to start rewatch: ${error.message}`);
+    }
+    return toUserMedia(data);
+  }
+
+  async unmarkWatched(userMediaId: string): Promise<UserMedia> {
+    const { data, error } = await this.supabase
+      .from("user_media")
+      .update({
+        current_episode: 0,
+        status: "plan_to_watch" as WatchStatus,
+        started_at: null,
+        completed_at: null,
+      })
+      .eq("id", userMediaId)
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") throw new Error(`User media not found: ${userMediaId}`);
+      throw new Error(`Failed to unmark watched: ${error.message}`);
+    }
+    return toUserMedia(data);
   }
 }

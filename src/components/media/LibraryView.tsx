@@ -47,6 +47,7 @@ function renderCard(item: UserMediaWithMedia, showStatus: boolean) {
       data={toCardData(item)}
       showStatus={showStatus}
       favoriteSlot={<FavoriteButton userMediaId={item.id} isFavorite={item.isFavorite} />}
+      href={`/media/${item.mediaId}`}
     />
   );
 }

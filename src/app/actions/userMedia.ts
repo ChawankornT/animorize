@@ -2,7 +2,8 @@
 
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthedUser } from "@/lib/supabase/auth";
+import { isPgUniqueViolation } from "@/lib/supabase/errors";
 import {
   createUserMediaRepository,
   createMediaRepository,
@@ -16,26 +17,30 @@ import { listMedia } from "@/domain/usecases/ListMedia";
 import { listMediaProviders } from "@/domain/usecases/ListMediaProviders";
 import { listProviders } from "@/domain/usecases/ListProviders";
 import { updateLibraryProvider } from "@/domain/usecases/UpdateLibraryProvider";
+import { incrementEpisode } from "@/domain/usecases/IncrementEpisode";
+import { startRewatch } from "@/domain/usecases/StartRewatch";
+import { unmarkWatched } from "@/domain/usecases/UnmarkWatched";
 import type { Media } from "@/domain/entities/Media";
 import type { MediaProvider } from "@/domain/entities/MediaProvider";
 import type { Provider } from "@/domain/entities/Provider";
 
 export type UserMediaActionResult =
   | { success: true; message: string }
-  | { success: false; message: string; reason: "duplicate" | "unauthorized" | "invalid" | "error" };
+  | {
+      success: false;
+      message: string;
+      reason: "duplicate" | "unauthorized" | "invalid" | "error" | "stale";
+    };
 
 export async function toggleFavoriteAction(
   userMediaId: string,
   next: boolean,
 ): Promise<UserMediaActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { success: false, message: "Unauthorized", reason: "unauthorized" };
+  const auth = await getAuthedUser();
+  if (!auth) return { success: false, message: "Unauthorized", reason: "unauthorized" };
 
   try {
-    const repo = createUserMediaRepository(supabase);
+    const repo = createUserMediaRepository(auth.supabase);
     await setFavorite(repo, userMediaId, next);
     revalidatePath("/dashboard");
     return { success: true, message: next ? "Added to favorites" : "Removed from favorites" };
@@ -46,14 +51,11 @@ export async function toggleFavoriteAction(
 }
 
 export async function removeFromLibraryAction(userMediaId: string): Promise<UserMediaActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { success: false, message: "Unauthorized", reason: "unauthorized" };
+  const auth = await getAuthedUser();
+  if (!auth) return { success: false, message: "Unauthorized", reason: "unauthorized" };
 
   try {
-    const repo = createUserMediaRepository(supabase);
+    const repo = createUserMediaRepository(auth.supabase);
     await removeFromLibrary(repo, userMediaId);
     revalidatePath("/dashboard");
     return { success: true, message: "Removed from library" };
@@ -64,13 +66,10 @@ export async function removeFromLibraryAction(userMediaId: string): Promise<User
 }
 
 export async function searchMediaAction(query: string): Promise<Media[]> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return [];
+  const auth = await getAuthedUser();
+  if (!auth) return [];
 
-  const repo = createMediaRepository(supabase);
+  const repo = createMediaRepository(auth.supabase);
   return listMedia(repo, { search: query });
 }
 
@@ -78,15 +77,12 @@ export async function getAddToLibraryDataAction(mediaId: string): Promise<{
   allProviders: Provider[];
   mediaProviders: MediaProvider[];
 }> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { allProviders: [], mediaProviders: [] };
+  const auth = await getAuthedUser();
+  if (!auth) return { allProviders: [], mediaProviders: [] };
 
   const [allProviders, mediaProviders] = await Promise.all([
-    listProviders(createProviderRepository(supabase)),
-    listMediaProviders(createMediaProviderRepository(supabase), mediaId),
+    listProviders(createProviderRepository(auth.supabase)),
+    listMediaProviders(createMediaProviderRepository(auth.supabase), mediaId),
   ]);
 
   return { allProviders, mediaProviders };
@@ -102,11 +98,8 @@ const addToLibrarySchema = z.object({
 export async function addToLibraryAction(
   input: z.infer<typeof addToLibrarySchema>,
 ): Promise<UserMediaActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { success: false, message: "Unauthorized", reason: "unauthorized" };
+  const auth = await getAuthedUser();
+  if (!auth) return { success: false, message: "Unauthorized", reason: "unauthorized" };
 
   const parsed = addToLibrarySchema.safeParse(input);
   if (!parsed.success) {
@@ -114,13 +107,13 @@ export async function addToLibraryAction(
   }
 
   try {
-    const repo = createUserMediaRepository(supabase);
-    await addToLibrary(repo, { userId: user.id, ...parsed.data });
+    const repo = createUserMediaRepository(auth.supabase);
+    await addToLibrary(repo, { userId: auth.user.id, ...parsed.data });
     revalidatePath("/dashboard");
     return { success: true, message: "Added to library" };
   } catch (error) {
     console.error("[addToLibraryAction]", error);
-    if (error instanceof DuplicateLibraryEntryError) {
+    if (error instanceof DuplicateLibraryEntryError || isPgUniqueViolation(error)) {
       return { success: false, message: "Already in your library.", reason: "duplicate" };
     }
     return { success: false, message: "Failed to add to library", reason: "error" };
@@ -137,11 +130,8 @@ export async function changeLibraryProviderAction(
   userMediaId: string,
   input: z.infer<typeof changeLibraryProviderSchema>,
 ): Promise<UserMediaActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { success: false, message: "Unauthorized", reason: "unauthorized" };
+  const auth = await getAuthedUser();
+  if (!auth) return { success: false, message: "Unauthorized", reason: "unauthorized" };
 
   const parsed = changeLibraryProviderSchema.safeParse(input);
   if (!parsed.success) {
@@ -149,7 +139,7 @@ export async function changeLibraryProviderAction(
   }
 
   try {
-    const repo = createUserMediaRepository(supabase);
+    const repo = createUserMediaRepository(auth.supabase);
     await updateLibraryProvider(repo, userMediaId, {
       providerId: parsed.data.providerId,
       audio: parsed.data.audio,
@@ -160,5 +150,59 @@ export async function changeLibraryProviderAction(
   } catch (error) {
     console.error("[changeLibraryProviderAction]", error);
     return { success: false, message: "Failed to update provider", reason: "error" };
+  }
+}
+
+export async function incrementEpisodeAction(
+  userMediaId: string,
+  fromEpisode: number,
+): Promise<UserMediaActionResult> {
+  const auth = await getAuthedUser();
+  if (!auth) return { success: false, message: "Unauthorized", reason: "unauthorized" };
+
+  try {
+    const repo = createUserMediaRepository(auth.supabase);
+    const result = await incrementEpisode(repo, userMediaId, fromEpisode);
+    revalidatePath("/dashboard");
+    if (result.status === "stale") {
+      return { success: false, message: "Episode already updated", reason: "stale" };
+    }
+    return { success: true, message: "Episode updated" };
+  } catch (error) {
+    console.error("[incrementEpisodeAction]", error);
+    return { success: false, message: "Failed to update episode", reason: "error" };
+  }
+}
+
+export async function startRewatchAction(userMediaId: string): Promise<UserMediaActionResult> {
+  const auth = await getAuthedUser();
+  if (!auth) return { success: false, message: "Unauthorized", reason: "unauthorized" };
+
+  try {
+    const repo = createUserMediaRepository(auth.supabase);
+    const result = await startRewatch(repo, userMediaId);
+    revalidatePath("/dashboard");
+    if (!result) {
+      return { success: false, message: "Cannot rewatch from current status", reason: "stale" };
+    }
+    return { success: true, message: "Rewatch started" };
+  } catch (error) {
+    console.error("[startRewatchAction]", error);
+    return { success: false, message: "Failed to start rewatch", reason: "error" };
+  }
+}
+
+export async function unmarkWatchedAction(userMediaId: string): Promise<UserMediaActionResult> {
+  const auth = await getAuthedUser();
+  if (!auth) return { success: false, message: "Unauthorized", reason: "unauthorized" };
+
+  try {
+    const repo = createUserMediaRepository(auth.supabase);
+    await unmarkWatched(repo, userMediaId);
+    revalidatePath("/dashboard");
+    return { success: true, message: "Marked as unwatched" };
+  } catch (error) {
+    console.error("[unmarkWatchedAction]", error);
+    return { success: false, message: "Failed to update status", reason: "error" };
   }
 }

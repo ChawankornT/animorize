@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "motion/react";
 import { Star } from "lucide-react";
 import { Icon } from "@/components/ui/Icon";
+import { Button } from "@/components/ui/Button";
 import { Sparkle } from "@/components/brand/Sparkle";
 import { Toast } from "@/components/ui/Toast";
 import { useToast } from "@/hooks/useToast";
@@ -13,9 +14,11 @@ import { toggleFavoriteAction } from "@/app/actions/userMedia";
 interface FavoriteButtonProps {
   userMediaId: string;
   isFavorite: boolean;
+  /** "icon" = circular icon-only (MediaCard overlay, default). "inline" = full-width labeled ghost button (tracker card). */
+  variant?: "icon" | "inline";
 }
 
-export function FavoriteButton({ userMediaId, isFavorite }: FavoriteButtonProps) {
+export function FavoriteButton({ userMediaId, isFavorite, variant = "icon" }: FavoriteButtonProps) {
   const [optimisticFav, setOptimisticFav] = useOptimistic(isFavorite);
   const [isPending, startTransition] = useTransition();
   const { toasts, show, dismiss } = useToast();
@@ -24,10 +27,14 @@ export function FavoriteButton({ userMediaId, isFavorite }: FavoriteButtonProps)
   function handleToggle() {
     const next = !optimisticFav;
     startTransition(async () => {
-      setOptimisticFav(next);
-      const result = await toggleFavoriteAction(userMediaId, next);
-      if (!result.success) {
-        show(result.message, "error");
+      try {
+        setOptimisticFav(next);
+        const result = await toggleFavoriteAction(userMediaId, next);
+        if (!result.success) {
+          show(result.message, "error");
+        }
+      } catch {
+        show("Failed to update favorite", "error");
       }
     });
   }
@@ -51,29 +58,49 @@ export function FavoriteButton({ userMediaId, isFavorite }: FavoriteButtonProps)
         },
       };
 
+  const sparkle = (
+    <motion.span
+      key="sparkle"
+      initial={sparkleInitial}
+      animate={sparkleAnimate}
+      className="flex items-center justify-center"
+    >
+      <Sparkle size={13} />
+    </motion.span>
+  );
+
   return (
     <>
-      <button
-        aria-label={optimisticFav ? "Remove from favorites" : "Add to favorites"}
-        aria-pressed={optimisticFav}
-        disabled={isPending}
-        onClick={handleToggle}
-        className="flex items-center justify-center w-full h-full disabled:cursor-not-allowed"
-        style={{ color: "#fff" }}
-      >
-        {optimisticFav ? (
-          <motion.span
-            key="sparkle"
-            initial={sparkleInitial}
-            animate={sparkleAnimate}
-            className="flex items-center justify-center"
-          >
-            <Sparkle size={13} />
-          </motion.span>
-        ) : (
-          <Icon as={Star} size={14} />
-        )}
-      </button>
+      {variant === "inline" ? (
+        <Button
+          variant="ghost"
+          size="md"
+          className="w-full"
+          aria-label={optimisticFav ? "Remove from favorites" : "Add to favorites"}
+          aria-pressed={optimisticFav}
+          disabled={isPending}
+          onClick={handleToggle}
+        >
+          {optimisticFav ? (
+            <>{sparkle} Favorited</>
+          ) : (
+            <>
+              <Icon as={Star} size={16} /> Favorite
+            </>
+          )}
+        </Button>
+      ) : (
+        <button
+          aria-label={optimisticFav ? "Remove from favorites" : "Add to favorites"}
+          aria-pressed={optimisticFav}
+          disabled={isPending}
+          onClick={handleToggle}
+          className="flex items-center justify-center w-full h-full disabled:cursor-not-allowed"
+          style={{ color: "#fff" }}
+        >
+          {optimisticFav ? sparkle : <Icon as={Star} size={14} />}
+        </button>
+      )}
 
       {typeof document !== "undefined" &&
         toasts.length > 0 &&

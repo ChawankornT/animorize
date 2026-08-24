@@ -5,6 +5,149 @@
 
 ---
 
+## [2026-08-24] fix(phase4): Part 2b — favorite button per design
+
+### Components
+
+- **`FavoriteButton`** — added `variant?: "icon" | "inline"` prop. `"icon"` (default) = unchanged circular overlay button used by `MediaCard`/`LibraryView`. `"inline"` = full-width `Button variant="ghost"` with `Star`/`Sparkle` icon + "Favorite"/"Favorited" label, matching `TrackerFav` in the design bundle.
+- **`EpisodeTracker`** — takes new `isFavorite` prop; renders `<FavoriteButton variant="inline">` as the last child of the `.tracker` card for both `MovieTracker` and `SeriesTracker` branches.
+- **`MediaDetailView`** — removed the separate circular favorite row rendered below the tracker; passes `isFavorite` straight into `EpisodeTracker` instead.
+
+Resolves design-vs-implementation gap #1 from the Part 2b impl prompt (previously deferred as "decision i — ห้ามแตะ FavoriteButton.tsx"; owner overrode this session: "fav เอาตาม design เลย"). Lint ✅ typecheck ✅ 150 tests ✅.
+
+---
+
+## [2026-08-24] feat(phase4): Part 2b — EpisodeTracker interactive component
+
+### Domain
+
+- **`computeStatusAfterIncrement`** — `domain/entities/UserMedia.ts`: client-side mirror of completion guard in RPC (`schema/14`). `nextEp >= total AND airing !== 'ongoing'` → `'completed'`; else → `'watching'`. Used for optimistic status in `useEpisodeTracker`. 4 unit tests (mid-series, finished-at-total, ongoing-caught-up, movie-mark).
+
+### Hooks
+
+- **`useEpisodeTracker`** — `hooks/useEpisodeTracker.ts`: `useOptimistic<TrackerState>` + `useTransition` + `useToast` + `useRouter`. Returns `{ episode, status, isPending, toasts, dismiss, incrementEpisode, markWatched, startRewatch, unmarkWatched }`. Stale CAS miss (reason="stale") → `router.refresh()` silently, no toast. Error → curated toast. Pattern adapted from `FavoriteButton`.
+
+### Components
+
+- **`EpisodeTracker`** — `components/media/EpisodeTracker.tsx`: delegates to `MovieTracker` or `SeriesTracker` based on `isMovie` prop (`!isTrackable(media)`). Confirm modal for rewatch/watch-again. Toast portal. `More` button always disabled (Phase 5).
+- **`MovieTracker`** — watched = `status === "completed"`. Unwatched: "Mark as watched". Watched: "Watch again" (confirm) + "Unmark as watched".
+- **`SeriesTracker`** — 5-state precedence: ① interrupted mid-way → ② completed at cap → ③ mid-way +1 → ④ ongoing caught-up → ⑤ all episodes watched (dead-end — Phase 5 dependency).
+- **`MediaDetailView`** — replaced read-only tracking summary with `<EpisodeTracker>`. FavoriteButton moved below. DetailPoster dead props removed. WatchHistory movie subtext dynamic count.
+
+### Tests
+
+- 150 tests total (146 + 4 computeStatusAfterIncrement) — lint ✅ typecheck ✅
+
+---
+
+## [2026-06-19] fix(phase4): stale-path hardening — null guard + revalidate consistency
+
+### Repository
+
+- **`SupabaseUserMediaRepository.incrementEpisode`** — hardened null guard: `data == null || data.id == null` (ปิด all-null composite gotcha by construction — PostgREST อาจ serialize `RETURN NULL` จาก composite function เป็น `{ id: null, ... }` แทน JS `null`; `id` เป็น PK → success จริงไม่มีทาง null → ตรวจ stale ได้ทั้งสอง representation)
+
+### Server Actions
+
+- **`startRewatchAction`** — ย้าย `revalidatePath("/dashboard")` ขึ้นก่อน stale return (ตรงกับ `incrementEpisodeAction` pattern — client sync state เงียบเสมอแม้ stale)
+
+### Tests
+
+- 4 repo unit tests ใหม่ (`SupabaseUserMediaRepository.test.ts`): valid row → updated, JS null → stale, all-null composite → stale, error → throws (140 tests total)
+
+---
+
+## [2026-06-18] feat(phase4): Part 1 backend — schema, entities, repos, usecases, actions, tests
+
+### Schema
+
+- **`schema/13-phase4-alter-user-media.sql`** — `ALTER TABLE user_media ADD COLUMN IF NOT EXISTS rewatch_count integer NOT NULL DEFAULT 0` (idempotent)
+- **`schema/14-increment-episode.sql`** — CAS RPC `increment_episode(p_user_media_id, p_from_episode)`: SECURITY INVOKER, atomic UPDATE + INSERT watchlog, completion guard `new_ep >= total AND airing_status <> 'ongoing'`, `RETURN NULL` on CAS miss, `GRANT TO authenticated`
+- **`schema/07-user-media.sql`** — canonical schema updated with `rewatch_count`
+- **`schema/README.md`** — prose updated 00→14, added "Existing Phase 3 DB" migration section
+
+### Domain
+
+- **`WatchLog` entity** — `src/domain/entities/WatchLog.ts`: pure interface `{ id, userId, mediaId, episodeNumber, watchedAt }`
+- **`types/enums.ts`** — centralized enum exports from `Database["public"]["Enums"]`; entity imports refactored (Media, MediaProvider, SyncLog)
+- **4 usecases**: `IncrementEpisode` (thin delegate to RPC), `StartRewatch` (reset pointer + rewatch_count), `UnmarkWatched` (reset to plan_to_watch), `GetLibraryItem` (single item lookup)
+
+### Repository
+
+- **`IWatchLogRepository`** — read-only interface (`findByUserAndMedia` with limit)
+- **`SupabaseWatchLogRepository`** — implementation using server.ts client
+- **`IUserMediaRepository`** — 4 new methods: `findWithMediaByUserAndMedia`, `incrementEpisode` (RPC wrapper → `IncrementEpisodeResult`), `startRewatch`, `unmarkWatched`
+- **`SupabaseUserMediaRepository`** — all 4 implemented; `startRewatch` uses status guard `WHERE status IN ('completed','dropped','on_hold')`
+- **mappers** — `toWatchLog`, `rewatchCount` field added to `toUserMedia`
+
+### Server Actions
+
+- **`incrementEpisodeAction`** — stale → `reason: "stale"` (no toast); revalidatePath always (§P4 1.1 "ปล่อย revalidate sync เงียบ")
+- **`startRewatchAction`** — null guard miss → `reason: "stale"`
+- **`unmarkWatchedAction`** — standard error handling
+- **`UserMediaActionResult.reason`** — extended with `"stale"`
+
+### Infrastructure
+
+- **`lib/supabase/types.ts`** — `Functions` type changed for `.rpc()` type inference
+- **`.gitignore`** — added `supabase/.temp/` (Supabase CLI local state)
+- **`types/database.ts`** — regenerated via `supabase gen types`
+
+### Tests
+
+- 14 new tests (136 total): 4 usecase test files + 2 mapper tests + mock harness extended
+- lint ✅ typecheck ✅
+
+---
+
+## [2026-06-15] fix: pre-Phase 4 error-handling hardening
+
+### Client error handling (§P4 1.8 convention)
+
+- **`FavoriteButton.handleToggle`** — added try/catch inside `startTransition`; network errors now show curated toast instead of silent optimistic revert
+- **`AddToLibraryModal.handleSubmit`** — added try/catch/finally; network errors show toast with description; `setSubmitting(false)` moved to `finally` (no more stuck "Adding…" button)
+- **`SearchView`** — added `isError` + retry button from `useQuery`; search errors no longer masquerade as "No results found"
+
+### TOCTOU race fix
+
+- **`SupabaseError`** (`lib/supabase/errors.ts`) — typed error class preserving PostgrestError `.code`; `isPgUniqueViolation` helper
+- **`SupabaseUserMediaRepository.add()`** — throws `SupabaseError` instead of plain `Error` (preserves `code` for callers)
+- **`addToLibraryAction`** — catch now checks `isPgUniqueViolation(error)` alongside `DuplicateLibraryEntryError` → concurrent adds correctly return `reason: "duplicate"`
+
+### Auth refactor
+
+- **`getAuthedUser()`** (`lib/supabase/auth.ts`) — extracts repeated `createClient → getUser → null check` boilerplate
+- All 6 user media actions refactored to use helper (behavior unchanged)
+
+---
+
+## [2026-06-07] docs: Pre-Phase 4 decisions + conventions
+
+### DECISIONS.md
+
+- **§P4 section appended** — 9 sub-decisions for Phase 4 Progress Tracking:
+  - §P4 1.1: +1 Episode = CAS idempotent increment via Postgres RPC (`SECURITY INVOKER`)
+  - §P4 1.2: Auto-status + completion guard revised (`airing_status <> 'ongoing'` แทน `current = total`)
+  - §P4 1.3: −1/correction deferred → Phase 5 "Edit progress"
+  - §P4 1.4: Rewatch added to Phase 4 scope (confirm → reset pointer, rewatch_count+1)
+  - §P4 1.5: movie/special toggle Watched (mark = RPC, unmark = reset pointer)
+  - §P4 1.6: Schema `user_media.rewatch_count`
+  - §P4 1.7: History scope = per-media only (global deferred)
+  - §P4 1.8: Error-handling convention (client try/catch + toast mandatory)
+  - §P4 1.9: AniList ongoing data caveat documented
+- **Stale entries annotated** — "Atomic +1 Episode" section + Phase 4 roadmap bullets ชี้ §P4
+
+### CLAUDE.md
+
+- **Key Business Rules** — replaced `+1 Episode` line with CAS block (guard, matched/no-match, movie/special, Rewatch, −1 deferred)
+- **Conventions DO block** — added error-handling rules (imperative mutation try/catch, TanStack queryFn throw)
+
+### PROGRESS.md
+
+- **Notes for Chat** — Phase 4 pre-implementation summary + fix round backlog + design addendum pending
+- **Versions bumped** — `decisions_version: 2026-06-07-v1`, `claude_md_version: 2026-06-07-v1`
+
+---
+
 ## [2026-06-03] Release: Phase 3 → main (PR #19)
 
 - **Code review** (high effort, 7 parallel angles) — 10 findings surfaced, 3 correctness bugs backlogged

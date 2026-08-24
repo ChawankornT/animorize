@@ -14,6 +14,7 @@ import type { MediaProvider, CreateMediaProviderInput } from "@/domain/entities/
 import type { SyncLog, CreateSyncLogInput } from "@/domain/entities/SyncLog";
 import type { SystemSettings } from "@/domain/entities/SystemSettings";
 import type { UserMedia, UserMediaWithMedia, AddToLibraryInput } from "@/domain/entities/UserMedia";
+import type { WatchLog } from "@/domain/entities/WatchLog";
 
 type ProviderRow = Database["public"]["Tables"]["providers"]["Row"];
 type FranchiseRow = Database["public"]["Tables"]["franchises"]["Row"];
@@ -22,6 +23,7 @@ type MediaProviderRow = Database["public"]["Tables"]["media_providers"]["Row"];
 type SyncLogRow = Database["public"]["Tables"]["sync_logs"]["Row"];
 type SystemSettingsRow = Database["public"]["Tables"]["system_settings"]["Row"];
 type UserMediaRow = Database["public"]["Tables"]["user_media"]["Row"];
+type WatchLogRow = Database["public"]["Tables"]["watchlogs"]["Row"];
 
 type MediaProviderRowWithJoin = MediaProviderRow & {
   providers?: { name: string; color: string } | null;
@@ -268,6 +270,7 @@ export function toUserMedia(row: UserMediaRow): UserMedia {
     customUrl: row.custom_url,
     startedAt: row.started_at,
     completedAt: row.completed_at,
+    rewatchCount: row.rewatch_count,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -290,6 +293,16 @@ export function toUserMediaWithMedia(row: UserMediaRowWithJoin): UserMediaWithMe
     providerName: row.providers?.name ?? null,
     providerColor: row.providers?.color ?? null,
     baseUrl: providerEntry?.base_url ?? null,
+  };
+}
+
+export function toWatchLog(row: WatchLogRow): WatchLog {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    mediaId: row.media_id,
+    episodeNumber: row.episode_number,
+    watchedAt: row.watched_at,
   };
 }
 

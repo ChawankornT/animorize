@@ -2,7 +2,7 @@
 
 > บันทึกเหตุผลการตัดสินใจทุกอย่างในโปรเจค
 > อัปเดตทุกครั้งที่มีการเปลี่ยน tech, approach, หรือ scope
-> อัปเดตล่าสุด: 2026-05-31
+> อัปเดตล่าสุด: 2026-06-07
 
 ---
 
@@ -247,7 +247,7 @@ UI            → app/ + components/         (render เท่านั้น)
 
 **กฎ:**
 
-- Phase 4: increment episode + insert watchlog + auto-complete (`current = total → status='completed'`) รวมใน Postgres function (RPC) เดียว เรียกผ่าน repository
+- Phase 4: increment episode + insert watchlog + auto-complete (`current = total → status='completed'`) รวมใน Postgres function (RPC) เดียว เรียกผ่าน repository ↳ 2026-06-07: completion revised → "new_ep >= total AND airing_status <> 'ongoing'"; increment เป็น CAS (from_episode). ดู §P4 1.1–1.2
 - usecase `IncrementEpisode` ยัง orchestrate (เรียก repo method ที่ wrap RPC) แต่ atomic step อยู่ DB
 - นี่คือ **ข้อยกเว้นที่ตั้งใจของกฎ "business logic ใน domain/usecases เท่านั้น"**
 
@@ -427,41 +427,7 @@ genres           → genres[]
 
 ---
 
-## Future Considerations (ยังไม่ทำใน MVP)
-
-### Calendar Feature
-
-มี 2 แบบที่วางไว้:
-
-- Airing Calendar — แสดงวันออกอากาศของแต่ละ media
-- User Viewing Calendar — user วางแผนว่าจะดูวันไหน
-  Schema ปัจจุบันรองรับได้ด้วย `air_date_start` และ `season_quarter`
-
-### Episodes Table
-
-รองรับในอนาคตสำหรับ episode-level metadata (ชื่อตอน, thumbnail, aired date)
-ตอนนี้ track แค่ episode_number เพียงพอสำหรับ MVP
-
-### Backend แยก (Custom API)
-
-ถ้าวันนึงต้องการ:
-
-- Public API สำหรับ third-party
-- Self-host หรือเปลี่ยน DB
-- Performance tuning เกินที่ Supabase รองรับ
-
-แนวทาง: เพิ่ม repository implementation ใหม่ — domain layer ไม่ต้องแตะ
-
-### Animation/Live Action Movie แยก
-
-ปัจจุบันใช้ `movie` รวม animated + live action
-ถ้าอนาคตต้องการแยก ค่อยเพิ่ม `animated_movie` ใน enum
-
-### Logging + Error Tracking
-
-- เพิ่ม Pino สำหรับ structured logging
-- เพิ่ม Sentry สำหรับ error tracking บน production
-- ทบทวนเมื่อ deploy production จริง
+> Future Considerations, Phase 7 detail, and User-facing AniList Import sections moved to [`docs/decisions-future.md`](docs/decisions-future.md)
 
 ---
 
@@ -521,10 +487,12 @@ genres           → genres[]
 #### Features
 
 - +1 Episode (EpisodeTracker → useEpisodeTracker → IncrementEpisode) + optimistic update
-- auto status update เมื่อ current = total → 'completed' (อยู่ใน IncrementEpisode)
+- auto status update เมื่อ current = total → 'completed' (อยู่ใน IncrementEpisode) (superseded — ดู §P4 1.2)
 - movie/special: toggle Watched (total_episodes = 1)
 - Watchlog auto-record atomic กับ +1 ทุกครั้ง
-- History page: รายการ watchlog ของ user
+- History page: รายการ watchlog ของ user (Phase 4 = per-media บน detail เท่านั้น; global page deferred — ดู §P4 1.7)
+- Rewatch (completed/dropped/on_hold → restart from ep 1) — ดู §P4 1.4
+- −1/correction → deferred to Phase 5 "Edit progress" (ดู §P4 1.3)
 
 ### Phase 5 — UX Polish
 
@@ -539,6 +507,7 @@ genres           → genres[]
 - AniList `coverImage.extraLarge` แทน `large` — poster resolution ดีขึ้น
 - Library filter/sort/search popover (design พร้อมใน handoff)
 - Motion/animation wrapper — page transition, card enter, list stagger
+- "Edit progress" (set episode ตรงๆ) ใน ⋯ More menu — รับช่วง −1/correction จาก Phase 4 (§P4 1.3)
 
 ### Phase 6 — Extended Features
 
@@ -558,94 +527,7 @@ genres           → genres[]
 - 7a: live discovery + select-import (ยังไม่มี table — diff กับ media สด)
 - 7b: import_candidates table (lean cache) + notification (count 'new') + dismiss
 - 7c: cron auto-refresh candidates (ใช้ cron infra ร่วมกับ Phase 6)
-- รายละเอียด + decision เต็ม: ดูหัวข้อ "Phase 7 — Discovery & Bulk Import (detail)" ด้านล่าง
-
----
-
-## Phase 7 — Discovery & Bulk Import (detail) [DRAFT 2026-05-30 rev.3]
-
-**สถานะ:** ร่าง — เคาะ scope + schema + data model แล้ว รอเริ่มจริง
-**ลำดับ:** admin-side ไม่ block Phase 3-6 → ทำหลัง Phase 3 ได้
-
-### ปัญหาที่แก้
-
-- import ได้ทีละเรื่อง + admin ต้องรู้ AniList ID เอง → ไม่รู้ว่าซีซั่นข้างหน้ามีอะไรเข้า
-
-### Scope ที่ทำ
-
-- Discovery = forward-only — default ซีซั่นปัจจุบัน + กำลังจะมา (RELEASING / NOT_YET_RELEASED)
-- ย้อนหลัง = manual filter (season + year) เท่านั้น ไม่ดึงย้อนอัตโนมัติ
-- Notification: เจอเรื่องใหม่ → ขึ้นจำนวน (candidates status='new') ไม่ import เอง
-- Admin เลือก import: list + checkbox → import เฉพาะที่เลือก
-- เรื่องที่ไม่เลือก: Dismiss → เก็บไว้ browse/import ภายหลัง ไม่เตือนซ้ำ
-- หน่วย import = ซีซั่น — ไม่ทำ full-catalog dump ผ่านเว็บ
-
-### Scope ที่ไม่ทำ (ตั้งใจ)
-
-- ❌ Full-catalog dump (หมื่นเรื่อง) ผ่าน Server Action — เกิน serverless timeout + ขัด curate model
-- ❌ ดึงย้อนหลังอัตโนมัติ
-
-### Data model — candidates เก็บ LEAN (เคาะ 2026-05-30)
-
-- เก็บแค่ field สำหรับ "แสดง list + อ้างอิงตอน import":
-  anilist_id (unique), title_romaji, title_en, poster_url, media_type,
-  season_quarter, season_year, airing_status, status (new|dismissed|imported), discovered_at
-- ไม่เก็บ synopsis / genres / episodes / air dates — เพราะ discovery มองเรื่องที่ยังไม่ฉาย
-  ข้อมูลพวกนี้เปลี่ยนบ่อยก่อนฉาย → cache แล้ว stale
-- ตอน admin กด import → re-fetch ตัวเต็มสด ๆ จาก AniList ด้วย anilist_id แล้วสร้าง media
-  (candidates ไม่เป็น source of truth ซ้อนกับ media, ไม่ drift จาก schema)
-
-### Schema — DEFER (เคาะ 2026-05-30)
-
-- import_candidates table ยังไม่ migrate ตอนนี้ → สร้างตอนเริ่ม 7b
-- เริ่มที่ 7a (live discovery, ไม่มี table) ก่อน
-- ตอนทำ 7b: เพิ่ม schema file ใหม่ + regenerate types/database.ts (auto-gen — ห้ามแก้มือ) + RLS (admin-only)
-
-### กฎที่ต้อง preserve / แก้
-
-- ✅ Preview ก่อน save ยังอยู่ — admin เลือกเอง = preview
-- ✅ ห้าม auto-save (สร้าง media อัตโนมัติ) ยังอยู่ — cache candidates ≠ save
-- 🔧 .claude/rules/admin.md:
-  - เพิ่ม: "cache discovery candidates ไม่ถือเป็น save — ห้ามสร้าง media อัตโนมัติ"
-  - แก้: bulk import แบบ select-list อนุญาต; bulk retry ยังห้าม (ทีละรายการ)
-- Dedup ด้วย anilist_id (unique ทั้ง media + candidates) — ข้ามที่มีแล้ว ไม่ overwrite
-- sync_log ต่อเรื่องตอน import — 1 เรื่อง fail ไม่ล้มทั้ง batch
-
-### Architecture (Clean Architecture เดิม)
-
-- lib/anilist/ — Page query (browse by season/year/status) + list mapper
-- domain/entities/ — ImportCandidate (7b)
-- domain/usecases/ — DiscoverUpcoming, BulkImportSelected, DismissCandidate (7b)
-- repositories/ — IImportCandidateRepository + Supabase impl (7b)
-- actions/ — refreshDiscoveryAction / bulkImportAction / dismissCandidateAction
-- rate limit: sleep ระหว่าง request, เคารพ ~30-90 req/min (Page ดึงทีละ ~50 ประหยัด quota)
-
-### ⚠️ ต้อง confirm ตอนเริ่ม
-
-1. notification ขึ้นที่ไหน — admin dashboard "Needs attention" inbox (มีอยู่แล้ว) เพิ่ม section?
-2. cron mechanism (7c) ใช้ตัวเดียวกับ auto-sync Phase 6
-
----
-
-## User-facing AniList Import — Deferred (post-Phase 7)
-
-> บันทึก 2026-05-31
-
-**สถานะ:** ยังไม่ทำ — Phase 3 user เพิ่มเรื่องจาก catalog (search) เท่านั้น
-**ทบทวนเมื่อ:** จบ Phase 7 (discovery/candidates พร้อม)
-
-### ไอเดียที่ลอยไว้
-
-- user ส่ง "request" เรื่องที่อยากได้ (อาจมาจาก AniList list ของตัวเอง) → เข้า queue
-- admin review/approve → import เข้า catalog → ค่อย add เข้า library ของ user
-- ต่อกับ Phase 7 candidates ได้ (request ที่ match anilist_id เดิม = dedup; ที่ยังไม่มีใน catalog = candidate ใหม่)
-- รักษา boundary เดิม: ยิง AniList = ฝั่ง server/admin เท่านั้น ห้าม client
-
-### ⚠️ ต้องเคาะตอนเริ่ม
-
-- schema ของ request queue
-- จุดที่ admin เห็น (inbox "Needs attention"?)
-- ความสัมพันธ์กับ import_candidates ของ Phase 7
+- รายละเอียด + decision เต็ม: ดู [`docs/decisions-future.md`](docs/decisions-future.md)
 
 ---
 
@@ -685,6 +567,89 @@ Effective URL = custom_url ?? media_providers.base_url
 **Counts:** page-head + Favorites tab = all-fav (`items.filter(isFavorite)`); Favorites section sub = fav-not-watching (คนละเลข ตั้งใจ)
 
 **Top-bar (Phase 3):** มีแค่ "Add media → /search"; Filter/Sort/Library-search popover defer → Phase 5 (design พร้อมใน handoff)
+
+---
+
+## §P4 — Phase 4 — Progress Tracking (pre-implementation, 2026-06-07)
+
+> บันทึก 2026-06-07 — เคาะก่อนเริ่ม Phase 4
+
+### §P4 1.1 — +1 Episode = CAS idempotent increment (RPC)
+
+- RPC `increment_episode(p_user_media_id uuid, p_from_episode int)` — **`SECURITY INVOKER`** (RLS ทำงานปกติ — ต่างจาก `is_admin()` ที่เป็น DEFINER โดยเจตนา)
+- Atomic transaction เดียว: `UPDATE user_media` + `INSERT watchlogs` — **documented exception** ต่อกฎ domain-purity (atomicity ข้าม 2 ตารางต้องอยู่ DB) — refine ของ decision "Atomic +1 Episode" เดิม
+- **CAS guard** (เงื่อนไข UPDATE): `user_id = auth.uid() AND current_episode = p_from_episode AND p_from_episode + 1 <= media.total_episodes`
+  - matched → update + INSERT watchlog(`episode_number = p_from_episode + 1`) · no match → **no-op ทั้งคู่** (watchlog ไม่ insert)
+- เหตุผล: relative `current++` แยกไม่ออกว่า request ซ้ำ = duplicate (กดย้ำ / retry หลัง timeout / race ข้าม tab–อุปกรณ์) หรือตั้งใจ +2 — CAS ตัดที่ต้นเหตุ; สอดคล้อง precedent `SetFavorite` (idempotent setter แทน blind toggle)
+- Action result เพิ่ม reason **`'stale'`** — no match ไม่ใช่ error (intent สำเร็จจาก request ก่อน) → ไม่ toast, ปล่อย revalidate sync เงียบ
+- Client: `disabled={isPending}` + `useOptimistic`; `from` = ค่า confirmed ล่าสุด
+
+### §P4 1.2 — Auto-status + completion guard (revise กฎเดิม)
+
+- increment สำเร็จ → `started_at = COALESCE(started_at, now())`
+- **completion: `new_episode >= total_episodes AND media.airing_status <> 'ongoing'`** → `status='completed'` + `completed_at=now()`; ไม่งั้น → `status='watching'`
+- **เปลี่ยนจากกฎเดิม `current = total → 'completed'`** (ไม่มี guard) เพราะ:
+  - ongoing ที่ตามทันตอนล่าสุด ≠ ดูจบ ("up to date" ≠ done)
+  - `<> 'ongoing'` ครอบ movie/special (default `airing_status = 'upcoming'`) ให้ complete ถูก **โดยไม่ต้อง special-case media_type**
+  - กัน **false-complete** ของ ongoing ที่ `total_episodes` ถูก map ผิดเป็น 1 จาก AniList null (ดู §P4 1.9)
+- เลือก `<> 'ongoing'` แทน `='finished' OR total=1` เพราะ robust กว่าทั้ง 3 เคส ('ongoing' = enum เดียวที่มี semantics "ตอนยังมาเพิ่ม")
+- status path plan→watching→completed = derive จาก episode count (`watching` = auto-start จาก plan / auto-resume จาก on_hold, dropped); `on_hold`/`dropped` ตั้ง manual (⋯ More — Phase 5)
+
+> SQL completion (อ้างอิงตอน implement — ตัว function จริงเขียนใน Phase 4 prompt):
+>
+> ```sql
+> status = CASE WHEN p_from_episode + 1 >= m.total_episodes AND m.airing_status <> 'ongoing'
+>               THEN 'completed'::watch_status ELSE 'watching'::watch_status END,
+> completed_at = CASE WHEN p_from_episode + 1 >= m.total_episodes AND m.airing_status <> 'ongoing'
+>                     THEN now() ELSE NULL END
+> ```
+
+### §P4 1.3 — −1 / correction — deferred (Option A)
+
+- **ไม่ทำใน Phase 4** — CAS (§P4 1.1) ตัด root cause (accidental multi-increment) แล้ว
+- Phase 5: ⋯ More menu ใส่ **"Edit progress"** (set episode เป็นเลขใดก็ได้) — general กว่า −1 ครอบทุกเคส
+- residual ยอมรับชั่วคราว: misclick เดี่ยวแก้ไม่ได้จน Phase 5 (รวม edge: กดพลาดที่ ep total−1 → premature auto-complete)
+- `watchlogs` คง **immutable** (SELECT+INSERT only) — ไม่เพิ่ม UPDATE/DELETE policy
+
+### §P4 1.4 — Rewatch — เพิ่มเข้า Phase 4 scope
+
+- สำหรับ `completed` / `dropped` / `on_hold`: ปุ่ม Rewatch (icon `RotateCcw` — sanctioned set) + **confirm dialog** ("Start over from episode 1?")
+- Effect: `current_episode = 0, status = 'watching', started_at = now(), completed_at = null, rewatch_count + 1`
+- **Update guard `WHERE status IN ('completed','dropped','on_hold')`** — เป็นทั้ง valid-source check และ **กัน double-fire** (หลังรอบแรก status='watching' → call ซ้ำเร็วๆ = no-op) → ไม่ต้อง CAS แม้ `rewatch_count` เป็น non-transactional counter
+- Single-table update → **usecase ปกติ ไม่ใช้ RPC** (ตาม domain rule)
+- ไม่แตะ watchlog เดิม — รอบใหม่ insert ทับ episode เดิมด้วย timestamp ใหม่ (จึง**ห้ามมี** unique constraint บน (user, media, episode) — ปัจจุบันไม่มี ✓); history sort `watched_at DESC` โชว์รอบใหม่ก่อน
+- `dropped`/`on_hold` มี 2 ทาง: **+1 = ดูต่อจากที่ค้าง** (RPC ย้าย → watching) / **Rewatch = เริ่มใหม่**
+- UI ยังไม่อยู่ใน design bundle → **design addendum ก่อนทำ UI**; backend เริ่มก่อนได้
+
+### §P4 1.5 — movie / special — toggle Watched (2 ทิศ)
+
+- mark = RPC `increment_episode` ตัวเดิม (0→1; total=1, `airing_status <> 'ongoing'` → complete ผ่าน guard §P4 1.2 ปกติ — **ไม่ต้อง special-case**)
+- unmark = reset-pointer usecase (`current = 0, status = 'plan_to_watch', started_at = null, completed_at = null`) — **ไม่ลบ watchlog** (log การดูครั้งก่อนคือเรื่องจริง)
+- **verify path นี้ explicit**: movie total=1 + default `airing_status='upcoming'` → mark → `current=1 >= 1 AND 'upcoming' <> 'ongoing'` → completed ✓
+
+### §P4 1.6 — Schema: `user_media.rewatch_count`
+
+- `ALTER TABLE public.user_media ADD COLUMN IF NOT EXISTS rewatch_count integer NOT NULL DEFAULT 0`
+- เหตุผล: reset pointer แล้วไม่เสีย information "เคยดูจบ" (ไม่งั้น library มองเรื่องที่ rewatch เป็นเพิ่งเริ่มดู); badge UI ("2nd watch") ยังไม่ทำ — เก็บ data ก่อน
+- Migration ทั้งรอบ (column + RPC): **manual ผ่าน Supabase SQL Editor** (Docker ยังติด) + save เป็น idempotent SQL files ใน `schema/` + อัปเดต canonical `schema/07-user-media.sql` ให้มี column + **regenerate `types/database.ts` หลัง apply** (ห้ามแก้มือ; ใช้ `supabase gen types` แบบ remote/`--project-id` — ไม่ต้องใช้ Docker)
+
+### §P4 1.7 — History scope (Phase 4) — per-media เท่านั้น
+
+- "Watch history" บน media detail: **5 entries ล่าสุด**, รูปแบบ `ep N · timestamp`, **ไม่มี provider column** (`watchlogs` คง shape `{episode_number, watched_at}`)
+- Global history page → **deferred** (future phase)
+
+### §P4 1.8 — Error-handling convention (client) — บังคับตั้งแต่ fix round + Phase 4
+
+- **Imperative mutation handlers** (onClick / `startTransition` ที่ await server action): **try/catch + toast เสมอ** — thrown error (network ฯลฯ) ห้ามเงียบ
+- **TanStack `queryFn`**: **ห้าม try/catch กลืน error** — ปล่อย throw, consumer จัดการผ่าน `isError`
+- Server actions: คงเดิม — try/catch + `console.error` + curated message (ห้าม raw `err.message` ถึง toast) + reason codes
+- ปุ่ม Phase 4 ทุกตัว (+1 card/detail, toggle Watched, Rewatch) ต้องมีครบตั้งแต่ commit แรก
+
+### §P4 1.9 — Known data caveat — AniList ongoing → total_episodes = 1
+
+- Import เรื่อง ongoing ที่ AniList ส่ง `episodes = null` → map เป็น total 1 → +1 ติด cap ทันที
+- เป็น **data issue** ไม่ใช่ logic; guard §P4 1.2 (`<> 'ongoing'`) กัน false-complete ไว้แล้ว
+- Fix path: **auto-sync อัปเดต total เมื่อ AniList มีข้อมูล (Phase 6)**; ระหว่างนั้น admin แก้ `total_episodes` เอง
 
 ---
 
