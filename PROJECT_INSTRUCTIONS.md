@@ -131,17 +131,31 @@ anime / series    →  episode tracking ปกติ
   no match → no-op ทั้ง update และ watchlog (reason 'stale' — ไม่ใช่ error)
 movie/special: mark = RPC เดิม (0→1) · unmark = reset pointer (current=0, plan_to_watch, ไม่ลบ watchlog)
 Rewatch (completed/dropped/on_hold): confirm → current=0, watching, started_at=now(), completed_at=null, rewatch_count+1 (guard status IN source set)
-−1/แก้ตอน: deferred → Phase 5 "Edit progress" (⋯ More)
+
+Edit progress (⋯ More, Phase 5): absolute set (ไม่ใช่ CAS/RPC, ไม่มี migration)
+  guard: user_id=auth.uid() AND 0<=n<=total_episodes (ต้อง total>0)
+  ordered rules เช็คบนลงล่าง หยุดที่ข้อแรกที่ match:
+    1. status ∈ {dropped, on_hold} → คง status เดิม แก้แค่ pointer
+    2. n=0 → เหมือน unmark (plan_to_watch, completed_at=null)
+    3. n>=total AND airing≠'ongoing' → completed, completed_at=COALESCE(completed_at, now())
+    4. n>=total AND airing='ongoing' → watching (caught-up), completed_at=null
+    5. 0<n<total → watching, started_at=COALESCE(started_at, now()), completed_at=null
+  ไม่แตะ watchlogs/rewatch_count · ⋯ More menu = Edit progress + Remove from library (destructive), enabled เสมอ
 
 Title display:    title_en > title_romaji > title_th
-Dashboard:        /dashboard = full library (tab "All"); status='watching' OR is_favorite = highlight sections + sort priority, ไม่ใช่ page filter (ดู DECISIONS.md heading "/dashboard = full library (tab All)")
+Dashboard:        /dashboard = full library (tab "All"); status='watching' OR is_favorite = highlight sections + sort priority, ไม่ใช่ page filter (ดู DECISIONS.md §P5 1.13/1.14)
+Library view:     Tabs=ขอบเขต (All/Watching/Favorites) · Filter=กรอง status ในขอบเขต (ซ่อนใน tab Watching) · Sort=ลำดับ
+                  default sort = updated_at DESC label "Recently active" (ไม่ใช่ "Recently watched") · อีก 2 แบบ: Recently added / Title A–Z
+                  filter active → All view ยุบเป็น flat grid · state เก็บใน URL searchParams
+Dark mode:        cookie + Server Action → data-theme ที่ <html> ตอน SSR (ห้ามใช้ localStorage — FOUC)
 Provider URL:     custom_url ?? base_url
 
 Auto-sync logic:  system_settings.enabled = true
                   AND media.auto_sync = true
                   AND media.airing_status = 'ongoing'
 
-Sync ไม่ overwrite: title_th, synopsis, poster_url
+Sync ไม่ overwrite: title_th, synopsis, poster_url (ไม่มีข้อยกเว้น)
+AniList mapper ใช้ coverImage.extraLarge — import ใหม่เท่านั้น (forward-only, ไม่แตะ sync path)
 ```
 
 ---
@@ -229,7 +243,7 @@ Phase 1  Foundation & Auth
 Phase 2  Admin Panel + AniList Import
 Phase 3  User Library & Dashboard
 Phase 4  Progress Tracking + Watchlog
-Phase 5  UX Polish
+Phase 5  UX Polish — Edit progress + ⋯ More, Tabs/Filter/Sort, dark mode, wide-screen scaling, motion, a11y (WCAG 2.1 AA ยกเว้น 1.4.10 Reflow)
 Phase 6  Extended Features
 Phase 7  Discovery & Bulk Import (admin) — forward-only, lean-cache candidates
 ```

@@ -9,17 +9,45 @@
 ## Versions (สำหรับ sync check)
 
 ```
-instructions_version: 2026-06-18-v1
-decisions_version: 2026-06-07-v1
+instructions_version: 2026-08-25-v1
+decisions_version: 2026-08-25-v1
 schema_version: 2026-06-18-v1
-claude_md_version: 2026-06-07-v1
+claude_md_version: 2026-08-25-v1
 ```
 
 ## Current Phase
 
 - **Completed:** Phase 3 — User Library & Dashboard ✅ (released to `main` via PR #19, 2026-06-03)
 - **Completed:** Phase 4 — Progress Tracking + Watchlog ✅ (released to `main` via PR #28, 2026-08-24)
-- **Not started:** Phase 5 — UX Polish (see roadmap in DECISIONS.md; includes "Edit progress" ⋯ More menu — closes the Phase 4 §P4 1.3 deferral and the SeriesTracker branch ⑤ dead-end)
+- **In progress:** Phase 5 — UX Polish — **P0 pre-phase docs** (this session, 2026-08-26); full spec = 16 decisions in `DECISIONS.md` §P5; task list = 9 parts (P0–P9), see Phase 5 Progress below
+
+## Phase 5 Progress
+
+> Planning session 2026-08-25 → **DECISIONS.md §P5 1.1–1.16** (16 decisions). `develop` recreated from `main` 2026-08-26 (clean history, content was already identical — no code change).
+
+| Part | ขอบเขต                                                                                                                          | สถานะ                           |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| P0   | Pre-phase docs (this PR)                                                                                                        | in progress                     |
+| P1   | DS chore — `Popover` component ใหม่ · `Modal` → native `<dialog>` · shared `ToastPortal` (ยุบ 3 duplicate)                      | blocked by P0                   |
+| P2   | Edit progress + `⋯ More` menu + Back button                                                                                     | blocked by P1 + design addendum |
+| P3   | Filter / Sort / Library search (design พร้อมใน bundle แล้ว)                                                                     | blocked by P1                   |
+| P4   | Admin เก็บตก — MediaCard admin shortcut · media list search · mapper → `coverImage.extraLarge` (forward-only, ไม่แตะ sync path) | —                               |
+| P5   | loading / error / empty audit + retry · `sanitizeSearchTerm` escape แทน strip                                                   | —                               |
+| P6   | Dark mode (cookie + SSR)                                                                                                        | —                               |
+| P7a  | Wide-screen scaling                                                                                                             | —                               |
+| P8   | a11y WCAG 2.1 AA (ยกเว้น 1.4.10 Reflow)                                                                                         | —                               |
+| P9   | Motion wrapper — page transition, card enter, list stagger, `prefers-reduced-motion`                                            | —                               |
+
+จบ P9 → **release PR `develop → main`** (single release, §P5 1.12)
+
+**Design addendum ที่ต้องสั่ง Claude Design ก่อนเริ่ม P2:**
+
+1. `⋯ More` popover — 2 items (§P5 1.15) + disabled item state พร้อม reason text (DS ปัจจุบันมีแค่ default/hover/`--destructive`)
+2. Edit progress inline mode — tracker card เข้า edit mode แทนปุ่ม `+1`: number input + `/ {total}` + Save/Cancel + inline warning (§P5 1.4)
+
+**P3 ไม่ต้องรอ design** — `library-screens.jsx#FilterPopoverDemo` / `#SortPopoverDemo` + `PopoverMenu` + `.popover*` CSS + `SearchInput` มีครบใน bundle แล้ว (verified 2026-08-25)
+
+**Guardrail:** P2/P3 ต้องเขียน UI ใหม่ให้ได้ a11y baseline (keyboard + aria + focus) ตั้งแต่แรก — P8 = audit ทั้ง codebase ไม่ใช่ retrofit ของที่เพิ่งสร้างเอง
 
 ## Phase 4 Progress
 
@@ -194,13 +222,13 @@ claude_md_version: 2026-06-07-v1
 
 ## Recent Changes (last 5)
 
-| วันที่     | เปลี่ยนอะไร                                                                                                                                          | เปลี่ยนในไฟล์ไหน                                                                                                                                         |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-24 | release: Phase 4 — Progress Tracking + Watchlog released to `main` (PR #28, merge commit `099dd1e`)                                                  | (release merge — no source changes beyond what PR #22–#27 already introduced on `develop`)                                                               |
-| 2026-08-24 | fix(phase4): Part 2b gap #1 — favorite button per design (inline variant, last child of tracker card); merged to develop (PR #27)                    | FavoriteButton.tsx (`variant` prop), EpisodeTracker.tsx (`isFavorite` prop + inline fav), MediaDetailView.tsx (removed circular fav row), PROGRESS.md    |
-| 2026-08-24 | chore: design bundle sync (8 files) + MediaDetailView watch history bordered container                                                               | .design-bundle/screens/\* (8 files), MediaDetailView.tsx (history border)                                                                                |
-| 2026-08-24 | feat(phase4): Part 2b — EpisodeTracker interactive component (computeStatusAfterIncrement, useEpisodeTracker, MovieTracker/SeriesTracker, 150 tests) | UserMedia.ts, useEpisodeTracker.ts, EpisodeTracker.tsx, MediaDetailView.tsx, UserMedia.test.ts                                                           |
-| 2026-06-21 | feat(phase4): Part 2a — media detail page (read-only) + card→detail link + formatTimestamp util (146 tests)                                          | MediaDetailView.tsx, media/[id] route (page+loading+error), MediaCard.tsx (overlay link), LibraryView.tsx (href), formatTimestamp.ts + test, PROGRESS.md |
+| วันที่     | เปลี่ยนอะไร                                                                                                                                                      | เปลี่ยนในไฟล์ไหน                                                                                                                                      |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-26 | docs(phase5): P0 pre-phase docs — §P5 decisions (16), Phase 4 as-built findings → DECISIONS, roadmap reword + Backlog (7 items), `develop` recreated from `main` | DECISIONS.md, CLAUDE.md, PROGRESS.md, CHANGELOG.md, PROJECT_INSTRUCTIONS.md                                                                           |
+| 2026-08-24 | release: Phase 4 — Progress Tracking + Watchlog released to `main` (PR #28, merge commit `099dd1e`)                                                              | (release merge — no source changes beyond what PR #22–#27 already introduced on `develop`)                                                            |
+| 2026-08-24 | fix(phase4): Part 2b gap #1 — favorite button per design (inline variant, last child of tracker card); merged to develop (PR #27)                                | FavoriteButton.tsx (`variant` prop), EpisodeTracker.tsx (`isFavorite` prop + inline fav), MediaDetailView.tsx (removed circular fav row), PROGRESS.md |
+| 2026-08-24 | chore: design bundle sync (8 files) + MediaDetailView watch history bordered container                                                                           | .design-bundle/screens/\* (8 files), MediaDetailView.tsx (history border)                                                                             |
+| 2026-08-24 | feat(phase4): Part 2b — EpisodeTracker interactive component (computeStatusAfterIncrement, useEpisodeTracker, MovieTracker/SeriesTracker, 150 tests)             | UserMedia.ts, useEpisodeTracker.ts, EpisodeTracker.tsx, MediaDetailView.tsx, UserMedia.test.ts                                                        |
 
 ## Blockers
 
@@ -208,35 +236,14 @@ claude_md_version: 2026-06-07-v1
 
 ## Notes for Chat
 
-### Phase 4 Part 2b — Interactive tracker (merged to develop — PR #27 ✅)
+**Phase 4 as-built findings & implementation notes → moved to `DECISIONS.md` §P4 as-built findings / §P4 1.1–1.9** (living-spec notes cleared now that Phase 5 begins overwriting this section)
 
-- **`computeStatusAfterIncrement`** — `domain/entities/UserMedia.ts`: client-side mirror of completion guard in RPC (`schema/14`). `nextEp >= total AND airing !== 'ongoing'` → completed; else → watching. Used for optimistic status in `useEpisodeTracker`.
-- **`useEpisodeTracker`** — `hooks/useEpisodeTracker.ts`: `useOptimistic<TrackerState>` + `useTransition` + `useToast` + `useRouter`. Returns `{ episode, status, isPending, toasts, dismiss, incrementEpisode, markWatched, startRewatch, unmarkWatched }`. Stale CAS miss (reason="stale") → `router.refresh()` silently, no toast. Error → toast "Failed to update". Pattern adapted from `FavoriteButton`.
-- **`EpisodeTracker`** — `components/media/EpisodeTracker.tsx`: delegates to `MovieTracker` or `SeriesTracker` based on `isMovie` prop. Confirm modal for rewatch/watch-again (immediate close → fire optimistic). Toast portal. `More` button always disabled (Phase 5).
-- **MovieTracker** — watched = `status === "completed"` (not episode-based). Unwatched: "Mark as watched" button. Watched: "Watch again" (confirm) + "Unmark as watched" (plain text button).
-- **SeriesTracker** — 5-state precedence: ① interrupted mid-way (canRewatch && canIncrement → +1 + Rewatch) → ② completed/interrupted at cap (Rewatch only) → ③ mid-way ('+1 episode' only) → ④ caught up (ongoing, ep>=total, watching → hint text) → ⑤ all episodes watched (ongoing→finished while watching, no exit — **Phase 5 dependency: "Edit progress" ⋯ More menu needed for escape**)
-- **MediaDetailView changes** — replaced `{/* Part 2b: EpisodeTracker */}` slot with `<EpisodeTracker>`. FavoriteButton moved below tracker. DetailPoster: removed dead `isFavorite`/`userMediaId` props. WatchHistory: movie subtext uses dynamic count instead of hardcoded "1 watch".
-- **⚠️ Phase 5 dependency**: Branch ⑤ dead-end — ongoing series → airing_status flips to finished while user is at ep cap with status='watching' → `canIncrement=false`, `canRewatch=false`, `More=disabled`. No exit until Phase 5 "Edit progress" (§P4 1.3). Sort priority puts it at dashboard top permanently. Copy shows "All episodes watched" which is honest but the state is stuck.
-- **MediaDetailView.tsx**: Watch history section uses a bordered container (`border-[0.5px] border-default rounded-card`) matching design `.history-list` CSS. Empty state also wrapped in bordered container.
+### Phase 5 — P0 status (2026-08-26)
 
-### Phase 4 Part 2b — Design-vs-implementation gaps (5 items — all resolved)
-
-1. **Favorite position** — ✅ **Resolved (2026-08-24, owner: "fav เอาตาม design เลย")** — overrides prior "decision i" (ห้ามแตะ `FavoriteButton.tsx`) from the impl prompt. Added `variant?: "icon" | "inline"` to `FavoriteButton.tsx` (default `"icon"` = unchanged circular overlay for `MediaCard`/`LibraryView`; `"inline"` = full-width `Button variant="ghost"` with `Star`/`Sparkle` + "Favorite"/"Favorited" label). `EpisodeTracker` now takes `isFavorite` prop and renders `<FavoriteButton variant="inline">` as last child of the `.tracker` card (both `MovieTracker` and `SeriesTracker` branches, matching `TrackerFav` in `screens.jsx`). `MediaDetailView` no longer renders the separate circular fav row — passes `isFavorite` straight to `EpisodeTracker`. Only 2 call sites for `FavoriteButton` in the codebase (`LibraryView`, `EpisodeTracker`) — verified no other usages broke.
-2. **isMovie logic** — Design: `type === "movie" || total === 1`. Implementation: `!isTrackable(media)` (only movie/special). Business rules (CLAUDE.md) support implementation — anime with 1 ep is trackable normally. **Business rules win over design — no change needed.**
-3. **Watch history container** — Design: bordered card (`.history-list`). ✅ **Already applied** (this session edit to MediaDetailView.tsx).
-4. **Watch history provider column** — Design: shows `ProviderPill` (3-column grid). Implementation: no provider column (2-column). **Per §P4 1.7**: "ไม่มี provider column" — **business rules win, no change.**
-5. **Confirm dialog loading** — Design: shows spinner inside button during loading. Implementation: closes modal immediately with optimistic action. **Implementation is better UX** — optimistic close is faster, spinner only shows on actual errors (which toast handles).
-
-### Phase 4 Part 2a — Detail page (merged to develop — PR #26 ✅)
-
-- **Route** — `app/(main)/media/[id]/page.tsx`: Server Component; gate: `getLibraryItem` → null → `notFound()` (not-in-library = deferred); then `Promise.all([getMedia, listMediaProviders, watchLogs])`
-- **MediaDetailView** — `components/media/MediaDetailView.tsx`: Server Component, 7 sub-sections: breadcrumb (link to `/dashboard`), detail poster (aspect-3/4, `next/image`), tracking summary (read-only — `StatusPill` + `ProgressBar` + `FavoriteButton`), titles×3 (separate fields, not `getDisplayTitle`), meta badges, synopsis, provider table (read-only "Switch to" disabled), watch history
-- **Hand-off slot** — `{/* Part 2b: EpisodeTracker action buttons + interactivity */}` comment in tracking summary section
-- **Provider table** — current marker matches `(providerId, audio)` not just `providerId`; "Switch to" buttons are disabled `<button>` with ghost variant (not wired)
-- **Watch history** — `formatTimestamp` util (`lib/utils/formatTimestamp.ts`): relative < 7d, absolute otherwise; movie uses "Full film" label instead of "ep 1"
-- **Card→detail link** — `MediaCard.Library` has `href?` prop; renders overlay `<Link>` at `z-2` (above poster text, below fav slot z-3); no `<button>` inside `<a>` — proper a11y
-- **`generateMetadata`** — dynamic title using `getDisplayTitle`
-- **Deferred** — not-in-library → `notFound()`, provider "Switch to" → disabled, action buttons → Part 2b
+- `develop` recreated from `main` (owner confirmed) — content was already identical, clean ref history only, no code change
+- Working on `feature/phase5-p0-docs` — docs-only PR (`DECISIONS.md`, `CLAUDE.md`, `PROGRESS.md`, `CHANGELOG.md`, `PROJECT_INSTRUCTIONS.md`)
+- **Blocked for P1+:** design addendum not yet ordered (`⋯ More` popover disabled-item state + Edit progress inline mode) — see Phase 5 Progress above
+- ⚠️ **`PROJECT_INSTRUCTIONS.md` changed** — owner ต้อง re-upload เข้า Claude Chat project ไม่งั้น Chat จะถือ version เก่า (`instructions_version` → `2026-08-25-v1`)
 
 ### Phase 3 Part 2a (merged to develop — PR #16 ✅)
 
@@ -303,51 +310,13 @@ claude_md_version: 2026-06-07-v1
 - **`sanitizeSearchTerm`** → empty string → repos return `[]` (ไม่ใช่ full catalog); search query มี `.limit(50)` (เฉพาะ search mode ไม่กระทบ admin list)
 - **`mappers.ts`** — exported `UserMediaRowWithJoin` type; repo cast `as unknown as UserMediaRowWithJoin` แทน `as any`
 
-### Phase 4 Part 1 backend (session 2026-06-18)
-
-- **Schema**: `schema/13-phase4-alter-user-media.sql` (rewatch_count) + `schema/14-increment-episode.sql` (CAS RPC, SECURITY INVOKER)
-- **RPC contract**: `increment_episode(p_user_media_id uuid, p_from_episode int)` → returns `user_media` row on success, `NULL` on CAS miss (stale)
-- **Completion guard**: `new_ep >= total AND airing_status <> 'ongoing'` — ใน RPC SQL
-- **WatchLog entity** — `src/domain/entities/WatchLog.ts`: pure interface `{ id, userId, mediaId, episodeNumber, watchedAt }`
-- **WatchLog repo** — read-only (`findByUserAndMedia` with limit); INSERT happens atomically inside RPC
-- **IUserMediaRepository** — 4 new methods: `findWithMediaByUserAndMedia` (single item), `incrementEpisode` (RPC wrapper → `IncrementEpisodeResult`), `startRewatch` (read-modify-write with status guard), `unmarkWatched` (reset pointer)
-- **`IncrementEpisodeResult`** — discriminated union: `{ status: "updated"; userMedia } | { status: "stale" }`
-- **Usecases** — thin delegates: `IncrementEpisode`, `StartRewatch`, `UnmarkWatched`, `GetLibraryItem`
-- **Actions** — `incrementEpisodeAction` (stale → reason "stale", revalidate always), `startRewatchAction` (null → reason "stale"), `unmarkWatchedAction`
-- **`UserMediaActionResult.reason`** — extended with `"stale"` (CAS no-op, ไม่ใช่ error → client ไม่ toast)
-- **`types/enums.ts`** — centralized enum exports; entity imports refactored (Media, MediaProvider, SyncLog)
-- **`lib/supabase/types.ts`** — `Functions` type changed from `Record<string, never>` to `Database["public"]["Functions"]` for `.rpc()` type inference
-- **Mock harness** — `makeWatchLog`, `createMockWatchLogRepository`, extended `createMockUserMediaRepository` with 4+1 new methods
-- ~~Stale path unverified~~ ✅ **Stale path hardened** — `data == null || data.id == null` guard ปิด all-null composite by construction; `startRewatchAction` revalidate ย้ายก่อน stale return; 4 repo unit tests lock guard (fix/phase4-stale-path-hardening)
-
-### Phase 4 pre-implementation (2026-06-07)
-
-- **Pre-Phase 4 decisions locked** — ดู DECISIONS.md §P4 (9 sub-decisions)
-- **Phase 4 scope**: +1 CAS RPC (`increment_episode` — SECURITY INVOKER, atomic) + Rewatch (confirm → reset pointer, rewatch_count+1) + per-media watch history (5 entries) + movie/special toggle Watched (mark=RPC, unmark=reset pointer)
-- **Completion guard revised**: `new_ep >= total AND airing_status <> 'ongoing'` (แทนกฎเดิม `current=total → completed` — กัน false-complete ของ ongoing + ครอบ movie/special ที่ default upcoming)
-- **Schema addition**: `user_media.rewatch_count integer NOT NULL DEFAULT 0` — migration manual + regenerate types
-- **−1 / correction deferred** → Phase 5 "Edit progress" (⋯ More menu)
-- **Design addendum pending**: Rewatch UI ยังไม่มีใน design bundle → ต้องขอ design ก่อนทำ UI; backend เริ่มก่อนได้
-- **Error-handling convention**: imperative client mutation → try/catch + toast เสมอ; TanStack queryFn → throw ไม่ swallow
-- **Fix round backlog** — ~~handleSubmit try/catch, FavoriteButton try/catch, AddToLibrary TOCTOU race~~ แก้แล้วใน `fix/pre-phase4-hardening` (ดู "Pre-Phase 4 fix round" section)
-- ~~PROJECT_INSTRUCTIONS.md ต้องอัปเดต~~ ✅ อัปเดตแล้ว session 2026-06-18 — CAS business rule + dashboard cross-ref แก้แล้ว (instructions_version → 2026-06-18-v1)
-
-### Pre-Phase 4 fix round (on `fix/pre-phase4-hardening`)
-
-- **`FavoriteButton.handleToggle`** — try/catch inside `startTransition`; catch → curated toast "Failed to update favorite" (optimistic revert = React auto)
-- **`AddToLibraryModal.handleSubmit`** — try/catch/finally; catch → toast title "Couldn't add to library" + description "Something went wrong — try again."; `setSubmitting(false)` ย้ายเข้า finally
-- **TOCTOU `addToLibraryAction`** — `SupabaseError` class (`lib/supabase/errors.ts`) preserves `.code` from PostgrestError; `SupabaseUserMediaRepository.add()` throws `SupabaseError` แทน plain Error; `isPgUniqueViolation` helper เช็ค `code === "23505"`; action catch: `instanceof DuplicateLibraryEntryError || isPgUniqueViolation(error)` → reason `"duplicate"`
-- **`SearchView` isError** — destructure `isError` + `refetch` จาก `useQuery`; เพิ่ม error state "Couldn't search — try again." + retry Button; no-results branch เพิ่ม `&& !isError`
-- **`getAuthedUser()` helper** — `lib/supabase/auth.ts`; refactor ทั้ง 6 actions ใน `userMedia.ts` ใช้ helper (behavior เหมือนเดิม 100%); ลบ `createClient` import (ใช้ผ่าน helper แทน)
-- 122 tests passed (116 + 6 ใหม่ `isPgUniqueViolation`) — lint ✅ typecheck ✅
-
 ### Git state (สำคัญ)
 
-- **`main`** — Phase 4 released (PR #28, merge commit `099dd1e`, 2026-08-24). Up to date with `develop` as of this release (both at the same content).
-- **`develop`** — Phase 4 complete (PR #22–#27 all merged). Tip: `d5dc8d7` (PR #27).
-- **`feature/phase4-part2b-tracker`** — deleted (remote + local) after PR #27 merge.
+- **`main`** — Phase 4 released (PR #28, merge commit `099dd1e`, 2026-08-24). Content identical to `develop` as of this release.
+- **`develop`** — recreated from `main` 2026-08-26 (force-delete + recreate, owner confirmed) for clean history going into Phase 5 — content unchanged, no code diff.
+- **`feature/phase5-p0-docs`** — active, branched from recreated `develop`, docs-only.
 - **Docker Supabase ใช้ได้แล้ว** — `supabase gen types --local` ใช้ได้
-- Design bundle synced (2026-08-24) — Claude Design project URL provided; used for Part 2b tracker UI
+- Design bundle synced (2026-08-24) — still current for Part 2b; Phase 5 P2 needs a design addendum (⋯ More popover disabled-item state + Edit progress inline mode) before implementation starts
 
 ### Prettier (session 2026-06-02)
 

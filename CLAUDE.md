@@ -49,12 +49,26 @@ UseCases: `IncrementEpisode.ts` / Repos: `IMediaRepository.ts` / Actions: `updat
   no match → no-op ทั้ง update และ watchlog (reason 'stale' — ไม่ใช่ error ไม่ toast)
 - movie/special: mark = RPC เดิม (0→1) · unmark = reset pointer (current=0, plan_to_watch, ไม่ลบ watchlog)
 - Rewatch (completed/dropped/on_hold): confirm → current=0, watching, started_at=now(), completed_at=null, rewatch_count+1 (guard status IN source set); ไม่แตะ watchlog เดิม
-- −1/แก้ตอน: deferred → Phase 5 "Edit progress" (⋯ More menu)
+- Edit progress (⋯ More, Phase 5): set episode ตรงๆ (absolute) — ไม่ใช่ CAS, ไม่ใช่ RPC, ไม่มี migration
+  guard: user_id=auth.uid() AND 0<=n<=total_episodes (ต้อง total>0)
+  ordered rules (เช็คบนลงล่าง เจอข้อแรกที่ match แล้วหยุด — ห้ามอ่านเป็น match-any):
+  1. status ∈ {dropped, on_hold} → คง status เดิม แก้แค่ pointer, ไม่แตะ timestamp
+  2. n=0 → เหมือน unmark (current=0, plan_to_watch, completed_at=null)
+  3. n>=total AND airing_status<>'ongoing' → completed, completed_at=COALESCE(completed_at, now())
+  4. n>=total AND airing_status='ongoing' → watching (caught-up), started_at=COALESCE(started_at,now()), completed_at=null
+  5. 0<n<total → watching, started_at=COALESCE(started_at,now()), completed_at=null
+     ไม่แตะ watchlogs และ rewatch_count ทุกกรณี
+- ⋯ More menu: Edit progress + divider + Remove from library (destructive) — enabled เสมอ, disable item ข้างในแทน (พร้อม reason text)
 - Title: title_en > title_romaji > title_th — impl เดียวที่ `domain/entities/title.ts#getDisplayTitle`, re-exported จาก Media + Franchise
-- Dashboard (/dashboard) = full library (tab All); 'watching' OR favorite = highlight sections + sort priority ไม่ใช่ filter ของทั้งหน้า — ดู DECISIONS.md
+- Dashboard (/dashboard) = full library (tab All); 'watching' OR favorite = highlight sections + sort priority ไม่ใช่ filter ของทั้งหน้า — ดู DECISIONS.md §P5 1.13/1.14
+- Library view (Phase 5): Tabs=ขอบเขต (All/Watching/Favorites) · Filter=กรอง status ภายในขอบเขต (ซ่อนใน tab Watching) · Sort=ลำดับ
+  default sort = updated_at DESC, label "Recently active" (ไม่ใช่ "Recently watched" — updated_at bump จาก user action ทุกชนิด ไม่ใช่การดูอย่างเดียว) · อีก 2 แบบ: Recently added / Title A–Z
+  composite sort (STATUS_PRIORITY) เหลือใช้จัดลำดับภายใน section เท่านั้น ไม่ใช่ global sort แล้ว
+  filter active → All view ยุบ 3 sections เป็น flat grid · filter/sort/search state เก็บใน URL searchParams
+- Dark mode (Phase 5): cookie + Server Action → data-theme ที่ `<html>` ตอน SSR (ห้ามใช้ localStorage — FOUC)
 - Provider URL: custom_url ?? base_url
 - Auto-sync: system enabled AND media.auto_sync AND airing_status='ongoing'
-- Sync ไม่ overwrite: title_th, synopsis, poster_url
+- Sync ไม่ overwrite: title_th, synopsis, poster_url (ไม่มีข้อยกเว้น) — AniList mapper ใช้ `coverImage.extraLarge` มีผลกับ import ใหม่เท่านั้น (forward-only, ไม่แตะ sync path/library เก่า)
 
 ## Git & Deploy
 

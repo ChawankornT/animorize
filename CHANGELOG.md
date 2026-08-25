@@ -5,6 +5,16 @@
 
 ---
 
+## [2026-08-26] docs(phase5): P0 pre-phase docs
+
+`§P5 decisions (16)` in `DECISIONS.md` — Edit progress (absolute set, ordered status-transition rules, `completed_at` COALESCE), watchlog policy unchanged, inline warning instead of confirm modal, `total_episodes = 0` guard, "Recent activity" watch-history copy, filter/sort/search in URL `searchParams`, dark mode via cookie + SSR, AniList `coverImage.extraLarge` forward-only (sync path untouched), single Phase 5 release with no schema migration, Tabs/Filter/Sort layering, sort default relabeled "Recently active", `⋯ More` menu scope (Edit progress + Remove from library), wide-screen-only responsive scope for Phase 5.
+
+Phase 4 as-built findings (favorite variant override, `isMovie` business-rule-over-design, watch history no provider column, branch ⑤ dead-end) moved from `PROGRESS.md` into `DECISIONS.md` §P4 as-built findings before that living-spec section gets overwritten. Superseded Phase 3/4 decisions annotated in place (not deleted). `develop` recreated from `main` for clean history (content was already identical). `PROJECT_INSTRUCTIONS.md` bumped to `2026-08-25-v1` — re-upload required for Claude Chat project.
+
+Docs-only — no `src/`, `schema/`, or `package.json` changes.
+
+---
+
 ## [2026-08-24] fix(phase4): Part 2b — favorite button per design
 
 ### Components
