@@ -244,7 +244,7 @@ claude_md_version: 2026-08-25-v1
 - **PR #29 merged to `develop`** (squash, `dd0f903`) — docs-only (`DECISIONS.md`, `CLAUDE.md`, `PROGRESS.md`, `CHANGELOG.md`, `PROJECT_INSTRUCTIONS.md`, `docs/Promp/phase5-p0-docs.impl-prompt.md`); `feature/phase5-p0-docs` deleted (remote + local)
 - **Next up: P1** (DS chore) — no blocker, can start immediately
 - **Blocked for P2:** design addendum not yet ordered (`⋯ More` popover disabled-item state + Edit progress inline mode) — see Phase 5 Progress above
-- ⚠️ **`PROJECT_INSTRUCTIONS.md` changed** — owner ต้อง re-upload เข้า Claude Chat project ไม่งั้น Chat จะถือ version เก่า (`instructions_version` → `2026-08-25-v1`) — **still pending as of this sync**
+- ✅ **`PROJECT_INSTRUCTIONS.md` re-uploaded** เข้า Claude Chat project แล้ว (`instructions_version` → `2026-08-25-v1`)
 
 ### Phase 3 Part 2a (merged to develop — PR #16 ✅)
 
