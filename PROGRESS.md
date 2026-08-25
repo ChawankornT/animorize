@@ -19,7 +19,7 @@ claude_md_version: 2026-08-25-v1
 
 - **Completed:** Phase 3 — User Library & Dashboard ✅ (released to `main` via PR #19, 2026-06-03)
 - **Completed:** Phase 4 — Progress Tracking + Watchlog ✅ (released to `main` via PR #28, 2026-08-24)
-- **In progress:** Phase 5 — UX Polish — **P0 pre-phase docs** (this session, 2026-08-26); full spec = 16 decisions in `DECISIONS.md` §P5; task list = 9 parts (P0–P9), see Phase 5 Progress below
+- **In progress:** Phase 5 — UX Polish — **P0 pre-phase docs ✅** (merged to `develop`, PR #29, 2026-08-26); full spec = 16 decisions in `DECISIONS.md` §P5; next up: P1 (DS chore), see Phase 5 Progress below
 
 ## Phase 5 Progress
 
@@ -27,8 +27,8 @@ claude_md_version: 2026-08-25-v1
 
 | Part | ขอบเขต                                                                                                                          | สถานะ                           |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
-| P0   | Pre-phase docs (this PR)                                                                                                        | in progress                     |
-| P1   | DS chore — `Popover` component ใหม่ · `Modal` → native `<dialog>` · shared `ToastPortal` (ยุบ 3 duplicate)                      | blocked by P0                   |
+| P0   | Pre-phase docs                                                                                                                  | ✅ done (PR #29, `dd0f903`)     |
+| P1   | DS chore — `Popover` component ใหม่ · `Modal` → native `<dialog>` · shared `ToastPortal` (ยุบ 3 duplicate)                      | ready — not started             |
 | P2   | Edit progress + `⋯ More` menu + Back button                                                                                     | blocked by P1 + design addendum |
 | P3   | Filter / Sort / Library search (design พร้อมใน bundle แล้ว)                                                                     | blocked by P1                   |
 | P4   | Admin เก็บตก — MediaCard admin shortcut · media list search · mapper → `coverImage.extraLarge` (forward-only, ไม่แตะ sync path) | —                               |
@@ -222,13 +222,13 @@ claude_md_version: 2026-08-25-v1
 
 ## Recent Changes (last 5)
 
-| วันที่     | เปลี่ยนอะไร                                                                                                                                                      | เปลี่ยนในไฟล์ไหน                                                                                                                                      |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-26 | docs(phase5): P0 pre-phase docs — §P5 decisions (16), Phase 4 as-built findings → DECISIONS, roadmap reword + Backlog (7 items), `develop` recreated from `main` | DECISIONS.md, CLAUDE.md, PROGRESS.md, CHANGELOG.md, PROJECT_INSTRUCTIONS.md                                                                           |
-| 2026-08-24 | release: Phase 4 — Progress Tracking + Watchlog released to `main` (PR #28, merge commit `099dd1e`)                                                              | (release merge — no source changes beyond what PR #22–#27 already introduced on `develop`)                                                            |
-| 2026-08-24 | fix(phase4): Part 2b gap #1 — favorite button per design (inline variant, last child of tracker card); merged to develop (PR #27)                                | FavoriteButton.tsx (`variant` prop), EpisodeTracker.tsx (`isFavorite` prop + inline fav), MediaDetailView.tsx (removed circular fav row), PROGRESS.md |
-| 2026-08-24 | chore: design bundle sync (8 files) + MediaDetailView watch history bordered container                                                                           | .design-bundle/screens/\* (8 files), MediaDetailView.tsx (history border)                                                                             |
-| 2026-08-24 | feat(phase4): Part 2b — EpisodeTracker interactive component (computeStatusAfterIncrement, useEpisodeTracker, MovieTracker/SeriesTracker, 150 tests)             | UserMedia.ts, useEpisodeTracker.ts, EpisodeTracker.tsx, MediaDetailView.tsx, UserMedia.test.ts                                                        |
+| วันที่     | เปลี่ยนอะไร                                                                                                                                                                                     | เปลี่ยนในไฟล์ไหน                                                                                                                                      |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-26 | docs(phase5): P0 pre-phase docs — §P5 decisions (16), Phase 4 as-built findings → DECISIONS, roadmap reword + Backlog (7 items), `develop` recreated from `main`; **merged PR #29 (`dd0f903`)** | DECISIONS.md, CLAUDE.md, PROGRESS.md, CHANGELOG.md, PROJECT_INSTRUCTIONS.md                                                                           |
+| 2026-08-24 | release: Phase 4 — Progress Tracking + Watchlog released to `main` (PR #28, merge commit `099dd1e`)                                                                                             | (release merge — no source changes beyond what PR #22–#27 already introduced on `develop`)                                                            |
+| 2026-08-24 | fix(phase4): Part 2b gap #1 — favorite button per design (inline variant, last child of tracker card); merged to develop (PR #27)                                                               | FavoriteButton.tsx (`variant` prop), EpisodeTracker.tsx (`isFavorite` prop + inline fav), MediaDetailView.tsx (removed circular fav row), PROGRESS.md |
+| 2026-08-24 | chore: design bundle sync (8 files) + MediaDetailView watch history bordered container                                                                                                          | .design-bundle/screens/\* (8 files), MediaDetailView.tsx (history border)                                                                             |
+| 2026-08-24 | feat(phase4): Part 2b — EpisodeTracker interactive component (computeStatusAfterIncrement, useEpisodeTracker, MovieTracker/SeriesTracker, 150 tests)                                            | UserMedia.ts, useEpisodeTracker.ts, EpisodeTracker.tsx, MediaDetailView.tsx, UserMedia.test.ts                                                        |
 
 ## Blockers
 
@@ -238,12 +238,13 @@ claude_md_version: 2026-08-25-v1
 
 **Phase 4 as-built findings & implementation notes → moved to `DECISIONS.md` §P4 as-built findings / §P4 1.1–1.9** (living-spec notes cleared now that Phase 5 begins overwriting this section)
 
-### Phase 5 — P0 status (2026-08-26)
+### Phase 5 — P0 ✅ done (2026-08-26)
 
 - `develop` recreated from `main` (owner confirmed) — content was already identical, clean ref history only, no code change
-- Working on `feature/phase5-p0-docs` — docs-only PR (`DECISIONS.md`, `CLAUDE.md`, `PROGRESS.md`, `CHANGELOG.md`, `PROJECT_INSTRUCTIONS.md`)
-- **Blocked for P1+:** design addendum not yet ordered (`⋯ More` popover disabled-item state + Edit progress inline mode) — see Phase 5 Progress above
-- ⚠️ **`PROJECT_INSTRUCTIONS.md` changed** — owner ต้อง re-upload เข้า Claude Chat project ไม่งั้น Chat จะถือ version เก่า (`instructions_version` → `2026-08-25-v1`)
+- **PR #29 merged to `develop`** (squash, `dd0f903`) — docs-only (`DECISIONS.md`, `CLAUDE.md`, `PROGRESS.md`, `CHANGELOG.md`, `PROJECT_INSTRUCTIONS.md`, `docs/Promp/phase5-p0-docs.impl-prompt.md`); `feature/phase5-p0-docs` deleted (remote + local)
+- **Next up: P1** (DS chore) — no blocker, can start immediately
+- **Blocked for P2:** design addendum not yet ordered (`⋯ More` popover disabled-item state + Edit progress inline mode) — see Phase 5 Progress above
+- ⚠️ **`PROJECT_INSTRUCTIONS.md` changed** — owner ต้อง re-upload เข้า Claude Chat project ไม่งั้น Chat จะถือ version เก่า (`instructions_version` → `2026-08-25-v1`) — **still pending as of this sync**
 
 ### Phase 3 Part 2a (merged to develop — PR #16 ✅)
 
@@ -313,8 +314,8 @@ claude_md_version: 2026-08-25-v1
 ### Git state (สำคัญ)
 
 - **`main`** — Phase 4 released (PR #28, merge commit `099dd1e`, 2026-08-24). Content identical to `develop` as of this release.
-- **`develop`** — recreated from `main` 2026-08-26 (force-delete + recreate, owner confirmed) for clean history going into Phase 5 — content unchanged, no code diff.
-- **`feature/phase5-p0-docs`** — active, branched from recreated `develop`, docs-only.
+- **`develop`** — recreated from `main` 2026-08-26 (force-delete + recreate, owner confirmed) for clean history going into Phase 5; then Phase 5 P0 merged (PR #29, `dd0f903`). Tip: `dd0f903`.
+- **`feature/phase5-p0-docs`** — deleted (remote + local) after PR #29 merge.
 - **Docker Supabase ใช้ได้แล้ว** — `supabase gen types --local` ใช้ได้
 - Design bundle synced (2026-08-24) — still current for Part 2b; Phase 5 P2 needs a design addendum (⋯ More popover disabled-item state + Edit progress inline mode) before implementation starts
 
