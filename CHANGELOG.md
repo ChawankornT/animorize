@@ -21,7 +21,7 @@
 - `BRAND.md` — corrected the `bg-surface` "where it lives" row, added a Modal dark-mode row, added Popover disabled-item/icon-slot/focus-ring spec. Bumped `v1.0 · May 2026` → `v1.1 · Aug 2026`.
 - `CLAUDE.md` — one line in the UI/Design workflow section stating the same bundle-is-not-an-a11y-SoT principle.
 
-No schema, `package.json`, or business-logic changes. Lint ✅ typecheck ✅ build ✅ 157 tests ✅ (150 baseline + 7 new). On `feature/phase5-p1-ds-chore`, PR not yet opened.
+No schema, `package.json`, or business-logic changes. Lint ✅ typecheck ✅ build ✅ 157 tests ✅ (150 baseline + 7 new). Merged to `develop` via PR #30 (`0f120c8`).
 
 ---
 
