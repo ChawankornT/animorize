@@ -2,7 +2,7 @@
 
 > บันทึกเหตุผลการตัดสินใจทุกอย่างในโปรเจค
 > อัปเดตทุกครั้งที่มีการเปลี่ยน tech, approach, หรือ scope
-> อัปเดตล่าสุด: 2026-08-26
+> อัปเดตล่าสุด: 2026-08-27
 
 ---
 
@@ -833,6 +833,27 @@ Remove from library    (trash)  — destructive
 - **P7b mobile/tablet → เลื่อนไป Phase 6+** — รอ feature นิ่งก่อน (อาจมี feature เพิ่ม/ลดอีก) และต้องมี design จริง (bundle ปัจจุบัน **ไม่มี `@media` แม้แต่บรรทัดเดียว**)
 
 ⚠️ **ผลต่อ a11y scope:** WCAG 2.1 AA มีข้อ **1.4.10 Reflow** (ใช้งานได้ที่ 320px) → P8 เคลม "AA เต็ม" ไม่ได้ ต้องเขียนตรงว่า **"WCAG 2.1 AA ยกเว้น 1.4.10 Reflow — รอ P7b"**
+
+### §P5 1.17 — Design bundle = visual/token SoT เท่านั้น ไม่ใช่ a11y SoT (P1)
+
+> บันทึก 2026-08-27 — ระหว่าง implement P1 (`Popover`)
+
+**หลักการ:** `.design-bundle/` (รวม `PopoverMenu` ใน `ds/components.jsx`) คือ prototype ของ **หน้าตาและ token** เท่านั้น ไม่ใช่ reference ของ keyboard/ARIA behavior โค้ดจริงตั้งใจมี semantics ที่ prototype ไม่มี เพราะ prototype เขียนด้วยสมมติฐานที่ผิด (ดูเหตุผลข้อ 1 ด้านล่าง) — **การ import bundle รอบใหม่ในอนาคตอัปเดตได้เฉพาะ visual/token ห้ามถอด ARIA หรือ keyboard behavior ที่โค้ดมีอยู่ออก**
+
+**deviation ที่ครอบ (ณ P1 — entry นี้ครอบของที่ P2/P3 เพิ่มทีหลังด้วย ไม่ต้องเปิด entry ใหม่ทุกครั้งที่เติม ARIA ให้ต่อท้ายตารางนี้แทน):**
+
+| #   | โค้ดทำ                                                                        | bundle เป็นยังไง                                                                              |
+| --- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| 1   | disabled item **focusable** (`tabindex="-1"`, roving แวะ) + **มี focus ring** | `<div>` ไม่มี `tabindex` · comment เขียนว่า _"arrow-key roving skips them, so no focus ring"_ |
+| 2   | `checked` → `role="menuitemradio"` + `aria-checked`                           | `role="menuitem"` ทุก item — check เป็น visual ล้วน                                           |
+| 3   | divider → `role="separator"`                                                  | ไม่มี role                                                                                    |
+| 4   | panel มี `aria-label`                                                         | ไม่มี                                                                                         |
+
+**เหตุผลของข้อ 1** (ข้ออื่นเป็น addition ตรงไปตรงมา ไม่ต้องอธิบายเพิ่ม): `role="menu"` ทำให้ screen reader (NVDA/JAWS) สลับเข้า focus mode อัตโนมัติ — ใน mode นั้น arrow key ถูกส่งให้ app จัดการเอง ไม่ใช่ browse cursor ของ SR ดังนั้น `<div>` ที่ไม่มี `tabindex` จะไม่ถูกแตะเลยระหว่าง roving → SR user ไม่รู้ด้วยซ้ำว่ามี item นี้อยู่ ไม่ต้องพูดถึง reason text ข้างใน → §P5 1.5 ("`⋯ More` enabled เสมอ — disable item ข้างในแทน พร้อม reason text") **ไม่ถูก implement ครบ** ถ้าตามสมมติฐานของ bundle ตรงๆ ARIA Authoring Practices Guide (APG) แนะนำให้ disabled menu item ยังคง focusable ด้วยเหตุผล discoverability เดียวกันนี้
+
+**บรรทัดที่ห้ามขาด — เขียนพูดกับ session อนาคตโดยตรง:**
+
+> ห้าม revert ข้อใดข้อหนึ่งในตารางนี้ด้วยเหตุผลว่า "ไม่ตรง design bundle" · ถ้า bundle รอบใหม่ที่ import เข้ามายังเป็นแบบเดิม (ไม่มี `tabindex`/role ที่ถูกต้อง) **นั่นคือสิ่งที่คาดไว้แล้ว ไม่ใช่ regression ที่ต้อง sync กลับ**
 
 ---
 

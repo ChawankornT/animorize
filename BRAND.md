@@ -2,7 +2,7 @@
 
 > Final visual identity and design language for the Animorize app.
 > Source of truth for every UI, logo variant, marketing asset, and visual decision.
-> v1.0 · May 2026
+> v1.1 · Aug 2026
 
 ---
 
@@ -140,21 +140,21 @@ The pink accent `#D4537E` is the _only_ chromatic color in the brand. It signals
 
 ### 3.3 Semantic colors — light mode
 
-| Token            | Value                 | Where it lives                                       |
-| ---------------- | --------------------- | ---------------------------------------------------- |
-| `bg-page`        | `#FFFFFF`             | `<html>` and `<body>`                                |
-| `bg-surface`     | `#F5F4EF`             | Cards, modals, popovers, sidebar                     |
-| `bg-surface-2`   | `#EEEDE7`             | Progress track, skeleton base, table stripes         |
-| `bg-overlay`     | `rgba(15,15,15,0.50)` | Modal backdrop                                       |
-| `text-primary`   | `#0F0F0F`             | Body, headings                                       |
-| `text-secondary` | `rgba(15,15,15,0.65)` | Descriptions, captions                               |
-| `text-tertiary`  | `rgba(15,15,15,0.45)` | Meta, labels, placeholders                           |
-| `text-disabled`  | `rgba(15,15,15,0.25)` | Disabled controls                                    |
-| `text-inverse`   | `#FFFFFF`             | Text on primary buttons / ink surfaces               |
-| `border-subtle`  | `rgba(0,0,0,0.06)`    | Dividers between rows                                |
-| `border-default` | `rgba(0,0,0,0.08)`    | Default 0.5px hairline (cards, inputs, all surfaces) |
-| `border-strong`  | `rgba(0,0,0,0.16)`    | Hover state, secondary button outline                |
-| `border-focus`   | `rgba(15,15,15,0.55)` | Focus rings                                          |
+| Token            | Value                 | Where it lives                                                      |
+| ---------------- | --------------------- | ------------------------------------------------------------------- |
+| `bg-page`        | `#FFFFFF`             | `<html>` and `<body>`                                               |
+| `bg-surface`     | `#F5F4EF`             | Popover item hover, Card `surface` variant, sidebar, inset surfaces |
+| `bg-surface-2`   | `#EEEDE7`             | Progress track, skeleton base, table stripes                        |
+| `bg-overlay`     | `rgba(15,15,15,0.50)` | Modal backdrop                                                      |
+| `text-primary`   | `#0F0F0F`             | Body, headings                                                      |
+| `text-secondary` | `rgba(15,15,15,0.65)` | Descriptions, captions                                              |
+| `text-tertiary`  | `rgba(15,15,15,0.45)` | Meta, labels, placeholders                                          |
+| `text-disabled`  | `rgba(15,15,15,0.25)` | Disabled controls                                                   |
+| `text-inverse`   | `#FFFFFF`             | Text on primary buttons / ink surfaces                              |
+| `border-subtle`  | `rgba(0,0,0,0.06)`    | Dividers between rows                                               |
+| `border-default` | `rgba(0,0,0,0.08)`    | Default 0.5px hairline (cards, inputs, all surfaces)                |
+| `border-strong`  | `rgba(0,0,0,0.16)`    | Hover state, secondary button outline                               |
+| `border-focus`   | `rgba(15,15,15,0.55)` | Focus rings                                                         |
 
 ### 3.4 Provider colors
 
@@ -463,17 +463,18 @@ Each component below uses the tokens above. Heights, paddings, and radii are exa
 
 ### 10.10 Modal
 
-| Property   | Value                               |
-| ---------- | ----------------------------------- |
-| Backdrop   | `bg-overlay` (no blur)              |
-| Background | `bg-page`                           |
-| Border     | `0.5px solid border-default`        |
-| Radius     | **16px**                            |
-| Width      | `min(420px, calc(100% - 32px))`     |
-| Padding    | 24px                                |
-| Title      | 17px / 500 / -0.02em                |
-| Body       | 14px / 400 / `text-secondary` / 1.6 |
-| Actions    | right-aligned, 8px gap              |
+| Property   | Value                                                                                                                                                                                                                         |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Backdrop   | `bg-overlay` (no blur)                                                                                                                                                                                                        |
+| Background | `bg-page`                                                                                                                                                                                                                     |
+| Border     | `0.5px solid border-default`                                                                                                                                                                                                  |
+| Radius     | **16px**                                                                                                                                                                                                                      |
+| Width      | `min(420px, calc(100% - 32px))`                                                                                                                                                                                               |
+| Padding    | 24px                                                                                                                                                                                                                          |
+| Title      | 17px / 500 / -0.02em                                                                                                                                                                                                          |
+| Body       | 14px / 400 / `text-secondary` / 1.6                                                                                                                                                                                           |
+| Actions    | right-aligned, 8px gap                                                                                                                                                                                                        |
+| Dark       | Background `bg-surface`, border `border-strong` — one step lighter than `bg-page` so the modal stays legible against a near-black backdrop on a near-black page. Not visually testable until dark mode is wired (Phase 5 P6). |
 
 ### 10.11 Popover
 
@@ -483,6 +484,10 @@ Each component below uses the tokens above. Heights, paddings, and radii are exa
 - Hover background: `bg-surface`.
 - Divider: 0.5px `border-default`, 4px vertical margin.
 - Destructive item color: `status-error`.
+- Icon slot: fixed 16px, always rendered even when an item has no icon — keeps labels aligned when a selected row's `check` appears.
+- Disabled item: label + reason both `text-secondary`; `align-items: flex-start`; padding-top/bottom intentionally asymmetric (7px/9px, optical correction — do not normalize). No hover.
+- Disabled item reason text: 12.5px, `line-snug`, `text-secondary` — hardcoded size straddling `--font-size-xs`/`-sm` by design (same precedent as `.kbd` at 11px).
+- Disabled item focus ring: same as an enabled item — disabled items are keyboard-focusable (roving `tabindex`) so their reason is reachable by screen readers; see `DECISIONS.md` §P5 for why this departs from the design bundle.
 
 ### 10.12 Toast
 

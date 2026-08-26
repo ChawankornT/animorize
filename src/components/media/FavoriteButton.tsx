@@ -1,13 +1,12 @@
 "use client";
 
 import { useOptimistic, useTransition } from "react";
-import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "motion/react";
 import { Star } from "lucide-react";
 import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { Sparkle } from "@/components/brand/Sparkle";
-import { Toast } from "@/components/ui/Toast";
+import { ToastPortal } from "@/components/ui/ToastPortal";
 import { useToast } from "@/hooks/useToast";
 import { toggleFavoriteAction } from "@/app/actions/userMedia";
 
@@ -102,25 +101,7 @@ export function FavoriteButton({ userMediaId, isFavorite, variant = "icon" }: Fa
         </button>
       )}
 
-      {typeof document !== "undefined" &&
-        toasts.length > 0 &&
-        createPortal(
-          <div
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-90 flex flex-col gap-2 pointer-events-none"
-            aria-live="polite"
-          >
-            {toasts.map(t => (
-              <Toast
-                key={t.id}
-                variant={t.variant}
-                title={t.title}
-                onClose={() => dismiss(t.id)}
-                className="pointer-events-auto"
-              />
-            ))}
-          </div>,
-          document.body,
-        )}
+      <ToastPortal toasts={toasts} onDismiss={dismiss} />
     </>
   );
 }

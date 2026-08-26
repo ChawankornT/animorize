@@ -41,6 +41,7 @@ export function Modal({ open, onClose, title, children, actions, className }: Mo
       onClose={onClose}
       onClick={handleBackdropClick}
       className={cn(
+        "modal",
         "w-[min(420px,calc(100%-32px))] p-0 m-auto",
         "bg-page rounded-modal border-[0.5px] border-default",
         "backdrop:bg-overlay",

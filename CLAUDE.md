@@ -89,6 +89,8 @@ UseCases: `IncrementEpisode.ts` / Repos: `IMediaRepository.ts` / Actions: `updat
 3. ถ้ายังไม่มี → สั่ง design ก่อน แล้วค่อย implement
 4. `BRAND.md` = source of truth ของ token/spec
 
+Design bundle = **visual/token SoT เท่านั้น ไม่ใช่ a11y SoT** · การ import bundle ใหม่ห้ามถอด ARIA/keyboard behaviour ที่โค้ดมีอยู่ ดู `DECISIONS.md` §P5 (entry deviation)
+
 กฎเพิ่มเติม: ดู `.claude/rules/ui.md`
 
 ## Session Sync

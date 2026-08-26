@@ -46,7 +46,7 @@ const iconConfig: Record<ToastVariant, { paths: string[]; color: string }> = {
 export function Toast({ variant = "info", title, description, onClose, className }: ToastProps) {
   return (
     <div
-      role="alert"
+      role={variant === "error" ? "alert" : "status"}
       className={cn(
         "flex items-start gap-3 min-w-70 max-w-90",
         "bg-page rounded-card border-[0.5px] border-default",

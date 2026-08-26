@@ -31,15 +31,15 @@
   --color-info-bg: var(--status-info-bg);
 
   /* Brand colors — static across modes */
-  --color-accent: #D4537E;
-  --color-ink: #0F0F0F;
-  --color-ink-2: #1A1A1A;
-  --color-paper: #FFFFFF;
-  --color-soft: #F5F4EF;
+  --color-accent: #d4537e;
+  --color-ink: #0f0f0f;
+  --color-ink-2: #1a1a1a;
+  --color-paper: #ffffff;
+  --color-soft: #f5f4ef;
   --color-soft-dark: #222222;
 
   /* Font family */
-  --font-sans: var(--font-inter, 'Inter'), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-inter, "Inter"), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: ui-monospace, monospace;
 
   /* Font sizes with paired line-heights & letter-spacing */
@@ -101,8 +101,13 @@
 
 /* Skeleton keyframes */
 @keyframes skeleton-pulse {
-  0%, 100% { background-color: var(--bg-skeleton); }
-  50% { background-color: var(--bg-skeleton-2); }
+  0%,
+  100% {
+    background-color: var(--bg-skeleton);
+  }
+  50% {
+    background-color: var(--bg-skeleton-2);
+  }
 }
 
 /* Modal backdrop */
@@ -110,9 +115,22 @@ dialog::backdrop {
   background: var(--bg-overlay);
 }
 
+/* Modal dark-mode surface lift — backdrop is near-black on a near-black page,
+   so the modal needs to sit one step lighter than bg-page to stay legible.
+   Not visually testable until dark mode is wired (Phase 5 P6). */
+[data-theme="dark"] .modal {
+  background: var(--bg-surface);
+  border-color: var(--border-strong);
+}
+
 /* Base body styles */
 body {
   background: var(--bg-page);
   color: var(--text-primary);
-  font-family: var(--font-inter, 'Inter'), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family:
+    var(--font-inter, "Inter"),
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
