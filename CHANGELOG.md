@@ -5,6 +5,26 @@
 
 ---
 
+## [2026-08-27] feat(phase5): P1 — DS chore (Popover, Modal gap-fill, shared ToastPortal)
+
+### Components
+
+- **`Popover`** (new, `components/ui/Popover.tsx`) — render-prop trigger API, no new dependency (no floating-ui/popper). Roving-tabindex keyboard menu: `ArrowUp`/`ArrowDown`/`Home`/`End`/`Escape`, disabled items stay focusable (roving visits them, `aria-disabled` + `aria-describedby` reason, focus ring) so screen readers can discover them, `checked` items get `role="menuitemradio"` + `aria-checked` instead of the design bundle's plain `menuitem`, dividers get `role="separator"`. 7 unit tests. Not consumed by any feature yet — P2/P3's job — previewed in `/dev/components`.
+- **`Modal`** — confirmed already native `<dialog>`-based; added `.modal` class + `[data-theme="dark"] .modal` surface-lift rule (untestable until dark mode is wired, P6).
+- **`AddToLibraryModal`** — migrated from a hand-rolled backdrop div (`role="dialog"`, manual Escape handler) onto `<Modal>`; native `<dialog>` now supplies focus trap / Esc / inert background.
+- **`ToastPortal`** (new, `components/ui/ToastPortal.tsx`) — shared position/z-index-only portal container, no ARIA (each `Toast` carries its own `role`, avoiding a double live-region). Replaces the duplicated inline portal in `FavoriteButton`, `EpisodeTracker`, `AddToLibraryModal`. In the process, standardized a real position/z-index mismatch across the three (`AddToLibraryModal`'s copy used the wrong z-index token and no `aria-live`) onto the majority pattern.
+- **`Toast`** — `role="alert"` hardcoded for every variant → `role={variant === "error" ? "alert" : "status"}`.
+
+### Docs
+
+- `DECISIONS.md` §P5 1.17 — new entry documenting that the Claude Design bundle is a visual/token source of truth only, not an accessibility one; the codebase intentionally carries keyboard/ARIA behavior the bundle doesn't show, and future bundle re-imports must not strip it back out.
+- `BRAND.md` — corrected the `bg-surface` "where it lives" row, added a Modal dark-mode row, added Popover disabled-item/icon-slot/focus-ring spec. Bumped `v1.0 · May 2026` → `v1.1 · Aug 2026`.
+- `CLAUDE.md` — one line in the UI/Design workflow section stating the same bundle-is-not-an-a11y-SoT principle.
+
+No schema, `package.json`, or business-logic changes. Lint ✅ typecheck ✅ build ✅ 157 tests ✅ (150 baseline + 7 new). On `feature/phase5-p1-ds-chore`, PR not yet opened.
+
+---
+
 ## [2026-08-26] docs(phase5): P0 pre-phase docs
 
 `§P5 decisions (16)` in `DECISIONS.md` — Edit progress (absolute set, ordered status-transition rules, `completed_at` COALESCE), watchlog policy unchanged, inline warning instead of confirm modal, `total_episodes = 0` guard, "Recent activity" watch-history copy, filter/sort/search in URL `searchParams`, dark mode via cookie + SSR, AniList `coverImage.extraLarge` forward-only (sync path untouched), single Phase 5 release with no schema migration, Tabs/Filter/Sort layering, sort default relabeled "Recently active", `⋯ More` menu scope (Edit progress + Remove from library), wide-screen-only responsive scope for Phase 5.

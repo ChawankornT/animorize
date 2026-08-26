@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { createPortal } from "react-dom";
 import { RotateCcw, CheckCircle2, Check, MoreHorizontal } from "lucide-react";
 import { useEpisodeTracker } from "@/hooks/useEpisodeTracker";
 import { StatusPill, ProgressBar } from "@/components/media/MediaCard";
@@ -9,7 +8,7 @@ import { FavoriteButton } from "@/components/media/FavoriteButton";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { Modal } from "@/components/ui/Modal";
-import { Toast } from "@/components/ui/Toast";
+import { ToastPortal } from "@/components/ui/ToastPortal";
 import type { WatchStatus } from "@/domain/entities/UserMedia";
 import type { AiringStatus } from "@/domain/entities/Media";
 
@@ -91,25 +90,7 @@ export function EpisodeTracker({
         {rewatchCopy.body}
       </Modal>
 
-      {typeof document !== "undefined" &&
-        t.toasts.length > 0 &&
-        createPortal(
-          <div
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-90 flex flex-col gap-2 pointer-events-none"
-            aria-live="polite"
-          >
-            {t.toasts.map(toast => (
-              <Toast
-                key={toast.id}
-                variant={toast.variant}
-                title={toast.title}
-                onClose={() => t.dismiss(toast.id)}
-                className="pointer-events-auto"
-              />
-            ))}
-          </div>,
-          document.body,
-        )}
+      <ToastPortal toasts={t.toasts} onDismiss={t.dismiss} />
     </>
   );
 }

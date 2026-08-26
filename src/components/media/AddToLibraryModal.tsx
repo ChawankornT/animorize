@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { createPortal } from "react-dom";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
-import { Toast } from "@/components/ui/Toast";
+import { Modal } from "@/components/ui/Modal";
+import { ToastPortal } from "@/components/ui/ToastPortal";
 import { useToast } from "@/hooks/useToast";
 import { getAddToLibraryDataAction, addToLibraryAction } from "@/app/actions/userMedia";
 import { getDisplayTitle } from "@/domain/entities/Media";
@@ -64,13 +64,6 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
     };
   }, [media.id, showToast]);
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    },
-    [onClose],
-  );
-
   const displayTitle = getDisplayTitle({
     titleEn: media.titleEn,
     titleRomaji: media.titleRomaji,
@@ -121,24 +114,28 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
 
   return (
     <>
-      {/* Backdrop — bg-overlay, no blur */}
-      {}
-      <div
-        className="fixed inset-0 z-50 bg-overlay flex items-center justify-center"
-        onClick={onClose}
-        onKeyDown={handleKeyDown}
+      <Modal
+        open
+        onClose={onClose}
+        actions={
+          <>
+            <Button variant="secondary" size="md" disabled={disabled} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button variant="primary" size="md" disabled={disabled} onClick={handleSubmit}>
+              {submitting ? (
+                <>
+                  <span className="inline-block w-3.5 h-3.5 border-[1.5px] border-current border-r-transparent rounded-full animate-spin shrink-0" />
+                  Adding…
+                </>
+              ) : (
+                "Add to library"
+              )}
+            </Button>
+          </>
+        }
       >
-        {/* Modal — design: .modal */}
-        <div
-          role="dialog"
-          aria-modal="true"
-          className={cn(
-            "w-[min(420px,calc(100%-32px))] bg-page rounded-modal",
-            "border-[0.5px] border-default p-6",
-            "flex flex-col gap-4",
-          )}
-          onClick={e => e.stopPropagation()}
-        >
+        <div className="flex flex-col gap-4">
           {/* Header: poster swatch + titles — design: .atl-head */}
           <div className="flex gap-3 items-start pb-3 border-b-[0.5px] border-default">
             <div
@@ -162,7 +159,7 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
               )}
             </div>
             <div className="flex flex-col gap-0.75 min-w-0 flex-1">
-              <div className="text-xl font-medium tracking-tight leading-tight">
+              <div className="text-xl font-medium tracking-tight leading-tight text-primary">
                 {media.titleEn ?? displayTitle}
               </div>
               <div className="text-xs text-secondary leading-snug">
@@ -296,43 +293,10 @@ export function AddToLibraryModal({ media, onClose, onAdded }: AddToLibraryModal
               )}
             </div>
           </div>
-
-          {/* Actions — design: .modal-actions, justify-end, gap space-2, mt space-2 */}
-          <div className="flex items-center justify-end gap-2 mt-2">
-            <Button variant="secondary" size="md" disabled={disabled} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button variant="primary" size="md" disabled={disabled} onClick={handleSubmit}>
-              {submitting ? (
-                <>
-                  <span className="inline-block w-3.5 h-3.5 border-[1.5px] border-current border-r-transparent rounded-full animate-spin shrink-0" />
-                  Adding…
-                </>
-              ) : (
-                "Add to library"
-              )}
-            </Button>
-          </div>
         </div>
-      </div>
+      </Modal>
 
-      {/* Toast portal */}
-      {typeof document !== "undefined" &&
-        toasts.length > 0 &&
-        createPortal(
-          <div className="fixed bottom-6 right-6 z-60 flex flex-col gap-2">
-            {toasts.map(t => (
-              <Toast
-                key={t.id}
-                variant={t.variant}
-                title={t.title}
-                description={t.description}
-                onClose={() => dismiss(t.id)}
-              />
-            ))}
-          </div>,
-          document.body,
-        )}
+      <ToastPortal toasts={toasts} onDismiss={dismiss} />
     </>
   );
 }

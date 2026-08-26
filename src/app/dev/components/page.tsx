@@ -1,19 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { Edit, Trash2, MoreHorizontal, Filter as FilterIcon, ArrowUpDown } from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
+import { Popover, type PopoverItem } from "@/components/ui/Popover";
+import { Icon } from "@/components/ui/Icon";
 import { Toast } from "@/components/ui/Toast";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { MediaCard } from "@/components/media/MediaCard";
 import { ProviderBadge } from "@/components/media/ProviderBadge";
 import { StatusPill } from "@/components/media/MediaCard";
 import type { WatchStatus } from "@/domain/entities/UserMedia";
+
+type SortValue = "recent" | "added" | "title";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -37,6 +42,59 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 
 export default function ComponentsPage() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [sortValue, setSortValue] = useState<SortValue>("recent");
+
+  const moreItems: PopoverItem[] = [
+    { kind: "item", label: "Edit progress", onSelect: () => alert("Edit progress"), icon: Edit },
+    { kind: "divider" },
+    {
+      kind: "item",
+      label: "Remove from library",
+      onSelect: () => alert("Remove from library"),
+      icon: Trash2,
+      destructive: true,
+    },
+  ];
+
+  const moreItemsDisabled: PopoverItem[] = [
+    {
+      kind: "item",
+      label: "Edit progress",
+      onSelect: () => {},
+      icon: Edit,
+      disabled: true,
+      disabledReason: "Episode count not set",
+    },
+    { kind: "divider" },
+    {
+      kind: "item",
+      label: "Remove from library",
+      onSelect: () => alert("Remove from library"),
+      icon: Trash2,
+      destructive: true,
+    },
+  ];
+
+  const sortItems: PopoverItem[] = [
+    {
+      kind: "item",
+      label: "Recently active",
+      onSelect: () => setSortValue("recent"),
+      checked: sortValue === "recent",
+    },
+    {
+      kind: "item",
+      label: "Recently added",
+      onSelect: () => setSortValue("added"),
+      checked: sortValue === "added",
+    },
+    {
+      kind: "item",
+      label: "Title A–Z",
+      onSelect: () => setSortValue("title"),
+      checked: sortValue === "title",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-surface p-8 space-y-10 max-w-4xl mx-auto">
@@ -222,6 +280,93 @@ export default function ComponentsPage() {
             be lost.
           </p>
         </Modal>
+      </Section>
+
+      {/* Popover */}
+      <Section title="Popover">
+        <Row label="More menu (enabled)">
+          <Popover
+            items={moreItems}
+            ariaLabel="More actions"
+            renderTrigger={p => (
+              <button
+                ref={p.ref}
+                type="button"
+                onClick={p.onClick}
+                onKeyDown={p.onKeyDown}
+                aria-haspopup={p["aria-haspopup"]}
+                aria-expanded={p["aria-expanded"]}
+                aria-controls={p["aria-controls"]}
+                aria-label="More actions"
+                className={buttonVariants({ variant: "ghost", size: "md" })}
+              >
+                <Icon as={MoreHorizontal} size={16} />
+              </button>
+            )}
+          />
+        </Row>
+        <Row label="More menu (disabled item + reason)">
+          <Popover
+            items={moreItemsDisabled}
+            ariaLabel="More actions"
+            renderTrigger={p => (
+              <button
+                ref={p.ref}
+                type="button"
+                onClick={p.onClick}
+                onKeyDown={p.onKeyDown}
+                aria-haspopup={p["aria-haspopup"]}
+                aria-expanded={p["aria-expanded"]}
+                aria-controls={p["aria-controls"]}
+                aria-label="More actions"
+                className={buttonVariants({ variant: "ghost", size: "md" })}
+              >
+                <Icon as={MoreHorizontal} size={16} />
+              </button>
+            )}
+          />
+        </Row>
+        <Row label="Filter (align start)">
+          <Popover
+            items={moreItems}
+            ariaLabel="Filter"
+            align="start"
+            renderTrigger={p => (
+              <button
+                ref={p.ref}
+                type="button"
+                onClick={p.onClick}
+                onKeyDown={p.onKeyDown}
+                aria-haspopup={p["aria-haspopup"]}
+                aria-expanded={p["aria-expanded"]}
+                aria-controls={p["aria-controls"]}
+                className={buttonVariants({ variant: "secondary", size: "md" })}
+              >
+                <Icon as={FilterIcon} size={15} /> Filter
+              </button>
+            )}
+          />
+        </Row>
+        <Row label="Sort (checked = menuitemradio)">
+          <Popover
+            items={sortItems}
+            ariaLabel="Sort"
+            renderTrigger={p => (
+              <button
+                ref={p.ref}
+                type="button"
+                onClick={p.onClick}
+                onKeyDown={p.onKeyDown}
+                aria-haspopup={p["aria-haspopup"]}
+                aria-expanded={p["aria-expanded"]}
+                aria-controls={p["aria-controls"]}
+                className={buttonVariants({ variant: "secondary", size: "md" })}
+              >
+                Sort <Icon as={ArrowUpDown} size={15} />
+              </button>
+            )}
+          />
+        </Row>
       </Section>
 
       {/* Toast */}
